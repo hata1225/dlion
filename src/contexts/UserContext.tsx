@@ -1,5 +1,4 @@
 import { User } from "@supabase/supabase-js";
-import { localstorageSave } from "functions/localstorage";
 import { createNotification } from "functions/notification";
 import React from "react";
 import { supabase } from "supabase";
@@ -30,7 +29,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       const userData = await supabase.auth.user();
       const user_id = userData?.id;
       if (user_id) {
-        const { data } = await supabase
+        const { data, error } = await supabase
           .from("users")
           .select("*")
           .eq("user_id", user_id);
@@ -41,12 +40,10 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
             email: data[0]?.email,
             user_id: data[0]?.user_id,
           });
-        } else {
-          console.log("isSignin: false");
+        } else if (error) {
           setUser((prev) => ({ isSignin: false, ...prev }));
         }
       } else {
-        console.log("isSigin: false");
         setUser((prev) => ({ isSignin: false, ...prev }));
       }
     };
@@ -73,7 +70,6 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
           email,
         },
       ]);
-      console.log("data: ", data);
       if (data) {
         createNotification(
           "success",

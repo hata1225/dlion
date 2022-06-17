@@ -1,21 +1,25 @@
 import { makeStyles } from "@material-ui/core";
 import { Header } from "components/Header";
+import { SubArea } from "components/SubArea";
 import React from "react";
 import { baseStyle } from "theme";
+import { UserContext } from "../../contexts/UserContext";
 
 interface Props {
   children?: React.ReactNode;
-  home?: boolean;
+  isAuthPage?: boolean;
 }
 
 export const Layout = (props: Props) => {
-  const { children, home } = props;
+  const { children, isAuthPage } = props;
   const classes = useStyles();
+
   return (
     <>
       <Header />
       <main className={classes.main}>
-        <div className={classes.mainInner}>{children}</div>
+        {window.location.pathname === "/auth" ? <></> : <SubArea />}
+        <div className={classes.mainArea}>{children}</div>
       </main>
     </>
   );
@@ -28,8 +32,12 @@ const useStyles = makeStyles({
     justifyContent: "center",
     alignItems: "center",
   },
-  mainInner: {
+  subArea: {
     height: "100%",
-    width: baseStyle.maxWidthLayout.pc,
+    width: baseStyle.subArea.width,
+  },
+  mainArea: {
+    height: "100%",
+    width: `calc(${baseStyle.maxWidthLayout.pc} - ${baseStyle.subArea.width})`,
   },
 });

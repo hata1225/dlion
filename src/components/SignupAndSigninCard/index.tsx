@@ -1,6 +1,5 @@
 import { Button, Card, makeStyles } from "@material-ui/core";
 import { BaseTextField } from "components/BaseTextField";
-import { SupabaseContext } from "contexts/SupabaseContext";
 import { UserContext } from "contexts/UserContext";
 import { createNotification } from "functions/notification";
 import React from "react";
@@ -34,7 +33,6 @@ export const SignupAndSigninCard = () => {
   };
 
   const handleClickSignup = async () => {
-    console.log("signup---");
     if (password !== reinputPassword) {
       createNotification("danger", "パスワードが一致しません");
       return;
@@ -50,6 +48,7 @@ export const SignupAndSigninCard = () => {
       email,
       user_id: user.user_id,
     });
+    window.location.href = "/";
   };
 
   const handleClickSignin = async () => {
@@ -61,6 +60,7 @@ export const SignupAndSigninCard = () => {
         email,
         user_id: user.id,
       });
+      window.location.href = "/";
     }
   };
 
