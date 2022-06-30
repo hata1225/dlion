@@ -1,0 +1,27 @@
+version: "3"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: app
+    environment:
+      SELENIUM_URL: http://selenium:4444/wd/hub
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./django_api:/django_api
+    command: >
+      sh -c "python3 manage.py migrate &&
+             python3 -u manage.py runserver 0.0.0.0:8000"
+    tty: true
+  selenium:
+    image: seleniarm/standalone-chromium
+    environment:
+      - SE_NODE_MAX_SESSIONS=3
+    ports:
+      - 4444:4444
+      - 15900:5900
+    volumes:
+      - /dev/shm:/dev/shm

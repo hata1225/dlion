@@ -1,7 +1,6 @@
 import { User } from "@supabase/supabase-js";
 import { createNotification } from "functions/notification";
 import React from "react";
-import { supabase } from "supabase";
 
 interface UserInterface {
   isSignin?: boolean;

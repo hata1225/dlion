@@ -6,7 +6,6 @@ import "react-notifications-component/dist/theme.css";
 import "animate.css/animate.min.css";
 
 import { ReactNotifications } from "react-notifications-component";
-import { SupabaseProvider } from "contexts/SupabaseContext";
 import { Layout } from "components/Layout";
 import { MainPage } from "pages/MainPage";
 import { SignupAndSigninPage } from "pages/SignupAndSigninPage";
@@ -23,16 +22,14 @@ export default function App() {
   }, [user]);
 
   return (
-    <SupabaseProvider>
-      <UserProvider>
-        <PostModalProvider>
-          <ReactNotifications />
-          <Layout>
-            <ReactRouter />
-          </Layout>
-        </PostModalProvider>
-      </UserProvider>
-    </SupabaseProvider>
+    <UserProvider>
+      <PostModalProvider>
+        <ReactNotifications />
+        <Layout>
+          <ReactRouter />
+        </Layout>
+      </PostModalProvider>
+    </UserProvider>
   );
 }
 

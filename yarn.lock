@@ -1685,6 +1685,13 @@
   dependencies:
     cross-fetch "^3.1.0"
 
+"@supabase/storage-js@^1.7.2":
+  version "1.7.2"
+  resolved "https://registry.yarnpkg.com/@supabase/storage-js/-/storage-js-1.7.2.tgz#f067ff29b4497830a9c7f79a5466323d9ec1da3b"
+  integrity sha512-HX4HAfLUJznVgAwiKVgdTe5QD0bpUcqgc0hpk/s5Uy8qoe1tHZAc5qE9kI+tqk7rQKyymFpiA7+bAHlzyZXxxQ==
+  dependencies:
+    cross-fetch "^3.1.0"
+
 "@supabase/supabase-js@^1.35.3":
   version "1.35.3"
   resolved "https://registry.yarnpkg.com/@supabase/supabase-js/-/supabase-js-1.35.3.tgz#3ee5a8f4b2e5ba3764f39b61118e07cf9f996e8b"
@@ -2876,6 +2883,11 @@ balanced-match@^1.0.0:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/balanced-match/-/balanced-match-1.0.2.tgz#e83e3a7e3f300b34cb9d87f615fa0cbf357690ee"
   integrity sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==
+
+base64-arraybuffer@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/base64-arraybuffer/-/base64-arraybuffer-1.0.2.tgz#1c37589a7c4b0746e34bd1feb951da2df01c1bdc"
+  integrity sha512-I3yl4r9QB5ZRY3XuJVEPfc2XhZO6YweFPI+UovAzn+8/hb3oJ6lnysaFcjVpkCPfVWFUDvoZ8kmVDP7WyRtYtQ==
 
 batch@0.6.1:
   version "0.6.1"
