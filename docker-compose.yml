@@ -1,11 +1,22 @@
 version: "3"
 
 services:
-  app:
+  react-app:
     build:
       context: .
-      dockerfile: Dockerfile
-    container_name: app
+      dockerfile: ./Dockerfiles/react.Dockerfile
+    volumes:
+      - ./:/src
+    command: sh -c "yarn start"
+    ports:
+      - "3000:3000"
+    stdin_open: true
+    tty: true
+  django_app:
+    build:
+      context: .
+      dockerfile: ./Dockerfiles/django.Dockerfile
+    container_name: django_app
     environment:
       SELENIUM_URL: http://selenium:4444/wd/hub
     ports:
