@@ -1,5 +1,4 @@
 import { makeStyles } from "@material-ui/core";
-import { supabase } from "supabase";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 import { ButtonWithIcon } from "components/ButtonWithIcon";
@@ -18,7 +17,6 @@ export const SubArea = () => {
   const { handleOpenPostModal } = React.useContext(PostModalContext);
 
   const handleClickSignout = () => {
-    supabase.auth.signOut();
     window.location.href = "/auth";
   };
 

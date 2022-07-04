@@ -25,8 +25,7 @@ SECRET_KEY = 'django-insecure-9%i)z@$qb2utddbyltj6w*i(s&4%3sl4tfaitnrq1m=%y+gkx)
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -39,20 +38,49 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'rest_framework.authtoken',
+    'django_cleanup',
     'core',
     'user',
-    'file_data'
+    'file_data',
+    'corsheaders',
+    'django_filters',
 ]
+
+#viewにて、フィルタリングした上でレスポンスするために追加
+REST_FRAMEWORK = {
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
 ]
+
+CORS_ORIGIN_WHITELIST = (
+    'http://localhost:3000',
+    'http://192.168.0.125:3000',
+    'http://125.12.209.175:3000',
+    'http://localhost:4444',
+)
+
+CORS_ALLOW_HEADERS = (
+  'accept',
+  'accept-encoding',
+  'authorization',
+  'content-type',
+  'dnt',
+  'origin',
+  'user-agent',
+  'x-csrftoken',
+  'x-requested-with',
+  'access-control-allow-origin',
+)
 
 ROOT_URLCONF = 'dlion_project.urls'
 
@@ -108,15 +136,17 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ja'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Tokyo'
 
 USE_I18N = True
 
 USE_L10N = True
 
 USE_TZ = True
+
+FILE_UPLOAD_MAX_MEMORY_SIZE = 1024 * 1024 * 1024 * 8196
 
 
 # Static files (CSS, JavaScript, Images)

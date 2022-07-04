@@ -10,7 +10,11 @@ interface Props {
 
 export const PostModal = (props: Props) => {
   const { isOpenPostModal, setIsOpenPostModal } = props;
-  const [subFileData, setSubFileData] = React.useState<File | null>();
+  const [title, setTitle] = React.useState("");
+  const [description, setDescription] = React.useState("");
+  const [categories, setCategories] = React.useState<string[]>([]);
+  const [coverImage, setCoverImage] = React.useState<File>();
+  const [videoData, setVideoData] = React.useState<File>();
 
   const classes = useStyles();
 
@@ -20,27 +24,13 @@ export const PostModal = (props: Props) => {
 
   const handlePost = async () => {
     console.log("handlePost");
-    console.log("sufileData: ", subFileData);
-    if (subFileData) {
-      // const { data, error } = await supabase.storage
-      //   .from("posd-data")
-      //   .upload(`example/example1.png`, subFileData, {
-      //     cacheControl: "3600",
-      //     upsert: false,
-      //   });
-      // if (error) {
-      //   console.log("post error: ", error);
-      // }
-      // if (data) {
-      //   console.log("post data: ", data);
-      // }
-    }
+    console.log("sufileData: ", coverImage);
   };
 
-  const handleChangeSubFileData = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChangecoverImage = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files?.length) {
-      const subFileData = e.target.files[0];
-      setSubFileData(subFileData);
+      const coverImage = e.target.files[0];
+      setCoverImage(coverImage);
     }
   };
 
@@ -69,7 +59,7 @@ export const PostModal = (props: Props) => {
               style={{ display: "none" }}
               type="file"
               accept="image/*"
-              onChange={(e) => handleChangeSubFileData(e)}
+              onChange={(e) => handleChangecoverImage(e)}
             />
           </Button>
           <Button

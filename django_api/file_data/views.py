@@ -3,6 +3,7 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 
 from core.models import FileData
+from core.models import Categories
 
 from file_data import serializers
 
@@ -32,3 +33,19 @@ class FileDataViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+    def get_queryset(self):
+        return FileData.objects.filter(user=self.request.user)
+
+class CategoriesViewSet(viewsets.ModelViewSet):
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+    serializer_class = serializers.CategoriesSerializer
+    queryset = Categories.objects.order_by('-created_at')
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+    def get_queryset(self):
+        return Categories.objects.filter(user=self.request.user)
+

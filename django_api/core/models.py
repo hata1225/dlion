@@ -1,3 +1,5 @@
+from io import StringIO
+from unicodedata import category
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.conf import settings
@@ -6,7 +8,6 @@ import json
 class UserManager(BaseUserManager):
 
     def create_user(self, email, password=None, **extra_fields):
-        """Creates and saves a new user"""
         if not email:
             raise ValueError('User must have an email address')
 
@@ -18,7 +19,6 @@ class UserManager(BaseUserManager):
         return user
 
     def create_superuser(self, email, password):
-        """Creates and saves a new superuser"""
         user = self.create_user(email, password)
         user.is_staff = True
         user.is_superuser = True
@@ -28,7 +28,6 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    """Custom user model that supports using email instead of username"""
     email = models.EmailField(max_length=255, null=False, unique=True)
     name = models.CharField(max_length=255, null=False)
     favorites = models.TextField(default=json.dumps([]))
@@ -47,6 +46,17 @@ def saveMainDataPath(instance, filename):
     ext = filename.split('.')[-1]
     return f'main/{instance.user.name}/{instance.id}/{instance.id}.{ext}'
 
+class Categories(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE
+    )
+    created_at = models.DateField(auto_now_add=True)
+    category = models.TextField()
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
 class FileData(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -55,9 +65,9 @@ class FileData(models.Model):
 
     #共通
     title = models.CharField(max_length=255, null=False)
-    content = models.TextField(null=True)
+    description = models.TextField(null=True)
     created_at = models.DateField(auto_now_add=True)
-    categories = models.TextField(null=True, default=json.dumps([]))
+    categories = models.TextField(null=False, default=json.dumps([]))
     cover_image = models.FileField(upload_to=saveCoverDataPath, null=True)
     main_data_size = models.CharField(max_length=1000, default=0)
     main_data_status = models.TextField(default="none")
@@ -92,5 +102,16 @@ class FileData(models.Model):
             if "force_insert" in kwargs:
                 kwargs.pop("force_insert")
 
-            # この段階ではインスタンスIDが存在するので、_file_upload_path関数でinstance.idが使える
+        # この段階ではインスタンスIDが存在する
         super().save(*args, **kwargs)
+
+        categories_objects = Categories.objects.all()
+        file_data_categories = json.loads(self.categories)
+        all_categories = []
+
+        for category_object in categories_objects:
+            all_categories.append(category_object.category)
+
+        for file_data_category in file_data_categories:
+            if not file_data_category in all_categories:
+                Categories.objects.create(category=file_data_category, user=self.user)

@@ -1,6 +1,4 @@
-import { User } from "@supabase/supabase-js";
 import { Store } from "react-notifications-component";
-import { supabase } from "supabase";
 
 type NotificationType = "success" | "danger" | "info" | "warning" | "default";
 

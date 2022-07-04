@@ -1,19 +1,19 @@
-import { User } from "@supabase/supabase-js";
+import { createUser, getToken, getUserInfo } from "api/api";
 import { createNotification } from "functions/notification";
 import React from "react";
 
 interface UserInterface {
-  isSignin?: boolean;
   name?: string;
+  password?: string;
   email?: string;
-  user_id?: string;
+  token?: string;
 }
 
 interface UserContextInterface {
   user?: UserInterface;
   setUser: React.Dispatch<React.SetStateAction<UserInterface | undefined>>;
   signup: (email: string, name: string, password: string) => Promise<any>;
-  signin: (email: string, password: string) => Promise<User | null | undefined>;
+  signin: (email: string, password: string) => Promise<any>;
 }
 
 export const UserContext = React.createContext<UserContextInterface>(
@@ -25,65 +25,54 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
   React.useEffect(() => {
     const f = async () => {
-      const userData = await supabase.auth.user();
-      const user_id = userData?.id;
-      if (user_id) {
-        const { data, error } = await supabase
-          .from("users")
-          .select("*")
-          .eq("user_id", user_id);
-        if (data !== null && data.length > 0) {
-          setUser({
-            isSignin: true,
-            name: data[0]?.name,
-            email: data[0]?.email,
-            user_id: data[0]?.user_id,
-          });
-        } else if (error) {
-          setUser((prev) => ({ isSignin: false, ...prev }));
+      if (user) {
+        const { email, password } = user;
+        let token = localStorage.getItem("token");
+        if (
+          !token &&
+          !email &&
+          !password &&
+          window.location.pathname === "/auth"
+        ) {
+          window.location.href = "/auth";
         }
-      } else {
-        setUser((prev) => ({ isSignin: false, ...prev }));
+        if (token) {
+          const userInfo = await getUserInfo(token);
+          setUser((prev) => ({ ...prev, ...userInfo, token }));
+        }
+        if (!token && email && password) {
+          token = await signin(email, password);
+        }
       }
     };
     f();
   }, []);
 
+  React.useEffect(() => {
+    console.log("user: ", user);
+  }, [user]);
+
   const signin = async (email: string, password: string) => {
-    const { user, error } = await supabase.auth.signIn({ email, password });
-    if (error) {
-      createNotification("danger", `サインアップ失敗\nerror: ${error.message}`);
-      return;
+    try {
+      const token = await getToken(email, password);
+      const userInfo = await getUserInfo(token);
+      localStorage.setItem("token", token);
+      return { ...userInfo, token };
+    } catch (error) {
+      console.log("@signin Error: ", error);
+      throw error;
     }
-    return user;
   };
 
   const signup = async (email: string, name: string, password: string) => {
-    let errorMssage = "";
-    const { user, error } = await supabase.auth.signUp({ email, password });
-    if (user) {
-      const { data, error } = await supabase.from("users").insert([
-        {
-          user_id: user.id,
-          name,
-          email,
-        },
-      ]);
-      if (data) {
-        createNotification(
-          "success",
-          `サインアップ成功\nEmail: ${email}\nName: ${name}`
-        );
-        return data[0];
-      }
-      if (error) {
-        errorMssage = error.message;
-      }
-    } else if (error) {
-      errorMssage = error.message;
+    try {
+      await createUser(email, password, name);
+      const userInfo = await signin(email, password);
+      return userInfo;
+    } catch (error) {
+      console.log("@signup Error: ", error);
+      throw error;
     }
-    if (errorMssage)
-      createNotification("danger", `サインアップ失敗\nerror: ${errorMssage}`);
   };
 
   return (

@@ -12,7 +12,7 @@ export const SignupAndSigninCard = () => {
   const [name, setName] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [reinputPassword, setReinputPassword] = React.useState("");
-  const { setUser, signup, signin } = React.useContext(UserContext);
+  const { signup, signin } = React.useContext(UserContext);
 
   const handleChangeEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
@@ -41,25 +41,13 @@ export const SignupAndSigninCard = () => {
       createNotification("danger", "パスワードは8文字以上入力してください");
       return;
     }
-    const user = await signup(email, name, password);
-    setUser({
-      isSignin: true,
-      name,
-      email,
-      user_id: user.user_id,
-    });
+    await signup(email, name, password);
     window.location.href = "/";
   };
 
   const handleClickSignin = async () => {
-    const user = await signin(email, password);
-    if (user) {
-      setUser({
-        isSignin: true,
-        name,
-        email,
-        user_id: user.id,
-      });
+    const userInfo = await signin(email, password);
+    if (userInfo) {
       window.location.href = "/";
     }
   };
