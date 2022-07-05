@@ -14,24 +14,6 @@ export const SignupAndSigninCard = () => {
   const [reinputPassword, setReinputPassword] = React.useState("");
   const { signup, signin } = React.useContext(UserContext);
 
-  const handleChangeEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setEmail(e.target.value);
-  };
-
-  const handleChangeName = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setName(e.target.value);
-  };
-
-  const handleChangePassword = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPassword(e.target.value);
-  };
-
-  const handleChangeReinputPassword = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setReinputPassword(e.target.value);
-  };
-
   const handleClickSignup = async () => {
     if (password !== reinputPassword) {
       createNotification("danger", "パスワードが一致しません");
@@ -55,13 +37,13 @@ export const SignupAndSigninCard = () => {
   return (
     <Card className={classes.card}>
       <h2>{isSigninCard ? "ログイン" : "アカウントを作成"}</h2>
-      <div>
+      <div className={classes.inputTextArea}>
         <BaseTextField
           label="メールアドレス"
           variant="outlined"
           type="email"
           value={email}
-          onChange={handleChangeEmail}
+          setValue={setEmail}
         />
         {isSigninCard ? (
           <></>
@@ -74,7 +56,7 @@ export const SignupAndSigninCard = () => {
             }
             variant="outlined"
             value={name}
-            onChange={handleChangeName}
+            setValue={setName}
             error={!name.match(/^[A-Za-z0-9]*$/)}
           />
         )}
@@ -83,7 +65,7 @@ export const SignupAndSigninCard = () => {
           variant="outlined"
           type="password"
           value={password}
-          onChange={handleChangePassword}
+          setValue={setPassword}
         />
         {isSigninCard ? (
           <></>
@@ -93,7 +75,7 @@ export const SignupAndSigninCard = () => {
             variant="outlined"
             type="password"
             value={reinputPassword}
-            onChange={handleChangeReinputPassword}
+            setValue={setReinputPassword}
           />
         )}
       </div>
@@ -127,6 +109,12 @@ const useStyles = makeStyles({
     flexDirection: "column",
     alignItems: "flex-start",
     gap: "10px",
+  },
+  inputTextArea: {
+    width: "100%",
+    display: "flex",
+    flexDirection: "column",
+    gap: "15px",
   },
   bottomArea: {
     width: "100%",

@@ -1,0 +1,88 @@
+import { makeStyles, Button } from "@material-ui/core";
+import React from "react";
+import { baseStyle, borderRadius } from "theme";
+import { FileDataStatus } from "types/fileDataStatus";
+
+interface Props {
+  mainData?: File;
+  mainDataObjectUrl: string;
+  handleChangeMainData: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  mainDataStatus: FileDataStatus;
+}
+
+export const MainDataInputArea = ({
+  mainData,
+  mainDataObjectUrl,
+  handleChangeMainData,
+  mainDataStatus,
+}: Props) => {
+  const classes = useStyles();
+
+  React.useEffect(() => {
+    if (mainData) {
+      const prevVideoElem = document.getElementById(
+        "preview-video"
+      ) as HTMLVideoElement | null;
+      if (prevVideoElem) {
+        prevVideoElem.volume = 0;
+      }
+    }
+  }, [mainData]);
+
+  const PreviewArea = () => {
+    if (mainDataStatus === "video") {
+      return (
+        <video
+          id="preview-video"
+          className={classes.previewArea}
+          src={mainDataObjectUrl}
+          preload="metadata"
+          controls
+        />
+      );
+    } else if (mainDataStatus === "image" || mainDataStatus === "none") {
+      return (
+        <div
+          className={classes.previewArea}
+          style={{ backgroundImage: `url(${mainDataObjectUrl})` }}
+        ></div>
+      );
+    } else {
+      return <>{mainDataStatus} is not defined</>;
+    }
+  };
+
+  return (
+    <div className={classes.mainDataInputArea}>
+      <PreviewArea />
+      <Button variant="contained" color="primary" component="label" fullWidth>
+        データを{mainData ? "変更" : "追加"}する
+        <input
+          style={{ display: "none" }}
+          type="file"
+          accept="*"
+          onChange={handleChangeMainData}
+        />
+      </Button>
+    </div>
+  );
+};
+
+const useStyles = makeStyles({
+  mainDataInputArea: {
+    width: "100%",
+    display: "flex",
+    flexDirection: "column",
+    gap: "5px",
+  },
+  previewArea: {
+    width: "100%",
+    aspectRatio: "1 / 1",
+    backgroundColor: baseStyle.color.gray.main,
+    backgroundSize: "contain",
+    backgroundPosition: "center",
+    backgroundRepeat: "no-repeat",
+    borderRadius: borderRadius.main,
+    verticalAlign: "bottom",
+  },
+});

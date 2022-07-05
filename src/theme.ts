@@ -33,6 +33,9 @@ export const baseStyle = {
     white: {
       light: "#ffffff",
     },
+    gray: {
+      main: "#888888",
+    },
   },
 };
 

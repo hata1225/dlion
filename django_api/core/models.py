@@ -70,7 +70,7 @@ class FileData(models.Model):
     categories = models.TextField(null=False, default=json.dumps([]))
     cover_image = models.FileField(upload_to=saveCoverDataPath, null=True)
     main_data_size = models.CharField(max_length=1000, default=0)
-    main_data_status = models.TextField(default="none")
+    main_data_type = models.TextField(default="none") # none | video | image | pdf | audio
 
     #動画 video 単数
     video_data = models.FileField(upload_to=saveMainDataPath, null=True)
@@ -78,7 +78,7 @@ class FileData(models.Model):
     video_data_status = models.TextField(default=json.dumps({'hm3u8': 0, 'lowmp4': 0, 'lm3u8': 0, 'playlist': 0, 'allcomplete': 0, 'completetotal': 0 }))
     short_video_path = models.TextField(default="")
 
-    #画像 photos 複数
+    #画像 images 複数
 
     #pdf pdf 単数
 
