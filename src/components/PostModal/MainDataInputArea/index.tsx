@@ -47,8 +47,14 @@ export const MainDataInputArea = ({
           style={{ backgroundImage: `url(${mainDataObjectUrl})` }}
         ></div>
       );
+    } else if (mainDataStatus === "audio") {
+      return (
+        <div className={`${classes.previewArea} ${classes.audioWrap}`}>
+          <audio src={mainDataObjectUrl} preload="metadata" controls></audio>
+        </div>
+      );
     } else {
-      return <>{mainDataStatus} is not defined</>;
+      return <>{mainDataStatus} cannnot be upload.</>;
     }
   };
 
@@ -75,7 +81,14 @@ const useStyles = makeStyles({
     flexDirection: "column",
     gap: "5px",
   },
+  audioWrap: {
+    display: "flex",
+    alignItems: "center",
+    aspectRatio: "unset !important",
+    backgroundColor: "#fff !important",
+  },
   previewArea: {
+    height: "100%",
     width: "100%",
     aspectRatio: "1 / 1",
     backgroundColor: baseStyle.color.gray.main,

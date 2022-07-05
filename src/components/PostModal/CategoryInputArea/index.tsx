@@ -5,17 +5,13 @@ import React from "react";
 import { baseStyle, borderRadius } from "theme";
 import { PostModalLine } from "../PostModalLine";
 import CloseIcon from "@material-ui/icons/Close";
+import { UserContext } from "contexts/UserContext";
+import { getCategories } from "api/api";
 
 interface Props {
   selectedCategories: string[];
   setSelectedCategories: React.Dispatch<React.SetStateAction<string[]>>;
 }
-
-const fetchCategories = [
-  {
-    category: "よふかしのうた",
-  },
-];
 
 export const CategoryInputArea = ({
   selectedCategories,
@@ -24,19 +20,25 @@ export const CategoryInputArea = ({
   const [fetchedCategories, setFetchedCategories] = React.useState<
     { value: string; title: string }[]
   >([]);
-  const [addCategory, setAddCategory] = React.useState<string>("");
-  const [addNewCategory, setAddNewCategory] = React.useState<
-    string | undefined
-  >();
+  const [addCategory, setAddCategory] = React.useState("");
+  const [addNewCategory, setAddNewCategory] = React.useState("");
+  const { user } = React.useContext(UserContext);
   const classes = useStyles();
 
   React.useEffect(() => {
-    const newFetchedCategories = fetchCategories.map((item) => ({
-      value: `${item.category}`,
-      title: `${item.category}`,
-    }));
-    setFetchedCategories(newFetchedCategories);
-  }, []);
+    (async () => {
+      if (user?.token) {
+        const fetchCategories = await getCategories(user.token);
+        if (fetchCategories?.length) {
+          const newFetchedCategories = fetchCategories.map((item: any) => ({
+            value: `${item.category}`,
+            title: `${item.category}`,
+          }));
+          setFetchedCategories(newFetchedCategories);
+        }
+      }
+    })();
+  }, [user]);
 
   React.useEffect(() => {
     // 重複したcategoryは削除
@@ -51,15 +53,15 @@ export const CategoryInputArea = ({
     }
   }, [selectedCategories]);
 
-  const handleChangeCategory = (
-    e: React.ChangeEvent<{
-      name?: string | undefined;
-      value?: unknown;
-    }>
-  ) => {
-    const value = e.target.value as string;
-    setAddCategory(value);
-    setSelectedCategories((prev) => [...prev, value]);
+  const handleClickAddCategory = (e: any) => {
+    let value = e.target?.value;
+    if (!value) {
+      value = e.target?.innerText;
+    }
+    if (value) {
+      setAddCategory(value);
+      setSelectedCategories((prev) => [...prev, value]);
+    }
   };
 
   const handleClickAddNewCategory = () => {
@@ -81,7 +83,7 @@ export const CategoryInputArea = ({
           selectLabelTitle="Add category"
           menuItems={fetchedCategories}
           value={addCategory}
-          onChange={handleChangeCategory}
+          onClick={handleClickAddCategory}
         />
         <PostModalLine />
         <div className={classes.addNewCategoryArea}>

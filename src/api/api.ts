@@ -14,9 +14,9 @@ axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
 
 const createFormData = (data: any) => {
   let formData = new FormData();
-  Object.keys(data).forEach((objectKey) => {
-    const value = data[objectKey];
-    formData.append(`${objectKey}`, value);
+  const objectKeys = Object.keys(data);
+  objectKeys.forEach((objectKey) => {
+    formData.append(`${objectKey}`, data[objectKey]);
   });
   return formData;
 };
@@ -179,6 +179,17 @@ export const updateUser = async (
   }
 };
 
+export const getCategories = async (token: string) => {
+  const path = "/categories/";
+  try {
+    const result = await get(path, token);
+    return result?.data;
+  } catch (error) {
+    console.log("@getCategories: ", error);
+    throw error;
+  }
+};
+
 export const postFileData = async (
   data: object,
   token: string,
@@ -186,11 +197,10 @@ export const postFileData = async (
   endOfUploadFunc?: undefined
 ) => {
   const path = "/file_data/";
-  const formData = createFormData(data);
   try {
     const result = await post(
       path,
-      formData,
+      data,
       token,
       setUploadProgress,
       endOfUploadFunc

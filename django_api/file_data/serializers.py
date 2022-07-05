@@ -11,7 +11,7 @@ class FileDataSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = FileData
-        fields = ('id', 'user', 'title', 'description', 'created_at', 'categories', 'cover_image', 'main_data_size', 'main_data_status', 'video_data', 'video_data_status', 'short_video_path')
+        fields = ('id', 'user', 'title', 'description', 'created_at', 'categories', 'cover_image', 'main_data_size', 'main_data_type', 'video_data', 'video_data_status', 'short_video_path')
         read_only_fields = ('id', 'user',)
 
 class CategoriesSerializer(serializers.ModelSerializer):

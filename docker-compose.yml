@@ -24,7 +24,8 @@ services:
     volumes:
       - ./django_api:/django_api
     command: >
-      sh -c "python3 manage.py migrate &&
+      sh -c "python3 manage.py makemigrations &&
+             python3 manage.py migrate &&
              python3 -u manage.py runserver 0.0.0.0:8000"
     tty: true
   selenium:

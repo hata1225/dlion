@@ -25,32 +25,25 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
   React.useEffect(() => {
     const f = async () => {
-      if (user) {
-        const { email, password } = user;
-        let token = localStorage.getItem("token");
-        if (
-          !token &&
-          !email &&
-          !password &&
-          window.location.pathname === "/auth"
-        ) {
-          window.location.href = "/auth";
-        }
-        if (token) {
-          const userInfo = await getUserInfo(token);
-          setUser((prev) => ({ ...prev, ...userInfo, token }));
-        }
-        if (!token && email && password) {
-          token = await signin(email, password);
-        }
+      let token = localStorage.getItem("token");
+      if (
+        !token &&
+        !user?.email &&
+        !user?.password &&
+        window.location.pathname === "/auth"
+      ) {
+        window.location.href = "/auth";
+      }
+      if (token) {
+        const userInfo = await getUserInfo(token);
+        setUser((prev) => ({ ...prev, ...userInfo, token }));
+      }
+      if (!token && user?.email && user?.password) {
+        token = await signin(user.email, user?.password);
       }
     };
     f();
   }, []);
-
-  React.useEffect(() => {
-    console.log("user: ", user);
-  }, [user]);
 
   const signin = async (email: string, password: string) => {
     try {

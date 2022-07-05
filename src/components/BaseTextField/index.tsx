@@ -16,7 +16,7 @@ export const BaseTextField = ({ setValue, ...props }: Props) => {
       <TextField
         {...props}
         variant="outlined"
-        inputProps={{ style: { fontSize: "1.5rem" } }}
+        inputProps={{ style: { fontSize: "1.5rem", lineHeight: "1.2" } }}
         InputLabelProps={{ style: { fontSize: "1.4rem" } }}
         fullWidth
         onChange={handleChangeValue}

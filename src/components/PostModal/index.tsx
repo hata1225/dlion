@@ -8,6 +8,8 @@ import { BaseTextField } from "components/BaseTextField";
 import { CategoryInputArea } from "./CategoryInputArea";
 import { PostModalLine } from "./PostModalLine";
 import { FileDataStatus } from "types/fileDataStatus";
+import { postFileData } from "api/api";
+import { UserContext } from "contexts/UserContext";
 
 interface Props {
   isOpenPostModal: boolean;
@@ -27,6 +29,7 @@ export const PostModal = (props: Props) => {
   const [mainDataObjectUrl, setMainDataObjectUrl] = React.useState("");
   const [mainDataStatus, setMainDataStatus] =
     React.useState<FileDataStatus>("none");
+  const { user } = React.useContext(UserContext);
   const classes = useStyles();
 
   const mainDataTypeAndStatus: { status: FileDataStatus; matchText: RegExp }[] =
@@ -54,9 +57,34 @@ export const PostModal = (props: Props) => {
   };
 
   const handlePost = async () => {
-    console.log("handlePost");
-    console.log("subfileData: ", coverImage);
-    console.log("subfileData: ", coverImage?.type);
+    if (coverImage && mainData && user?.token) {
+      let data = {
+        title,
+        description,
+        categories: JSON.stringify(selectedCategories),
+        coverImage: coverImage,
+        main_data_size: String(mainData?.size ?? 0),
+        main_data_type: mainDataStatus,
+      };
+      if (mainDataStatus === "video") {
+        const newData = {
+          ...{
+            video_data: mainData,
+            video_data_status: JSON.stringify({
+              hm3u8: 0,
+              lowmp4: 0,
+              lm3u8: 0,
+              playlist: 0,
+              allcomplete: 0,
+              completetotal: 0,
+            }),
+          },
+          ...data,
+        };
+        await postFileData(newData, user.token);
+      } else if (mainDataStatus === "image") {
+      }
+    }
   };
 
   const handleChangeFileData = (
@@ -67,7 +95,6 @@ export const PostModal = (props: Props) => {
     if (e.target.files?.length) {
       const fileData = e.target.files[0];
       setFileData(fileData);
-      console.log("fileDataType: ", fileData.type);
       const newFileDataObjectUrl = URL.createObjectURL(fileData);
       setFileDataObjectUrl(newFileDataObjectUrl);
     }
@@ -94,7 +121,7 @@ export const PostModal = (props: Props) => {
               value={description}
               setValue={setDescription}
               multiline
-              rows={2}
+              minRows={2}
             />
           </div>
           <PostModalLine />
@@ -178,6 +205,9 @@ const useStyles = makeStyles({
     display: "flex",
     flexDirection: "column",
     gap: "10px",
+  },
+  inputDescription: {
+    lineHeight: "1.2",
   },
   inputArea: {
     width: "100%",

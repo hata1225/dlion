@@ -22,6 +22,8 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Supabase
-**/supabase/.branches
-**/supabase/.temp
+/media
+
+db.sqlite3
+/django_api/*/migrations/*.py
+/django_api/*/migrations/*.pyc

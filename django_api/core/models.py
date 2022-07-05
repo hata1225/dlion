@@ -40,11 +40,11 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 def saveCoverDataPath(instance, filename):
     ext = filename.split('.')[-1]
-    return f'sub/{instance.user.name}/{instance.id}/{instance.id}.{ext}'
+    return f'media/sub/{instance.user.name}/{instance.id}/{instance.id}.{ext}'
 
 def saveMainDataPath(instance, filename):
     ext = filename.split('.')[-1]
-    return f'main/{instance.user.name}/{instance.id}/{instance.id}.{ext}'
+    return f'media/main/{instance.user.name}/{instance.id}/{instance.id}.{ext}'
 
 class Categories(models.Model):
     user = models.ForeignKey(
