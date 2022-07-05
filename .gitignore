@@ -25,5 +25,4 @@ yarn-error.log*
 /media
 
 db.sqlite3
-/django_api/*/migrations/*.py
-/django_api/*/migrations/*.pyc
+/django_api/*/migrations
