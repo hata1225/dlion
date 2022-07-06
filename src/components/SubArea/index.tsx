@@ -5,6 +5,7 @@ import { ButtonWithIcon } from "components/ButtonWithIcon";
 import { fontSize, baseStyle, shadow } from "theme";
 import React from "react";
 import { PostModalContext } from "contexts/PostModalContext";
+import { UserContext } from "contexts/UserContext";
 
 type SubAreaContents = {
   func: any;
@@ -15,9 +16,10 @@ type SubAreaContents = {
 export const SubArea = () => {
   const classes = useStyles();
   const { handleOpenPostModal } = React.useContext(PostModalContext);
+  const { signout } = React.useContext(UserContext);
 
   const handleClickSignout = () => {
-    window.location.href = "/auth";
+    signout();
   };
 
   const subAreaContents: SubAreaContents = [

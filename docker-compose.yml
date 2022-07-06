@@ -27,6 +27,8 @@ services:
       sh -c "python3 manage.py makemigrations &&
              python3 manage.py migrate &&
              python3 -u manage.py runserver 0.0.0.0:8000"
+    env_file:
+      - ./.env
     tty: true
   selenium:
     image: seleniarm/standalone-chromium

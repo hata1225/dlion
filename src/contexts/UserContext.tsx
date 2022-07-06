@@ -14,6 +14,7 @@ interface UserContextInterface {
   setUser: React.Dispatch<React.SetStateAction<UserInterface | undefined>>;
   signup: (email: string, name: string, password: string) => Promise<any>;
   signin: (email: string, password: string) => Promise<any>;
+  signout: () => void;
 }
 
 export const UserContext = React.createContext<UserContextInterface>(
@@ -30,7 +31,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         !token &&
         !user?.email &&
         !user?.password &&
-        window.location.pathname === "/auth"
+        window.location.pathname !== "/auth"
       ) {
         window.location.href = "/auth";
       }
@@ -53,6 +54,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       return { ...userInfo, token };
     } catch (error) {
       console.log("@signin Error: ", error);
+      createNotification("danger", "サインインに失敗しました");
       throw error;
     }
   };
@@ -68,8 +70,14 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const signout = () => {
+    localStorage.removeItem("token");
+    setUser({});
+    window.location.href = "/auth";
+  };
+
   return (
-    <UserContext.Provider value={{ user, setUser, signup, signin }}>
+    <UserContext.Provider value={{ user, setUser, signup, signin, signout }}>
       {children}
     </UserContext.Provider>
   );
