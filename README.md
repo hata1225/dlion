@@ -1,55 +1,59 @@
-# Getting Started with Create React App
+# DLion - ファイル管理 SNS
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Requirement
 
-## Available Scripts
+> 立ち上げにあたり、事前に docker,docker-compose,yarn(or npm)コマンドが使えるようにしてください 🙏\
+> \
+> バージョンについて\
+> Docker version 20.10.13\
+> node: 18.4.0
 
-In the project directory, you can run:
+## 立ち上げ方
 
-### `npm start`
+1.  **git clone をする**
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+    `git clone git@github.com:hata1225/dlion.git`
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+2.  **clone してできた、dlion フォルダへ移動する**
 
-### `npm test`
+    `cd dlion`
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+3.  **任意のブランチに切り替える**
 
-### `npm run build`
+    例: `git checkout develop/v1.0.0`
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+4.  **.env ファイルを作成する**
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+    `touch .env`
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+5.  **Django 用シークレットキーを、.env ファイルに書き込み**
 
-### `npm run eject`
+    - 共同で運営、管理等する場合、シークレットキーは githubAccount: @hata1225 からもらってください。
+    - 個人でソースを使う場合は、シークレットキーを自分で発行し.env ファイルに貼り付けてください。
+      1. `cd django_api && python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())' && cd ../`
+      2. 出力された文字列をコピー
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+    **.env ファイル内に、以下を例に記述(xxxxxxx...はコピーした文字列)**
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+          `SECRET_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+6.  **yarn install をする**
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+    dlion ディレクトリ直下でコマンドを叩いてください。
+    `yarn install`
 
-## Learn More
+7.  **docker-compose build をする**
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+    最初は時間がかかるかもしれないです。
+    `docker-compose build`
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+8.  **docker-compose up**
 
-## supabase
+    `docker-compose up`
 
-- API URL: http://localhost:54321
-- DB URL: postgresql://postgres:postgres@localhost:54322/postgres
-- Studio URL: http://localhost:54323
-- Inbucket URL: http://localhost:54324
-- anon key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs
-- service_role key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSJ9.vI9obAHOGyVVKa3pD--kJlyxp-Z2zV9UUMAhKpNLAcU
+    > 一番下の行にこんなのが出たら、多分成功です。　\
+    > 　　`react-app_1 | No issues found.`
+
+9.  **localhost:3000 へ移動する**
+
+    **http://localhost:3000**
