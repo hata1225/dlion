@@ -2,14 +2,13 @@ import { Button, IconButton, makeStyles, Modal } from "@material-ui/core";
 import React from "react";
 import { baseStyle, borderRadius, fontSize } from "theme";
 import CloseIcon from "@material-ui/icons/Close";
-import { CoverImageInputArea } from "./CoverImageInputArea";
-import { MainDataInputArea } from "./MainDataInputArea";
 import { BaseTextField } from "components/BaseTextField";
 import { CategoryInputArea } from "./CategoryInputArea";
 import { PostModalLine } from "./PostModalLine";
 import { FileDataStatus } from "types/fileDataStatus";
 import { postFileData } from "api/api";
 import { UserContext } from "contexts/UserContext";
+import { FileDataInputArea } from "./FileDataInputArea";
 
 interface Props {
   isOpenPostModal: boolean;
@@ -87,19 +86,6 @@ export const PostModal = (props: Props) => {
     }
   };
 
-  const handleChangeFileData = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    setFileData: (value: React.SetStateAction<File | undefined>) => void,
-    setFileDataObjectUrl: (value: React.SetStateAction<string>) => void
-  ) => {
-    if (e.target.files?.length) {
-      const fileData = e.target.files[0];
-      setFileData(fileData);
-      const newFileDataObjectUrl = URL.createObjectURL(fileData);
-      setFileDataObjectUrl(newFileDataObjectUrl);
-    }
-  };
-
   return (
     <Modal
       className={classes.modal}
@@ -125,25 +111,17 @@ export const PostModal = (props: Props) => {
             />
           </div>
           <PostModalLine />
-          <div>
-            <div className={classes.inputArea}>
-              <CoverImageInputArea
-                coverImage={coverImage}
-                coverImageObjectUrl={coverImageObjectUrl}
-                handleChangeCoverImage={(e) =>
-                  handleChangeFileData(e, setCoverImage, setCoverImageObjectUrl)
-                }
-              />
-              <MainDataInputArea
-                mainData={mainData}
-                mainDataObjectUrl={mainDataObjectUrl}
-                handleChangeMainData={(e) =>
-                  handleChangeFileData(e, setMainData, setMainDataObjectUrl)
-                }
-                mainDataStatus={mainDataStatus}
-              />
-            </div>
-          </div>
+          <FileDataInputArea
+            coverImage={coverImage}
+            coverImageObjectUrl={coverImageObjectUrl}
+            setCoverImage={setCoverImage}
+            setCoverImageObjectUrl={setCoverImageObjectUrl}
+            mainData={mainData}
+            mainDataObjectUrl={mainDataObjectUrl}
+            setMainData={setMainData}
+            setMainDataObjectUrl={setMainDataObjectUrl}
+            mainDataStatus={mainDataStatus}
+          />
           <PostModalLine />
           <CategoryInputArea
             selectedCategories={selectedCategories}
@@ -208,11 +186,6 @@ const useStyles = makeStyles({
   },
   inputDescription: {
     lineHeight: "1.2",
-  },
-  inputArea: {
-    width: "100%",
-    display: "flex",
-    gap: "5px",
   },
   postButton: {
     width: "100%",

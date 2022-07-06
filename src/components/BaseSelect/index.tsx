@@ -15,39 +15,41 @@ type Props = FormControlProps & {
   ) => void;
 };
 
-export const BaseSelect = ({
-  selectLabelTitle,
-  menuItems,
-  value,
-  setValue,
-  onChange,
-  ...props
-}: Props) => {
-  const handleSelectValue = (
-    e: React.ChangeEvent<{
-      name?: string | undefined;
-      value?: unknown;
-    }>
-  ) => {
-    if (setValue) {
-      setValue(e.target.value);
-    }
-  };
+export const BaseSelect = React.memo(
+  ({
+    selectLabelTitle,
+    menuItems,
+    value,
+    setValue,
+    onChange,
+    ...props
+  }: Props) => {
+    const handleSelectValue = (
+      e: React.ChangeEvent<{
+        name?: string | undefined;
+        value?: unknown;
+      }>
+    ) => {
+      if (setValue) {
+        setValue(e.target.value);
+      }
+    };
 
-  return (
-    <FormControl variant="outlined" fullWidth {...props}>
-      <InputLabel>{selectLabelTitle}</InputLabel>
-      <Select
-        label={selectLabelTitle}
-        value={value}
-        onChange={onChange ?? handleSelectValue}
-      >
-        {menuItems.map((item, i) => (
-          <MenuItem value={item.value} key={i}>
-            {item.title}
-          </MenuItem>
-        ))}
-      </Select>
-    </FormControl>
-  );
-};
+    return (
+      <FormControl variant="outlined" fullWidth {...props}>
+        <InputLabel>{selectLabelTitle}</InputLabel>
+        <Select
+          label={selectLabelTitle}
+          value={value}
+          onChange={onChange ?? handleSelectValue}
+        >
+          {menuItems.map((item, i) => (
+            <MenuItem value={item.value} key={i}>
+              {item.title}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+    );
+  }
+);

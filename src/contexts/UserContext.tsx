@@ -71,7 +71,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const signout = () => {
-    localStorage.removeItem("token");
+    localStorage.clear();
     setUser({});
     window.location.href = "/auth";
   };

@@ -8,30 +8,28 @@ interface Props {
   handleChangeCoverImage: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-export const CoverImageInputArea = ({
-  coverImage,
-  coverImageObjectUrl,
-  handleChangeCoverImage,
-}: Props) => {
-  const classes = useStyles();
-  return (
-    <div className={classes.coverImageInputArea}>
-      <div
-        className={classes.previewArea}
-        style={{ backgroundImage: `url(${coverImageObjectUrl})` }}
-      ></div>
-      <Button variant="contained" color="primary" component="label" fullWidth>
-        カバー画像を{coverImage ? "変更" : "追加"}する
-        <input
-          style={{ display: "none" }}
-          type="file"
-          accept="image/*"
-          onChange={handleChangeCoverImage}
-        />
-      </Button>
-    </div>
-  );
-};
+export const CoverImageInputArea = React.memo(
+  ({ coverImage, coverImageObjectUrl, handleChangeCoverImage }: Props) => {
+    const classes = useStyles();
+    return (
+      <div className={classes.coverImageInputArea}>
+        <div
+          className={classes.previewArea}
+          style={{ backgroundImage: `url(${coverImageObjectUrl})` }}
+        ></div>
+        <Button variant="contained" color="primary" component="label" fullWidth>
+          カバー画像を{coverImage ? "変更" : "追加"}する
+          <input
+            style={{ display: "none" }}
+            type="file"
+            accept="image/*"
+            onChange={handleChangeCoverImage}
+          />
+        </Button>
+      </div>
+    );
+  }
+);
 
 const useStyles = makeStyles({
   coverImageInputArea: {

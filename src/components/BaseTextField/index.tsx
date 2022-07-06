@@ -6,7 +6,7 @@ type Props = TextFieldProps & {
   setValue: React.Dispatch<React.SetStateAction<any>>;
 };
 
-export const BaseTextField = ({ setValue, ...props }: Props) => {
+export const BaseTextField = React.memo(({ setValue, ...props }: Props) => {
   const handleChangeValue = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValue(e.target.value);
   };
@@ -23,4 +23,4 @@ export const BaseTextField = ({ setValue, ...props }: Props) => {
       />
     </>
   );
-};
+});
