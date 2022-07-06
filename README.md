@@ -1,5 +1,7 @@
 # DLion - ファイル管理 SNS
 
+管理したいファイルをアップロードすると、タイムラインに流れるwebアプリを目指して作製中。。。
+
 ## Requirement
 
 > 立ち上げにあたり、事前に docker,docker-compose,yarn(or npm)コマンドが使えるようにしてください 🙏\
