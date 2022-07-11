@@ -1,8 +1,10 @@
 # DLion - ファイル管理 SNS
 
+管理したいファイルをアップロードすると、タイムラインに流れるwebアプリを目指して作製中。。。
+
 ## Requirement
 
-> 立ち上げにあたり、事前に docker,docker-compose,yarn(or npm)コマンドが使えるようにしてください 🙏\
+> 立ち上げにあたり、事前に **docker-compose,yarnコマンド**が使えるようにしてください 🙏\
 > \
 > バージョンについて\
 > Docker version 20.10.13\
@@ -37,7 +39,7 @@
 
           `SECRET_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`
 
-6.  **yarn install をする**
+6.  **yarn installをする**
 
     dlion ディレクトリ直下でコマンドを叩いてください。
     `yarn install`
