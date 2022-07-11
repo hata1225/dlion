@@ -25,7 +25,7 @@ export const post = async (
   path: string,
   data: object,
   token?: string,
-  setUploadProgress?: React.Dispatch<React.SetStateAction<number>> | null,
+  setUploadProgressValue?: React.Dispatch<React.SetStateAction<number>> | null,
   endOfUploadFunc?: undefined
 ) => {
   axios.defaults.withCredentials = false;
@@ -47,11 +47,11 @@ export const post = async (
           total: number;
           loaded: number;
         }) => {
-          if (setUploadProgress) {
+          if (setUploadProgressValue) {
             let total = ProgressEvent.total;
             let loaded = ProgressEvent.loaded;
             let percentCompleted = (loaded / total) * 100;
-            setUploadProgress(percentCompleted);
+            setUploadProgressValue(percentCompleted);
             if (endOfUploadFunc && percentCompleted === 100) {
               setTimeout(endOfUploadFunc, 500);
             }
@@ -193,8 +193,8 @@ export const getCategories = async (token: string) => {
 export const postFileData = async (
   data: object,
   token: string,
-  setUploadProgress?: React.Dispatch<React.SetStateAction<number>> | null,
-  endOfUploadFunc?: undefined
+  setUploadProgressValue?: React.Dispatch<React.SetStateAction<number>> | null,
+  endOfUploadFunc?: any
 ) => {
   const path = "/file_data/";
   try {
@@ -202,7 +202,7 @@ export const postFileData = async (
       path,
       data,
       token,
-      setUploadProgress,
+      setUploadProgressValue,
       endOfUploadFunc
     );
     return result;

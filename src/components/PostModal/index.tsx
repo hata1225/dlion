@@ -1,4 +1,10 @@
-import { Button, IconButton, makeStyles, Modal } from "@material-ui/core";
+import {
+  Button,
+  IconButton,
+  makeStyles,
+  Modal,
+  LinearProgress,
+} from "@material-ui/core";
 import React from "react";
 import { baseStyle, borderRadius, fontSize } from "theme";
 import CloseIcon from "@material-ui/icons/Close";
@@ -28,6 +34,8 @@ export const PostModal = (props: Props) => {
   const [mainDataObjectUrl, setMainDataObjectUrl] = React.useState("");
   const [mainDataStatus, setMainDataStatus] =
     React.useState<FileDataStatus>("none");
+  const [isDisabledPostButton, setIsDisabledPostButton] = React.useState(true);
+  const [uploadProgressValue, setUploadProgressValue] = React.useState(0);
   const { user } = React.useContext(UserContext);
   const classes = useStyles();
 
@@ -38,6 +46,14 @@ export const PostModal = (props: Props) => {
       { status: "audio", matchText: /audio/ },
       { status: "pdf", matchText: /pdf/ },
     ];
+
+  React.useEffect(() => {
+    if (mainData && coverImage && user?.token) {
+      setIsDisabledPostButton(false);
+    } else {
+      setIsDisabledPostButton(true);
+    }
+  }, [mainData, coverImage, user?.token]);
 
   React.useEffect(() => {
     if (mainData) {
@@ -61,7 +77,7 @@ export const PostModal = (props: Props) => {
         title,
         description,
         categories: JSON.stringify(selectedCategories),
-        coverImage: coverImage,
+        cover_image: coverImage,
         main_data_size: String(mainData?.size ?? 0),
         main_data_type: mainDataStatus,
       };
@@ -80,7 +96,22 @@ export const PostModal = (props: Props) => {
           },
           ...data,
         };
-        await postFileData(newData, user.token);
+        await postFileData(
+          newData,
+          user.token,
+          setUploadProgressValue,
+          async () => {
+            setTitle("");
+            setDescription("");
+            setCoverImage(undefined);
+            setCoverImageObjectUrl("");
+            setMainData(undefined);
+            setMainDataObjectUrl("");
+            setMainDataStatus("none");
+            setIsDisabledPostButton(true);
+            setUploadProgressValue(0);
+          }
+        );
       } else if (mainDataStatus === "image") {
       }
     }
@@ -128,11 +159,23 @@ export const PostModal = (props: Props) => {
             setSelectedCategories={setSelectedCategories}
           />
           <PostModalLine />
+          {uploadProgressValue ? (
+            <div>
+              {`${Math.floor(uploadProgressValue)}%`}
+              <LinearProgress
+                variant="determinate"
+                value={uploadProgressValue}
+              />
+            </div>
+          ) : (
+            <></>
+          )}
           <Button
             className={classes.postButton}
             variant="contained"
             color="primary"
             onClick={handlePost}
+            disabled={isDisabledPostButton}
           >
             投稿する
           </Button>
