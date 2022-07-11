@@ -30,14 +30,15 @@
 
 5.  **Django 用シークレットキーを、.env ファイルに書き込み**
 
-    - 共同で運営、管理等する場合、シークレットキーは githubAccount: @hata1225 からもらってください。
-    - 個人でソースを使う場合は、シークレットキーを自分で発行し.env ファイルに貼り付けてください。
-      1. `cd django_api && python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())' && cd ../`
-      2. 出力された文字列をコピー
+- 共同で運営、管理等する場合、シークレットキーは githubAccount: @hata1225 からもらってください。
+- 個人でソースを使う場合は、シークレットキーを自分で発行し.env ファイルに貼り付けてください。
 
-    **.env ファイル内に、以下を例に記述(xxxxxxx...はコピーした文字列)**
+  1.  `cd django_api && python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())' && cd ../`
+  2.  出力された文字列をコピー
 
-          `SECRET_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`
+  **.env ファイル内に、以下を例に記述(xxxxxxx...はコピーした文字列)**
+
+             `SECRET_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`
 
 6.  **yarn install をする**
 
