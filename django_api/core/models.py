@@ -46,6 +46,12 @@ def saveMainDataPath(instance, filename):
     ext = filename.split('.')[-1]
     return f'media/main/{instance.user.name}/{instance.id}/{instance.id}.{ext}'
 
+
+class VideoDataStatus(models.Model):
+    video_id = models.IntegerField(null=False)
+    video_data_status = models.TextField(default=json.dumps({'hm3u8': 0, 'lowmp4': 0, 'lm3u8': 0, 'playlist': 0, 'allcomplete': 0, 'completetotal': 0 }))
+
+
 class Categories(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -56,6 +62,7 @@ class Categories(models.Model):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
+
 
 class FileData(models.Model):
     user = models.ForeignKey(
@@ -75,7 +82,7 @@ class FileData(models.Model):
     #動画 video 単数
     video_data = models.FileField(upload_to=saveMainDataPath, null=True)
         # lowmp4=>低画質mp4 playlist=>低画質高画質混合m3u8 allcomplete=>エンコード完了 completetotal(0~4)=>エンコード状況
-    video_data_status = models.TextField(default=json.dumps({'hm3u8': 0, 'lowmp4': 0, 'lm3u8': 0, 'playlist': 0, 'allcomplete': 0, 'completetotal': 0 }))
+    video_data_status = models.ForeignKey(VideoDataStatus, on_delete=models.CASCADE)
     short_video_path = models.TextField(default="")
 
     #画像 images 複数

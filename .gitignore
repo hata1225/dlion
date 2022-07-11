@@ -23,7 +23,7 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-/media
+media
 
 db.sqlite3
 /django_api/*/migrations

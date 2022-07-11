@@ -1,4 +1,4 @@
-from rest_framework import viewsets, generics, pagination, response
+from rest_framework import viewsets, pagination, response
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 
@@ -49,3 +49,11 @@ class CategoriesViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return Categories.objects.filter(user=self.request.user)
 
+class VideoDataStatusViewSet(viewsets.ModelViewSet):
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+    serializer_class = serializers.VideoDataStatusSerializer
+    queryset = Categories.objects.order_by('-created_at')
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
