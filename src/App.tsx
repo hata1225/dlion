@@ -1,22 +1,26 @@
 import React from "react";
 import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { Home } from "pages/Home";
 import { UserProvider } from "contexts/UserContext";
 import "react-notifications-component/dist/theme.css";
 import "animate.css/animate.min.css";
 
 import { ReactNotifications } from "react-notifications-component";
-import { SupabaseProvider } from "contexts/SupabaseContext";
+import { Layout } from "components/Layout";
+import { MainPage } from "pages/MainPage";
+import { SignupAndSigninPage } from "pages/SignupAndSigninPage";
+import { PostModalProvider } from "contexts/PostModalContext";
 
 export default function App() {
   return (
-    <SupabaseProvider>
-      <UserProvider>
+    <UserProvider>
+      <PostModalProvider>
         <ReactNotifications />
-        <ReactRouter />
-      </UserProvider>
-    </SupabaseProvider>
+        <Layout>
+          <ReactRouter />
+        </Layout>
+      </PostModalProvider>
+    </UserProvider>
   );
 }
 
@@ -27,7 +31,8 @@ const ReactRouter = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<MainPage />} />
+        <Route path="/auth" element={<SignupAndSigninPage />} />
       </Routes>
     </BrowserRouter>
   );

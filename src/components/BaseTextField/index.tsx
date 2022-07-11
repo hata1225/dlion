@@ -1,26 +1,26 @@
 import React from "react";
-import { makeStyles, TextField } from "@material-ui/core";
+import { TextField } from "@material-ui/core";
 
 type TextFieldProps = React.ComponentProps<typeof TextField>;
-type Props = TextFieldProps;
+type Props = TextFieldProps & {
+  setValue: React.Dispatch<React.SetStateAction<any>>;
+};
 
-export const BaseTextField = (props: Props) => {
-  const classes = useStyles();
+export const BaseTextField = React.memo(({ setValue, ...props }: Props) => {
+  const handleChangeValue = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setValue(e.target.value);
+  };
+
   return (
     <>
       <TextField
-        className={classes.textField}
         {...props}
-        inputProps={{ style: { fontSize: "1.5rem" } }}
+        variant="outlined"
+        inputProps={{ style: { fontSize: "1.5rem", lineHeight: "1.2" } }}
         InputLabelProps={{ style: { fontSize: "1.4rem" } }}
         fullWidth
+        onChange={handleChangeValue}
       />
     </>
   );
-};
-
-const useStyles = makeStyles({
-  textField: {
-    margin: "10px 0",
-  },
 });

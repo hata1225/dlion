@@ -1,6 +1,6 @@
 import { makeStyles } from "@material-ui/core";
 import React from "react";
-import { baseStyle } from "theme";
+import { baseStyle, shadow } from "theme";
 
 export const Header = () => {
   const classes = useStyles();
@@ -8,7 +8,7 @@ export const Header = () => {
     <header className={classes.header}>
       <div className={classes.headerInner}>
         <div>
-          <h1>DLion</h1>
+          <h1 className={classes.heading}>DLion</h1>
         </div>
         <div></div>
       </div>
@@ -19,9 +19,10 @@ export const Header = () => {
 const useStyles = makeStyles({
   header: {
     height: baseStyle.header.height,
-    backgroundColor: "#888",
+    backgroundColor: baseStyle.color.purple.main,
     display: "flex",
     justifyContent: "center",
+    boxShadow: shadow.main,
   },
   headerInner: {
     height: "100%",
@@ -29,5 +30,8 @@ const useStyles = makeStyles({
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
+  },
+  heading: {
+    color: baseStyle.color.white.light,
   },
 });

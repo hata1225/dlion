@@ -1,6 +1,5 @@
 import { Button, Card, makeStyles } from "@material-ui/core";
 import { BaseTextField } from "components/BaseTextField";
-import { SupabaseContext } from "contexts/SupabaseContext";
 import { UserContext } from "contexts/UserContext";
 import { createNotification } from "functions/notification";
 import React from "react";
@@ -13,28 +12,9 @@ export const SignupAndSigninCard = () => {
   const [name, setName] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [reinputPassword, setReinputPassword] = React.useState("");
-  const { setUser, signup, signin } = React.useContext(UserContext);
-
-  const handleChangeEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setEmail(e.target.value);
-  };
-
-  const handleChangeName = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setName(e.target.value);
-  };
-
-  const handleChangePassword = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPassword(e.target.value);
-  };
-
-  const handleChangeReinputPassword = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setReinputPassword(e.target.value);
-  };
+  const { signup, signin } = React.useContext(UserContext);
 
   const handleClickSignup = async () => {
-    console.log("signup---");
     if (password !== reinputPassword) {
       createNotification("danger", "パスワードが一致しません");
       return;
@@ -43,37 +23,27 @@ export const SignupAndSigninCard = () => {
       createNotification("danger", "パスワードは8文字以上入力してください");
       return;
     }
-    const user = await signup(email, name, password);
-    setUser({
-      isSignin: true,
-      name,
-      email,
-      user_id: user.user_id,
-    });
+    await signup(email, name, password);
+    window.location.href = "/";
   };
 
   const handleClickSignin = async () => {
-    const user = await signin(email, password);
-    if (user) {
-      setUser({
-        isSignin: true,
-        name,
-        email,
-        user_id: user.id,
-      });
+    const userInfo = await signin(email, password);
+    if (userInfo) {
+      window.location.href = "/";
     }
   };
 
   return (
     <Card className={classes.card}>
       <h2>{isSigninCard ? "ログイン" : "アカウントを作成"}</h2>
-      <div>
+      <div className={classes.inputTextArea}>
         <BaseTextField
           label="メールアドレス"
           variant="outlined"
           type="email"
           value={email}
-          onChange={handleChangeEmail}
+          setValue={setEmail}
         />
         {isSigninCard ? (
           <></>
@@ -86,7 +56,7 @@ export const SignupAndSigninCard = () => {
             }
             variant="outlined"
             value={name}
-            onChange={handleChangeName}
+            setValue={setName}
             error={!name.match(/^[A-Za-z0-9]*$/)}
           />
         )}
@@ -95,7 +65,7 @@ export const SignupAndSigninCard = () => {
           variant="outlined"
           type="password"
           value={password}
-          onChange={handleChangePassword}
+          setValue={setPassword}
         />
         {isSigninCard ? (
           <></>
@@ -105,7 +75,7 @@ export const SignupAndSigninCard = () => {
             variant="outlined"
             type="password"
             value={reinputPassword}
-            onChange={handleChangeReinputPassword}
+            setValue={setReinputPassword}
           />
         )}
       </div>
@@ -139,6 +109,12 @@ const useStyles = makeStyles({
     flexDirection: "column",
     alignItems: "flex-start",
     gap: "10px",
+  },
+  inputTextArea: {
+    width: "100%",
+    display: "flex",
+    flexDirection: "column",
+    gap: "15px",
   },
   bottomArea: {
     width: "100%",

@@ -1,55 +1,86 @@
-# Getting Started with Create React App
+# DLion - ファイル管理 SNS
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+管理したいファイルをアップロードすると、タイムラインに流れる web アプリを目指して作製中。。。
 
-## Available Scripts
+## Requirement
 
-In the project directory, you can run:
+> 立ち上げにあたり、事前に **docker-compose,yarn コマンド**が使えるようにしてください 🙏\
+> \
+> バージョンについて\
+> Docker version 20.10.13\
+> node: 18.4.0
 
-### `npm start`
+## 立ち上げ方
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+1.  **git clone をする**
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+        `git clone git@github.com:hata1225/dlion.git`
 
-### `npm test`
+2.  **clone してできた、dlion フォルダへ移動する**
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+        `cd dlion`
 
-### `npm run build`
+3.  **任意のブランチに切り替える**
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+        `例: git checkout develop/v1.0.0`
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+4.  **.env ファイルを作成する**
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+        `touch .env`
 
-### `npm run eject`
+5.  **Django 用シークレットキーを、.env ファイルに書き込み**
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+- 共同で運営、管理等する場合、シークレットキーは githubAccount: @hata1225 からもらってください。
+- 個人でソースを使う場合は、シークレットキーを自分で発行し.env ファイルに貼り付けてください。
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+  1.  `cd django_api && python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())' && cd ../`
+  2.  出力された文字列をコピー
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+  **.env ファイル内に、以下を例に記述(xxxxxxx...はコピーした文字列)**
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+             `SECRET_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`
 
-## Learn More
+6.  **yarn install をする**
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+    dlion ディレクトリ直下でコマンドを叩いてください。
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+        `yarn install`
 
-## supabase
+7.  **docker-compose build をする**
 
-- API URL: http://localhost:54321
-- DB URL: postgresql://postgres:postgres@localhost:54322/postgres
-- Studio URL: http://localhost:54323
-- Inbucket URL: http://localhost:54324
-- anon key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24ifQ.625_WdcF3KHqz5amU0x2X5WWHP-OEs_4qj0ssLNHzTs
-- service_role key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSJ9.vI9obAHOGyVVKa3pD--kJlyxp-Z2zV9UUMAhKpNLAcU
+    最初は時間がかかるかもしれないです。
+
+        `docker-compose build`
+
+8.  **docker-compose up**
+
+        `docker-compose up`
+
+    > しばらくした後、一番下の行にこんなのが出たら**多分成功**です。　\
+    > 　　`react-app_1 | No issues found.`
+
+9.  **localhost:3000 へ移動する**
+
+    **http://localhost:3000**
+
+## データベースのリセット方法
+
+1. `django_api/migrations`を削除
+
+   マイグレーションファイルを削除
+
+2. `django_api/db.sqlite3`を削除
+
+   データベース削除
+
+3. `docker-compose run --rm django_app sh -c "python3 manage.py makemigrations core"`を実行
+
+   --rm: コンテナ停止後、コンテナを削除
+
+   sh -c: シェルコマンド （bash -c: バッシュコマンド）
+
+   マイグレーションファイルを作製
+
+4. `doker-compose run --rm django_app sh -c "python3 manage.py migrate core"`を実行
+
+   マイグレーションファイルをもとに、database へ反映
