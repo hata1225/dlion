@@ -140,6 +140,10 @@ export const getUserInfo = async (token: string) => {
     return result?.data;
   } catch (error) {
     console.log("@getUserInfo: ", error);
+    if (window.location.pathname !== "/auth") {
+      localStorage.clear();
+      window.location.href = "/auth";
+    }
     throw error;
   }
 };
