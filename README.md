@@ -65,22 +65,22 @@
 
 ## データベースのリセット方法
 
-1. **`django_api/migrations`を削除**
+1.  **マイグレーションファイルを削除**
 
-   マイグレーションファイルを削除
+        `django_api/migrations`
 
-2. **`django_api/db.sqlite3`を削除**
+2.  **データベース削除**
 
-   データベース削除
+        `django_api/db.sqlite3`
 
-3. **`docker-compose run --rm django_app sh -c "python3 manage.py makemigrations core"`を実行**
+3.  **マイグレーションファイルを作製**
 
-   --rm: コンテナ停止後、コンテナを削除
+    --rm: コンテナ停止後、コンテナを削除
 
-   sh -c: シェルコマンド （bash -c: バッシュコマンド）
+    sh -c: シェルコマンド （bash -c: バッシュコマンド）
 
-   マイグレーションファイルを作製
+        `docker-compose run --rm django_app sh -c "python3 manage.py makemigrations core"`
 
-4. **`doker-compose run --rm django_app sh -c "python3 manage.py migrate core"`を実行**
+4.  **マイグレーションファイルをもとに、database へ反映**
 
-   マイグレーションファイルをもとに、database へ反映
+        `doker-compose run --rm django_app sh -c "python3 manage.py migrate core"`
