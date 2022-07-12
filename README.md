@@ -29,7 +29,7 @@
 >
 > - docker: 20.10.13
 > - docker-compose: 1.92.2
-> - node: 18.4.0
+> - node: 18.5.0
 >
 > ---
 >
@@ -181,7 +181,6 @@
 - docker-compose で動かしている docker イメージを更新する（現状は selenium の更新のみ）
 
         `docker-compose pull | grep "Downloaded newer image" && docker-compose down && docker-compose up -d`
-
 
 - UI 実装時によく使っているライブラリ
 
