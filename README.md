@@ -7,6 +7,8 @@
 - [⚙️ Requirement](https://github.com/hata1225/dlion/edit/main/README.md#%EF%B8%8F-requirement)
 - [🌳 ブランチ管理について](https://github.com/hata1225/dlion/edit/main/README.md#-%E3%83%96%E3%83%A9%E3%83%B3%E3%83%81%E7%AE%A1%E7%90%86%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6)
 - [⤴️ 立ち上げ方](https://github.com/hata1225/dlion/edit/main/README.md#%EF%B8%8F-%E7%AB%8B%E3%81%A1%E4%B8%8A%E3%81%92%E6%96%B9)
+  - [立ち上げ 2 回目以降](https://github.com/hata1225/dlion/edit/develop/v1.0.0/README.md#%E7%AB%8B%E3%81%A1%E4%B8%8A%E3%81%92-2-%E5%9B%9E%E7%9B%AE%E4%BB%A5%E9%99%8D)
+  - [立ち上げ初回](https://github.com/hata1225/dlion/edit/develop/v1.0.0/README.md#%E5%88%9D%E3%82%81%E3%81%A6%E7%AB%8B%E3%81%A1%E4%B8%8A%E3%81%92%E3%82%8B%E3%81%A8%E3%81%8D)
 - [🛢 データベースのリセット方法](https://github.com/hata1225/dlion/edit/main/README.md#-%E3%83%87%E3%83%BC%E3%82%BF%E3%83%99%E3%83%BC%E3%82%B9%E3%81%AE%E3%83%AA%E3%82%BB%E3%83%83%E3%83%88%E6%96%B9%E6%B3%95)
 - [🍭 その他](https://github.com/hata1225/dlion/edit/main/README.md#-%E3%81%9D%E3%81%AE%E4%BB%96)
 
@@ -47,7 +49,7 @@
 > >
 > > > feature/[機能名]
 
-**現在は、develop のみを用いて、直接コミットしています。**
+**現在は、develop/v1.0.0 に直接コミットしています。**
 
 - develop/[バージョン]
 
@@ -62,6 +64,28 @@
 <br>
 
 ## ⤴️ 立ち上げ方
+
+### 立ち上げ 2 回目以降
+
+<details>
+
+1.  **立ち上げ**
+
+    ```
+      docker-compose up
+    ```
+
+    dlion ディレクトリ直下で実行
+
+2.  **停止**
+
+    ショートカット: cmd + c
+
+</details>
+
+### 初めて立ち上げるとき
+
+<details>
 
 1.  **git clone をする**
 
@@ -116,9 +140,17 @@
 
     **http://localhost:3000**
 
+10. **停止**
+
+    ショートカット: cmd + c
+
+</details>
+
 <br>
 
 ## 🛢 データベースのリセット方法
+
+<details>
 
 1.  **マイグレーションファイルを削除**
 
@@ -140,6 +172,8 @@
 
         `doker-compose run --rm django_app sh -c "python3 manage.py migrate core"`
 
+</details>
+
 <br>
 
 ## 🍭 その他
@@ -147,3 +181,8 @@
 - docker-compose で動かしている docker イメージを更新する（現状は selenium の更新のみ）
 
         `docker-compose pull | grep "Downloaded newer image" && docker-compose down && docker-compose up -d`
+
+
+- UI 実装時によく使っているライブラリ
+
+  - [material ui v4](https://v4.mui.com/)
