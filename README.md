@@ -63,6 +63,20 @@
 
 ## ⤴️ 立ち上げ方
 
+立ち上げ 2 回目以降
+
+1.  **立ち上げ**
+
+        `docker-compose up`
+
+        dlionディレクトリ直下で実行
+
+2.  **停止**
+
+    cmd + c
+
+初めて立ち上げるとき
+
 1.  **git clone をする**
 
         `git clone git@github.com:hata1225/dlion.git`
@@ -115,6 +129,10 @@
 9.  **localhost:3000 へ移動する**
 
     **http://localhost:3000**
+
+10. **停止**
+
+    cmd + c
 
 <br>
 
