@@ -128,11 +128,11 @@
 
 3.  **マイグレーションファイルを作製**
 
+        `docker-compose run --rm django_app sh -c "python3 manage.py makemigrations core"`
+
     --rm: コンテナ停止後、コンテナを削除
 
     sh -c: シェルコマンド （bash -c: バッシュコマンド）
-
-        `docker-compose run --rm django_app sh -c "python3 manage.py makemigrations core"`
 
 4.  **マイグレーションファイルをもとに、データベースへ反映**
 
