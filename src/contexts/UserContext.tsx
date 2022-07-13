@@ -54,7 +54,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       return { ...userInfo, token };
     } catch (error) {
       console.log("@signin Error: ", error);
-      createNotification("danger", "サインインに失敗しました");
+      createNotification("danger", "ログインに失敗しました");
       throw error;
     }
   };
