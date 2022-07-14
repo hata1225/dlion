@@ -17,7 +17,6 @@ class VideoDataStatusSerializer(serializers.ModelSerializer):
 class FileDataSerializer(serializers.ModelSerializer):
 
     user = UserSerializer(read_only=True)
-    video_data_status = VideoDataStatusSerializer(read_only=True)
 
     class Meta:
         model = FileData
