@@ -107,8 +107,10 @@
 
     個人でソース(dlion)を使う場合は、シークレットキーを自分で発行し.env ファイルに貼り付けてください。
 
-    1.  `cd django_api && python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())' && cd ../`
+    1.  シークレットキー発行
+        cd django_api && python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())' && cd ../
     2.  出力された文字列をコピー
+        ターミナルに出力される文字列をコピー
 
     **.env ファイル内に、以下を例に記述(xxxxxxx...はコピーした文字列)**
 
