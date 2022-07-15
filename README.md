@@ -73,9 +73,9 @@
 
 1.  **立ち上げ**
 
-    ```
-      docker-compose up
-    ```
+```
+docker-compose up
+```
 
     dlion ディレクトリ直下で実行
 
@@ -91,27 +91,27 @@
 
 1.  **git clone をする**
 
-        ```
-        git clone git@github.com:hata1225/dlion.git
-        ```
+```
+git clone git@github.com:hata1225/dlion.git
+```
 
 2.  **clone してできた、dlion フォルダへ移動する**
 
-        ```
-        cd dlion
-        ```
+```
+cd dlion
+```
 
 3.  **任意のブランチに切り替える**
 
-        ```
-        例: git checkout develop/v1.0.0
-        ```
+```
+例: git checkout develop/v1.0.0
+```
 
 4.  **.env ファイルを作成する**
 
-        ```
-        touch .env
-        ```
+```
+touch .env
+```
 
 5.  **Django 用シークレットキーを、.env ファイルに書き込み**
 
@@ -123,17 +123,17 @@
 
   **.env ファイル内に、以下を例に記述(xxxxxxx...はコピーした文字列)**
 
-             ```
-             SECRET_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-             ```
+        ```
+        SECRET_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+        ```
 
 6.  **yarn install をする**
 
     dlion ディレクトリ直下でコマンドを叩いてください。
 
-        ```
-        yarn install
-        ```
+```
+yarn install
+```
 
 7.  **docker-compose build をする**
 
@@ -141,15 +141,15 @@
 
     ubuntu を download したり、React で使用するモジュールを download したり色々やってくれます。
 
-        ```
-        docker-compose build
-        ```
+```
+docker-compose build
+```
 
 8.  **docker-compose up**
 
-        ```
-        docker-compose up
-        ```
+```
+docker-compose up
+```
 
     しばらくした後、ターミナルの一番下の行にこんなのが出力されたら**多分成功**です。\
     `react-app_1 | No issues found.`
@@ -172,21 +172,21 @@
 
 1.  **マイグレーションファイルを削除**
 
-        ```
-        django_api/migrations
-        ```
+```
+django_api/migrations
+```
 
 2.  **データベース削除**
 
-        ```
-        django_api/db.sqlite3
-        ```
+```
+django_api/db.sqlite3
+```
 
 3.  **マイグレーションファイルを作製**
 
-        ```
-        docker-compose run --rm django_app sh -c "python3 manage.py makemigrations core"
-        ```
+```
+docker-compose run --rm django_app sh -c "python3 manage.py makemigrations core"
+```
 
     --rm: コンテナ停止後、コンテナを削除
 
@@ -194,9 +194,9 @@
 
 4.  **マイグレーションファイルをもとに、データベースへ反映**
 
-        ```
-        doker-compose run --rm django_app sh -c "python3 manage.py migrate core"
-        ```
+```
+doker-compose run --rm django_app sh -c "python3 manage.py migrate core"
+```
 
 </details>
 
@@ -206,9 +206,9 @@
 
 - docker-compose で動かしている docker イメージを更新する（現状は selenium の更新のみ）
 
-        ```
-        docker-compose pull | grep "Downloaded newer image" && docker-compose down && docker-compose up -d
-        ```
+```
+docker-compose pull | grep "Downloaded newer image" && docker-compose down && docker-compose up -d
+```
 
 - UI 実装時によく使っているライブラリ
 
