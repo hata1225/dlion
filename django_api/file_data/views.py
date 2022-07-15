@@ -9,7 +9,7 @@ from file_data import serializers
 
 
 class FileDataPagination(pagination.PageNumberPagination):
-    page_size = 2
+    page_size = 10
 
     def get_paginated_response(self, data):
         return response.Response({
