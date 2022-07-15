@@ -105,13 +105,12 @@
 
 5.  **Django 用シークレットキーを、.env ファイルに書き込み**
 
-- 畠中と共同で運営、管理、開発等する場合、シークレットキーは githubAccount: @hata1225 からもらってください。
-- 個人でソース(dlion)を使う場合は、シークレットキーを自分で発行し.env ファイルに貼り付けてください。
+    個人でソース(dlion)を使う場合は、シークレットキーを自分で発行し.env ファイルに貼り付けてください。
 
-  1.  `cd django_api && python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())' && cd ../`
-  2.  出力された文字列をコピー
+    1.  `cd django_api && python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())' && cd ../`
+    2.  出力された文字列をコピー
 
-  **.env ファイル内に、以下を例に記述(xxxxxxx...はコピーした文字列)**
+    **.env ファイル内に、以下を例に記述(xxxxxxx...はコピーした文字列)**
 
         SECRET_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
