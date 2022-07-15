@@ -10,16 +10,19 @@ import { Layout } from "components/Layout";
 import { MainPage } from "pages/MainPage";
 import { SignupAndSigninPage } from "pages/SignupAndSigninPage";
 import { PostModalProvider } from "contexts/PostModalContext";
+import { FileDataProvider } from "contexts/FileDataContexts";
 
 export default function App() {
   return (
     <UserProvider>
-      <PostModalProvider>
-        <ReactNotifications />
-        <Layout>
-          <ReactRouter />
-        </Layout>
-      </PostModalProvider>
+      <FileDataProvider>
+        <PostModalProvider>
+          <ReactNotifications />
+          <Layout>
+            <ReactRouter />
+          </Layout>
+        </PostModalProvider>
+      </FileDataProvider>
     </UserProvider>
   );
 }

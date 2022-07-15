@@ -194,6 +194,17 @@ export const getCategories = async (token: string) => {
   }
 };
 
+export const getFileData = async (token: string) => {
+  const path = "/file_data/";
+  try {
+    const result = await get(path, token);
+    return result?.data?.results;
+  } catch (error) {
+    console.log("@getFileData: ", error);
+    throw error;
+  }
+};
+
 export const postFileData = async (
   data: object,
   token: string,
