@@ -184,7 +184,29 @@
 
 - docker-compose で動かしている docker イメージを更新する（現状は selenium の更新のみ）
 
-        docker-compose pull | grep "Downloaded newer image" && docker-compose down && docker-compose up -d
+      docker-compose pull | grep "Downloaded newer image" && docker-compose down && docker-compose up -d
+
+
+- django に super user を作成する
+
+  以下を実行
+
+  ```
+  python manage.py createsuperuser
+  ```
+
+  入力を求められるので、以下を例に入力
+
+  ```
+  Username (leave blank to use 'user1'): example
+  Email address: example@example.com
+  Password: # パスワードを入力
+  Password (again):
+  This password is too common. # パスワードが単純過ぎる場合はエラー発生
+  Password:
+  Password (again):
+  Superuser created successfully.
+  ```
 
 - UI 実装時によく使っているライブラリ
 
