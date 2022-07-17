@@ -7,9 +7,8 @@ from core.models import Categories
 
 from file_data import serializers
 
-
 class FileDataPagination(pagination.PageNumberPagination):
-    page_size = 10
+    page_size = 20
 
     def get_paginated_response(self, data):
         return response.Response({

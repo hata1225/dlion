@@ -1,10 +1,10 @@
 import { makeStyles, Button } from "@material-ui/core";
 import React from "react";
 import { baseStyle, borderRadius } from "theme";
-import { FileDataStatus } from "types/fileDataStatus";
+import { FileDataStatus } from "types/fileData";
 
 interface Props {
-  mainData?: File;
+  mainData: File | undefined;
   mainDataObjectUrl: string;
   handleChangeMainData: (e: React.ChangeEvent<HTMLInputElement>) => void;
   mainDataStatus: FileDataStatus;
@@ -68,7 +68,10 @@ export const MainDataInputArea = React.memo(
             style={{ display: "none" }}
             type="file"
             accept="*"
-            onChange={handleChangeMainData}
+            onChange={(e) => handleChangeMainData(e)}
+            onClick={(e: any) => {
+              e.target.value = "";
+            }}
           />
         </Button>
       </div>

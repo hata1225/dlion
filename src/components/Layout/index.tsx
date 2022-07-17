@@ -31,6 +31,7 @@ const useStyles = makeStyles({
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
+    padding: `0 ${baseStyle.pagePaddingHorizontal.main}`,
   },
   subArea: {
     height: "100%",
@@ -38,6 +39,12 @@ const useStyles = makeStyles({
   },
   mainArea: {
     height: "100%",
-    width: `calc(${baseStyle.maxWidthLayout.pc} - ${baseStyle.subArea.width})`,
+    width: `calc(${baseStyle.maxWidthLayout.pc}px - ${baseStyle.subArea.width})`,
+    overflow: "scroll",
+    msOverflowStyle: "none",
+    scrollbarWidth: "none",
+    "&::-webkit-scrollbar": {
+      display: "none",
+    },
   },
 });

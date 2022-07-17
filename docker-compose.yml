@@ -10,6 +10,8 @@ services:
     command: sh -c "yarn start"
     ports:
       - "3000:3000"
+    depends_on:
+      - "django_app"
     stdin_open: true
     tty: true
   django_app:
@@ -25,7 +27,11 @@ services:
       - ./django_api:/django_api
     command: >
       sh -c "python3 manage.py makemigrations &&
+             sleep 3 &&
              python3 manage.py migrate &&
+             sleep 3 &&
+             DJANGO_SUPERUSER_PASSWORD=${SUPER_USER_PASS} python3 manage.py createsuperuser --no-input --email ${SUPER_USER_EMAIL} &&
+             sleep 5 &&
              python3 -u manage.py runserver 0.0.0.0:8000"
     env_file:
       - ./.env

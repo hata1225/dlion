@@ -71,7 +71,7 @@ class FileData(models.Model):
     )
 
     #共通
-    title = models.CharField(max_length=255, null=False)
+    title = models.CharField(max_length=70, null=False)
     description = models.TextField(null=True)
     created_at = models.DateField(auto_now_add=True)
     categories = models.TextField(null=False, default=json.dumps([]))

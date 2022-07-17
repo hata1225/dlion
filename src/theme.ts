@@ -1,4 +1,11 @@
+import { CreateCSSProperties } from "@material-ui/core/styles/withStyles";
+import { PropsFunc } from "@material-ui/styles";
+import { CSSProperties } from "react";
+
 export const baseStyle = {
+  pagePaddingHorizontal: {
+    main: "15px",
+  },
   header: {
     height: "70px",
   },
@@ -13,7 +20,9 @@ export const baseStyle = {
     width: "250px",
   },
   maxWidthLayout: {
-    pc: "1000px",
+    pc: 1350,
+    tb: 980,
+    sp: 600,
   },
   postModalWidth: {
     pc: "500px",
@@ -23,6 +32,13 @@ export const baseStyle = {
   },
   postAreaHeader: {
     pc: "33px",
+  },
+  mainPageFileDataCardGap: {
+    main: "10px",
+  },
+  bottomAreaButtonAreaSize: {
+    height: "25px",
+    width: "50px",
   },
   color: {
     purple: {
@@ -34,7 +50,9 @@ export const baseStyle = {
       light: "#ffffff",
     },
     gray: {
+      dark: "#686868",
       main: "#888888",
+      lright: "#a8a8a8",
     },
   },
 };
@@ -47,9 +65,13 @@ export const shadow = {
   main: "rgba(0, 0, 0, 0.24) 0px 3px 8px",
 };
 
+export const baseAnimationTransitoin = {
+  main: "all 0.3s 0s ease",
+};
+
 export const fontSize = {
   large: {
-    large: "2.4rem",
+    large: "3rem",
     medium: "2.2rem",
     small: "2rem",
   },
@@ -62,3 +84,5 @@ export const fontSize = {
     large: "1.2rem",
   },
 };
+
+export const fileDataTitleMaxLength = 70;

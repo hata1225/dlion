@@ -198,6 +198,10 @@ export const getFileData = async (token: string) => {
   const path = "/file_data/";
   try {
     const result = await get(path, token);
+    const fileData = result.data.results;
+    fileData.forEach((item: any) => {
+      item.categories = JSON.parse(item.categories);
+    });
     return result?.data?.results;
   } catch (error) {
     console.log("@getFileData: ", error);
@@ -205,6 +209,14 @@ export const getFileData = async (token: string) => {
   }
 };
 
+/**
+ * fileDataをpostする際に使うapi
+ * @param data
+ * @param token
+ * @param setUploadProgressValue
+ * @param endOfUploadFunc
+ * @returns
+ */
 export const postFileData = async (
   data: object,
   token: string,
