@@ -198,6 +198,10 @@ export const getFileData = async (token: string) => {
   const path = "/file_data/";
   try {
     const result = await get(path, token);
+    const fileData = result.data.results;
+    fileData.forEach((item: any) => {
+      item.categories = JSON.parse(item.categories);
+    });
     return result?.data?.results;
   } catch (error) {
     console.log("@getFileData: ", error);

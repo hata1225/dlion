@@ -66,7 +66,7 @@ export const shadow = {
 };
 
 export const baseAnimationTransitoin = {
-  main: "all 0.35s 0s ease",
+  main: "all 0.3s 0s ease",
 };
 
 export const fontSize = {

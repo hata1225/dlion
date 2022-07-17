@@ -25,9 +25,6 @@ export const FileDataProvider = ({
     const f = async () => {
       if (user?.token) {
         const newFileData = await getFileData(user?.token);
-        newFileData.forEach((item: any) => {
-          item.categories = JSON.parse(item.categories);
-        });
         setFileData(newFileData);
       }
     };

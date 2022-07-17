@@ -184,6 +184,7 @@ const useStyles = makeStyles({
     overflow: "hidden",
     WebkitLineClamp: 1,
     WebkitBoxOrient: "vertical",
+    minHeight: "1.5rem",
   },
   tagItem: {
     color: baseStyle.color.gray.main,

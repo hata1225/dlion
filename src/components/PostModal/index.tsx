@@ -121,7 +121,6 @@ export const PostModal = (props: Props) => {
         } catch (error: any) {
           createNotification("danger", error?.message, "投稿に失敗しました");
         }
-
         await updateFileData();
       } else if (mainDataStatus === "image") {
       }
