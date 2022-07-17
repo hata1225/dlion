@@ -1,13 +1,7 @@
 import { createUser, getToken, getUserInfo } from "api/api";
 import { createNotification } from "functions/notification";
 import React from "react";
-
-interface UserInterface {
-  name?: string;
-  password?: string;
-  email?: string;
-  token?: string;
-}
+import { UserInterface } from "../types/User";
 
 interface UserContextInterface {
   user?: UserInterface;

@@ -6,15 +6,23 @@ import {
   LinearProgress,
 } from "@material-ui/core";
 import React from "react";
-import { baseStyle, borderRadius, fontSize } from "theme";
+import {
+  baseStyle,
+  borderRadius,
+  fileDataTitleMaxLength,
+  fontSize,
+} from "theme";
 import CloseIcon from "@material-ui/icons/Close";
 import { BaseTextField } from "components/BaseTextField";
 import { CategoryInputArea } from "./CategoryInputArea";
 import { PostModalLine } from "./PostModalLine";
-import { FileDataStatus } from "types/fileDataStatus";
+import { FileDataStatus } from "types/fileData";
 import { postFileData } from "api/api";
 import { UserContext } from "contexts/UserContext";
 import { FileDataInputArea } from "./FileDataInputArea";
+import { FileDataContext } from "contexts/FileDataContexts";
+import { createNotification } from "functions/notification";
+import { countString } from "functions/countString";
 
 interface Props {
   isOpenPostModal: boolean;
@@ -37,6 +45,7 @@ export const PostModal = (props: Props) => {
   const [isDisabledPostButton, setIsDisabledPostButton] = React.useState(true);
   const [uploadProgressValue, setUploadProgressValue] = React.useState(0);
   const { user } = React.useContext(UserContext);
+  const { updateFileData } = React.useContext(FileDataContext);
   const classes = useStyles();
 
   const mainDataTypeAndStatus: { status: FileDataStatus; matchText: RegExp }[] =
@@ -75,7 +84,7 @@ export const PostModal = (props: Props) => {
     if (coverImage && mainData && user?.token) {
       let data = {
         title,
-        description,
+        description: description ?? "",
         categories: JSON.stringify(selectedCategories),
         cover_image: coverImage,
         main_data_size: String(mainData?.size ?? 0),
@@ -96,22 +105,24 @@ export const PostModal = (props: Props) => {
           },
           ...data,
         };
-        await postFileData(
-          newData,
-          user.token,
-          setUploadProgressValue,
-          async () => {
-            setTitle("");
-            setDescription("");
-            setCoverImage(undefined);
-            setCoverImageObjectUrl("");
-            setMainData(undefined);
-            setMainDataObjectUrl("");
-            setMainDataStatus("none");
-            setIsDisabledPostButton(true);
-            setUploadProgressValue(0);
-          }
-        );
+        try {
+          await postFileData(newData, user.token, setUploadProgressValue);
+          setTitle("");
+          setDescription("");
+          setSelectedCategories([]);
+          setCoverImage(undefined);
+          setCoverImageObjectUrl("");
+          setMainData(undefined);
+          setMainDataObjectUrl("");
+          setMainDataStatus("none");
+          setIsDisabledPostButton(true);
+          setUploadProgressValue(0);
+          createNotification("success", "投稿できました");
+        } catch (error: any) {
+          createNotification("danger", error?.message, "投稿に失敗しました");
+        }
+
+        await updateFileData();
       } else if (mainDataStatus === "image") {
       }
     }
@@ -132,7 +143,19 @@ export const PostModal = (props: Props) => {
         </div>
         <div className={classes.main}>
           <div className={classes.inputTextArea}>
-            <BaseTextField label="タイトル" value={title} setValue={setTitle} />
+            <BaseTextField
+              label={`タイトル (${countString(
+                title
+              )}/${fileDataTitleMaxLength})`}
+              value={title}
+              setValue={setTitle}
+              error={countString(title) > fileDataTitleMaxLength}
+              helperText={
+                countString(title) > fileDataTitleMaxLength
+                  ? `${fileDataTitleMaxLength}文字以内で入力してください。`
+                  : undefined
+              }
+            />
             <BaseTextField
               label="説明文"
               value={description}

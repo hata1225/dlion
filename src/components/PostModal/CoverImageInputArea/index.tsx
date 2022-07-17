@@ -23,7 +23,10 @@ export const CoverImageInputArea = React.memo(
             style={{ display: "none" }}
             type="file"
             accept="image/*"
-            onChange={handleChangeCoverImage}
+            onChange={(e) => handleChangeCoverImage(e)}
+            onClick={(e: any) => {
+              e.target.value = "";
+            }}
           />
         </Button>
       </div>

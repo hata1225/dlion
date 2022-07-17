@@ -22,6 +22,7 @@ export const BaseSelect = React.memo(
     value,
     setValue,
     onChange,
+    disabled = false,
     ...props
   }: Props) => {
     const handleSelectValue = (
@@ -36,7 +37,7 @@ export const BaseSelect = React.memo(
     };
 
     return (
-      <FormControl variant="outlined" fullWidth {...props}>
+      <FormControl variant="outlined" fullWidth disabled={disabled} {...props}>
         <InputLabel>{selectLabelTitle}</InputLabel>
         <Select
           label={selectLabelTitle}

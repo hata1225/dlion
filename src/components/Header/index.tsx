@@ -26,10 +26,11 @@ const useStyles = makeStyles({
   },
   headerInner: {
     height: "100%",
-    width: baseStyle.maxWidthLayout.pc,
+    width: `${baseStyle.maxWidthLayout.pc}px`,
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
+    padding: `0 ${baseStyle.pagePaddingHorizontal.main}`,
   },
   heading: {
     color: baseStyle.color.white.light,

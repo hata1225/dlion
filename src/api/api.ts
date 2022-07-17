@@ -205,6 +205,14 @@ export const getFileData = async (token: string) => {
   }
 };
 
+/**
+ * fileDataをpostする際に使うapi
+ * @param data
+ * @param token
+ * @param setUploadProgressValue
+ * @param endOfUploadFunc
+ * @returns
+ */
 export const postFileData = async (
   data: object,
   token: string,

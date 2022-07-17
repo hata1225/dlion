@@ -58,7 +58,7 @@ export const CategoryInputArea = ({
     if (!value) {
       value = e.target?.innerText;
     }
-    if (value) {
+    if (value && fetchedCategories.length) {
       setAddCategory(value);
       setSelectedCategories((prev) => [...prev, value]);
     }
@@ -81,9 +81,19 @@ export const CategoryInputArea = ({
       <div className={classes.inputArea}>
         <BaseSelect
           selectLabelTitle="Add category"
-          menuItems={fetchedCategories}
-          value={addCategory}
+          menuItems={
+            fetchedCategories.length
+              ? fetchedCategories
+              : [
+                  {
+                    value: "addNewCategories",
+                    title: "新しくカテゴリーを追加してください",
+                  },
+                ]
+          }
+          value={fetchedCategories.length ? addCategory : "addNewCategories"}
           onClick={handleClickAddCategory}
+          disabled={!fetchedCategories.length}
         />
         <PostModalLine />
         <div className={classes.addNewCategoryArea}>
@@ -107,7 +117,7 @@ export const CategoryInputArea = ({
         <div className={classes.previewAreaInner}>
           {selectedCategories.map((category, key) => (
             <div className={classes.selectedCategory} key={key}>
-              <p>{category}</p>
+              <p>#{category}</p>
               <CloseIcon
                 className={classes.selectedCategoryCloseIcon}
                 onClick={() => handleClickCategoryClose(key)}

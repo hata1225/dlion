@@ -2,7 +2,7 @@ import React from "react";
 import { makeStyles } from "@material-ui/core";
 import { CoverImageInputArea } from "components/PostModal/CoverImageInputArea";
 import { MainDataInputArea } from "components/PostModal/MainDataInputArea";
-import { FileDataStatus } from "types/fileDataStatus";
+import { FileDataStatus } from "types/fileData";
 
 interface Props {
   coverImage?: File;
