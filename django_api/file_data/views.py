@@ -7,7 +7,6 @@ from core.models import Categories
 
 from file_data import serializers
 
-
 class FileDataPagination(pagination.PageNumberPagination):
     page_size = 20
 
