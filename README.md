@@ -193,7 +193,7 @@
 
       docker-compose pull | grep "Downloaded newer image" && docker-compose down && docker-compose up -d
 
-- django に super user を作成する
+- django に superuser を新しく作成する
 
   以下を実行
 
