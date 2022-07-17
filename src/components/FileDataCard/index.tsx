@@ -31,10 +31,6 @@ export const FileDataCard = ({
   const bottomAreaRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
-    console.log("bottomareadefaultheight: ", bottomAreaDefaultHeight);
-  }, [bottomAreaDefaultHeight]);
-
-  React.useEffect(() => {
     if (!isScaleUpBottomArea && bottomAreaRef.current) {
       const bottomAreaHeightByRef = bottomAreaRef.current?.clientHeight;
       if (bottomAreaDefaultHeight === 0) {

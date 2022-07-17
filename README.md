@@ -119,13 +119,20 @@
 
         SECRET_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-6.  **yarn install をする**
+6.  **superuser 情報を.env ファイルに追記**
+
+    localhost:8000/admin にログインするとき & watchdog でディレクトリを監視、エンコード等で使います
+
+        SUPER_USER_EMAIL=example@example.com
+        SUPER_USER_PASS=password
+
+7.  **yarn install をする**
 
     dlion ディレクトリ直下でコマンドを叩いてください。
 
         yarn install
 
-7.  **docker-compose build をする**
+8.  **docker-compose build をする**
 
     最初は時間がかかるかもしれないです。
 
@@ -133,18 +140,18 @@
 
         docker-compose build
 
-8.  **docker-compose up**
+9.  **docker-compose up**
 
-        docker-compose up
+    docker-compose up
 
     しばらくした後、ターミナルの一番下の行にこんなのが出力されたら**多分成功**です。\
     `react-app_1 | No issues found.`
 
-9.  **localhost:3000 へ移動する**
+10. **localhost:3000 へ移動する**
 
     **http://localhost:3000**
 
-10. **停止**
+11. **停止**
 
     ショートカット: cmd + c
 
