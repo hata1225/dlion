@@ -37,8 +37,8 @@
 >
 > ### 使用している Docker イメージについて
 >
-> - ubuntu:22.04 (LTS)
-> - node:18.5.0-alpine (最新)
+> - ubuntu: 22.04 (LTS)
+> - node: 18.5.0-alpine (最新)
 > - selenium (docker hub から image を引っ張ってる)
 >
 > ---
