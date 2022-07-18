@@ -40,6 +40,14 @@
 > - ubuntu:22.04 (LTS)
 > - node:18.5.0-alpine (最新)
 > - selenium (docker hub から image を引っ張ってる)
+>
+> ---
+>
+> ### URL
+>
+> - フロント: [http://localhost:3000](http://localhost:3000)
+> - バック(api 確認) : [http://localhost:8000/api](http://localhost:8000/api)
+> - バック(管理画面) : [http://localhost:8000/admin](http://localhost:8000/admin)
 
 <br>
 
