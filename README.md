@@ -7,6 +7,7 @@
 ## 目次
 
 - [⚙️ Requirement](https://github.com/hata1225/dlion/edit/main/README.md#%EF%B8%8F-requirement)
+- [👀 画面設計(構想)](https://lh5.googleusercontent.com/fX7YNotu_3EWe1d6ZENl0mPMkT3SRh0WC_JwLeCbxWl3F6wN9_gXfG8Ms7jPLNrx1vixWjXWLnhvOTRux-HF=w2156-h1528-rw)
 - [🌳 ブランチ管理について](https://github.com/hata1225/dlion/edit/main/README.md#-%E3%83%96%E3%83%A9%E3%83%B3%E3%83%81%E7%AE%A1%E7%90%86%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6)
 - [⤴️ 立ち上げ方](https://github.com/hata1225/dlion/edit/main/README.md#%EF%B8%8F-%E7%AB%8B%E3%81%A1%E4%B8%8A%E3%81%92%E6%96%B9)
   - [立ち上げ 2 回目以降](https://github.com/hata1225/dlion/edit/develop/v1.0.0/README.md#%E7%AB%8B%E3%81%A1%E4%B8%8A%E3%81%92-2-%E5%9B%9E%E7%9B%AE%E4%BB%A5%E9%99%8D)
@@ -48,6 +49,12 @@
 > - フロント: [http://localhost:3000](http://localhost:3000)
 > - バック(api 確認) : [http://localhost:8000/api](http://localhost:8000/api)
 > - バック(管理画面) : [http://localhost:8000/admin](http://localhost:8000/admin)
+
+<br>
+
+## 👀 画面設計（構想）
+
+![画面設計](https://lh3.googleusercontent.com/nRzfPmMVbbyvrw7XO_T2Hqz-Uk9Kj2yGbcYo4pGIRLjMKewo2auP54qUlDVImhk4hfYDJsgM6Reo0Ksk63pq=w2156-h1414-rw)
 
 <br>
 
