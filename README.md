@@ -54,7 +54,11 @@
 
 ## 👀 画面設計（構想）
 
+<details>
+
 ![画面設計](https://lh3.googleusercontent.com/nRzfPmMVbbyvrw7XO_T2Hqz-Uk9Kj2yGbcYo4pGIRLjMKewo2auP54qUlDVImhk4hfYDJsgM6Reo0Ksk63pq=w2156-h1414-rw)
+
+</details>
 
 <br>
 
