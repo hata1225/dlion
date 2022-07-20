@@ -200,7 +200,7 @@
 
 4.  **マイグレーションファイルをもとに、データベースへ反映**
 
-        doker-compose run --rm django_app sh -c "python3 manage.py migrate core"
+        docker-compose run --rm django_app sh -c "python3 manage.py migrate core"
 
 </details>
 
