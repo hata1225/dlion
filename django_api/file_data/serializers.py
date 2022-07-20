@@ -5,6 +5,7 @@ from core.models import FileData
 from core.models import Categories
 from user.serializers import UserSerializer
 
+
 class FileDataSerializer(serializers.ModelSerializer):
 
     user = UserSerializer(read_only=True)
