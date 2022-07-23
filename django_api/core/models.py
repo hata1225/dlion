@@ -144,10 +144,10 @@ class FileData(models.Model):
         cmd += f' {main_data_path_by_export}ls/ls_%5d.ts'
         code = subprocess.call(cmd.split())
         print('process=' + str(code))
-        main_data_status = json.loads(self.main_data_status)
-        main_data_status['lsm3u8'] = 1
-        main_data_status['completetotal'] = 1
-        self.main_data_status = json.dumps(main_data_status)
+        video_data_status = json.loads(self.video_data_status)
+        video_data_status['lsm3u8'] = 1
+        video_data_status['completetotal'] = 1
+        self.video_data_status = json.dumps(video_data_status)
         super().save(*args, **kwargs)
 
         # short.mp4, short.webp作成
@@ -180,9 +180,9 @@ class FileData(models.Model):
             code = subprocess.call(cmd.split())
             print('process=' + str(code))
         f = open(f'{main_data_path_by_export}short_videos.txt', 'w')
-        main_data_status = json.loads(self.main_data_status)
-        main_data_status['shortmp4'] = 1
-        self.main_data_status = json.dumps(main_data_status)
+        video_data_status = json.loads(self.video_data_status)
+        video_data_status['shortmp4'] = 1
+        self.video_data_status = json.dumps(video_data_status)
         super().save(*args, **kwargs)
 
         short_videos = []
@@ -211,11 +211,11 @@ class FileData(models.Model):
 
         self.main_data_size = os.path.getsize(main_data_path)
         self.main_data = main_data_path_by_export + "ls/ls.m3u8"
-        main_data_status = json.loads(self.main_data_status)
-        main_data_status['allcomplete'] = 1
-        main_data_status['completetotal'] = 3
+        video_data_status = json.loads(self.video_data_status)
+        video_data_status['allcomplete'] = 1
+        video_data_status['completetotal'] = 3
 
-        self.main_data_status = json.dumps(main_data_status)
+        self.video_data_status = json.dumps(video_data_status)
         super().save(*args, **kwargs)
 
     def __str__(self):
