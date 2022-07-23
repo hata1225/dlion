@@ -125,14 +125,16 @@ class FileData(models.Model):
         cover_image_path = "media/"+str(self.cover_image)
         main_data_name = str(main_data_path).split("/")[-1]
         main_data_path_by_export = main_data_path.replace(main_data_name, "")
-        image_name = str(cover_image_path).split("/")[-1]
-        cover_image_path_by_export = cover_image_path.replace(image_name, "")
+        cover_image_name = str(cover_image_path).split("/")[-1]
+        cover_image_path_by_export = cover_image_path.replace(cover_image_name, "")
 
         # cover_imageをwebpに変換
-        cmd = f'ffmpeg -i {cover_image_path_by_export} -vf scale=800:-1 -q:v 65 {cover_image_path_by_export}cover_image.webp'
+        cmd = f'ffmpeg -i {cover_image_path} -vf scale=800:-1 -q:v 65 {cover_image_path_by_export}cover_image.webp'
         code = subprocess.call(cmd.split())
         print('process=' + str(code))
-        self.cover_image = f'media/{cover_image_path_by_export}cover_image.webp'
+        cover_image_path_by_export = cover_image_path_by_export.replace("media/", "")
+        self.cover_image = f'{cover_image_path_by_export}cover_image.webp'
+        super().save(*args, **kwargs)
 
         # m3u8の作成([input].mp4 -> ls/ls.m3u8)
         os.makedirs(f'{main_data_path_by_export}ls')
@@ -197,7 +199,7 @@ class FileData(models.Model):
         code  = subprocess.call(cmd.split())
         print('process=' + str(code))
         cmd = f'ffmpeg -i {main_data_path_by_export}short.mp4  -vb 100k  -vf scale=-1:180  -r 18 -pix_fmt pal8 {main_data_path_by_export}short.webp'
-        code = subprocess.call(c.split())
+        code = subprocess.call(cmd.split())
         print('process=' + str(code))
         i = 1
         while i <= export_video_ren:
@@ -205,12 +207,12 @@ class FileData(models.Model):
             os.remove(path)
             i += 1
         cap = cv2.VideoCapture(f'{main_data_path_by_export}short.mp4')
-        os.remove(f'{main_data_path_by_export}input_low.mp4')
         os.remove(f'{main_data_path_by_export}short_videos.txt')
         os.remove(f'{main_data_path_by_export}short.mp4')
 
         self.main_data_size = os.path.getsize(main_data_path)
-        self.main_data = main_data_path_by_export + "ls/ls.m3u8"
+        main_data_path_by_export = main_data_path_by_export.replace("media/", "")
+        self.video_data = main_data_path_by_export + "ls/ls.m3u8"
         video_data_status = json.loads(self.video_data_status)
         video_data_status['allcomplete'] = 1
         video_data_status['completetotal'] = 3
