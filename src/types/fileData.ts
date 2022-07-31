@@ -2,6 +2,7 @@ import { UserInterface } from "./User";
 export type FileDataStatus = "none" | "video" | "image" | "pdf" | "audio";
 
 export type FileData = {
+  id: number;
   user: UserInterface;
   title: string;
   description: string;
@@ -11,6 +12,7 @@ export type FileData = {
   main_data_size: string;
   main_data_type: FileDataStatus;
   video_data: string;
-  video_data_status: string;
+  video_data_status: any;
   short_video_path: string;
+  short_video_play_time: number;
 };

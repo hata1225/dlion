@@ -1,6 +1,6 @@
 import React from "react";
 import { UserContext } from "contexts/UserContext";
-import { getFileData } from "api/api";
+import { getAllFileData } from "api/api";
 import { FileData } from "types/fileData";
 
 interface FileDataContextInterface {
@@ -24,7 +24,7 @@ export const FileDataProvider = ({
   React.useEffect(() => {
     const f = async () => {
       if (user?.token) {
-        const newFileData = await getFileData(user?.token);
+        const newFileData = await getAllFileData(user?.token);
         setFileData(newFileData);
       }
     };
@@ -33,7 +33,7 @@ export const FileDataProvider = ({
 
   const updateFileData = async () => {
     if (user?.token) {
-      const newFileData = await getFileData(user?.token);
+      const newFileData = await getAllFileData(user?.token);
       setFileData(newFileData);
     } else {
       console.log("@updateFileData: User token is not found. ");

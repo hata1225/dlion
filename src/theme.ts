@@ -1,6 +1,6 @@
-import { CreateCSSProperties } from "@material-ui/core/styles/withStyles";
-import { PropsFunc } from "@material-ui/styles";
-import { CSSProperties } from "react";
+// import { CreateCSSProperties } from "@material-ui/core/styles/withStyles";
+// import { PropsFunc } from "@material-ui/styles";
+// import { CSSProperties } from "react";
 
 export const baseStyle = {
   pagePaddingHorizontal: {
@@ -52,7 +52,7 @@ export const baseStyle = {
     gray: {
       dark: "#686868",
       main: "#888888",
-      lright: "#a8a8a8",
+      light: "#a8a8a8",
     },
   },
 };

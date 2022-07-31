@@ -95,10 +95,8 @@ export const PostModal = (props: Props) => {
           ...{
             video_data: mainData,
             video_data_status: JSON.stringify({
-              hm3u8: 0,
-              lowmp4: 0,
-              lm3u8: 0,
-              playlist: 0,
+              lsm3u8: 0,
+              shortmp4: 0,
               allcomplete: 0,
               completetotal: 0,
             }),
