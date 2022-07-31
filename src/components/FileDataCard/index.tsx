@@ -8,6 +8,9 @@ import {
   fontSize,
 } from "theme";
 import ExpandLessIcon from "@material-ui/icons/ExpandLess";
+import { getFileData } from "api/api";
+import { UserContext } from "contexts/UserContext";
+import { ImageArea } from "components/FileDataCard/ImageArea";
 
 type CardProps = React.ComponentProps<typeof Card>;
 type Props = CardProps & {
@@ -21,14 +24,49 @@ export const FileDataCard = ({
   style,
   ...props
 }: Props) => {
-  const { user, title, description, created_at, categories, cover_image } =
-    fileData;
+  const {
+    id,
+    title,
+    description,
+    created_at,
+    categories,
+    cover_image,
+    short_video_path,
+    video_data_status,
+  } = fileData;
   const [isScaleUpBottomArea, setIsScaleUpButtonArea] = React.useState(false);
   const [bottomAreaDefaultHeight, setBottomAreaDefaultHeight] =
     React.useState(0);
+  const [videoDataStatus, setVideoDataStatus] = React.useState(0);
+  const [coverImage, setCoverImage] = React.useState(cover_image);
+  const [shortVideo, setShortVideo] = React.useState(short_video_path);
+  const { user } = React.useContext(UserContext);
   const classes = useStyles();
 
   const bottomAreaRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    setVideoDataStatus(video_data_status);
+    (async () => {
+      if (video_data_status["allcomplete"] === 0) {
+        console.log("not complete");
+        const getFileDataInterval = setInterval(async () => {
+          if (user?.token) {
+            const newFileData = await getFileData(user.token, id);
+            const newVideoDataStatus = JSON.parse(
+              newFileData.video_data_status
+            );
+            setVideoDataStatus(newVideoDataStatus);
+            setCoverImage(newFileData.cover_image);
+            if (newVideoDataStatus["allcomplete"] === 1) {
+              console.log("all complete");
+              clearInterval(getFileDataInterval);
+            }
+          }
+        }, 2000);
+      }
+    })();
+  }, []);
 
   React.useEffect(() => {
     if (!isScaleUpBottomArea && bottomAreaRef.current) {
@@ -52,7 +90,11 @@ export const FileDataCard = ({
         ...style,
       }}
     >
-      <img className={classes.img} src={cover_image} alt={title} />
+      <ImageArea
+        coverImage={coverImage}
+        shortVideo={shortVideo}
+        fileData={fileData}
+      />
       <div
         ref={bottomAreaRef}
         className={classes.bottomArea}

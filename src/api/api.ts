@@ -1,4 +1,5 @@
 import axios, { AxiosRequestConfig } from "axios";
+import { FileData } from "types/fileData";
 
 const ENVS = {
   develop: "localhost",
@@ -194,15 +195,28 @@ export const getCategories = async (token: string) => {
   }
 };
 
-export const getFileData = async (token: string) => {
+export const getAllFileData = async (token: string) => {
   const path = "/file_data/";
   try {
     const result = await get(path, token);
-    const fileData = result.data.results;
+    const fileData: FileData[] = result.data.results;
     fileData.forEach((item: any) => {
       item.categories = JSON.parse(item.categories);
+      item.video_data_status = JSON.parse(item.video_data_status);
     });
     return result?.data?.results;
+  } catch (error) {
+    console.log("@getAllFileData: ", error);
+    throw error;
+  }
+};
+
+export const getFileData = async (token: string, id: number) => {
+  const path = `/file_data/${id}/`;
+  try {
+    const result = await get(path, token);
+    const fileData: FileData = result.data;
+    return fileData;
   } catch (error) {
     console.log("@getFileData: ", error);
     throw error;

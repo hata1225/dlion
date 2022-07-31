@@ -95,10 +95,8 @@ export const PostModal = (props: Props) => {
           ...{
             video_data: mainData,
             video_data_status: JSON.stringify({
-              hm3u8: 0,
-              lowmp4: 0,
-              lm3u8: 0,
-              playlist: 0,
+              lsm3u8: 0,
+              shortmp4: 0,
               allcomplete: 0,
               completetotal: 0,
             }),
@@ -106,22 +104,28 @@ export const PostModal = (props: Props) => {
           ...data,
         };
         try {
-          await postFileData(newData, user.token, setUploadProgressValue);
-          setTitle("");
-          setDescription("");
-          setSelectedCategories([]);
-          setCoverImage(undefined);
-          setCoverImageObjectUrl("");
-          setMainData(undefined);
-          setMainDataObjectUrl("");
-          setMainDataStatus("none");
-          setIsDisabledPostButton(true);
-          setUploadProgressValue(0);
-          createNotification("success", "投稿できました");
+          await postFileData(
+            newData,
+            user.token,
+            setUploadProgressValue,
+            async () => {
+              await updateFileData();
+              setTitle("");
+              setDescription("");
+              setSelectedCategories([]);
+              setCoverImage(undefined);
+              setCoverImageObjectUrl("");
+              setMainData(undefined);
+              setMainDataObjectUrl("");
+              setMainDataStatus("none");
+              setIsDisabledPostButton(true);
+              setUploadProgressValue(0);
+              createNotification("success", "投稿できました");
+            }
+          );
         } catch (error: any) {
           createNotification("danger", error?.message, "投稿に失敗しました");
         }
-        await updateFileData();
       } else if (mainDataStatus === "image") {
       }
     }

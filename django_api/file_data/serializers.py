@@ -3,15 +3,7 @@ from rest_framework import serializers
 
 from core.models import FileData
 from core.models import Categories
-from core.models import VideoDataStatus
 from user.serializers import UserSerializer
-
-
-class VideoDataStatusSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = VideoDataStatus
-        fields = ('id', 'video_data_status',)
-        read_only_fields = ('id',)
 
 
 class FileDataSerializer(serializers.ModelSerializer):
@@ -20,7 +12,7 @@ class FileDataSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = FileData
-        fields = ('id', 'user', 'title', 'description', 'created_at', 'categories', 'cover_image', 'main_data_size', 'main_data_type', 'video_data', 'video_data_status', 'short_video_path')
+        fields = ('id', 'user', 'title', 'description', 'created_at', 'categories', 'cover_image', 'main_data_size', 'main_data_type', 'video_data', 'video_data_status', 'short_video_path', 'short_video_play_time')
         read_only_fields = ('id', 'user',)
 
 
