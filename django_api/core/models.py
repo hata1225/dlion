@@ -80,6 +80,7 @@ class FileData(models.Model):
         # lowmp4=>低画質mp4 playlist=>低画質高画質混合m3u8 allcomplete=>エンコード完了 completetotal(0~4)=>エンコード状況
     video_data_status = models.TextField(default=json.dumps({'lsm3u8': 0, 'shortmp4': 0, 'allcomplete': 0, 'completetotal': 0 }))
     short_video_path = models.TextField(default="")
+    short_video_play_time = models.IntegerField(default=0)
 
     #画像 images 複数
 
@@ -184,6 +185,7 @@ class FileData(models.Model):
         f = open(f'{main_data_path_by_export}short_videos.txt', 'w')
         video_data_status = json.loads(self.video_data_status)
         video_data_status['shortmp4'] = 1
+        video_data_status['completetotal'] = 2
         self.video_data_status = json.dumps(video_data_status)
         super().save(*args, **kwargs)
 
@@ -206,7 +208,12 @@ class FileData(models.Model):
             path = f'{main_data_path_by_export}short_{i}.mp4'
             os.remove(path)
             i += 1
+        self.short_video_path = f'http://localhost:8000/media/main/example1/{self.id}/short.webp'
+
         cap = cv2.VideoCapture(f'{main_data_path_by_export}short.mp4')
+        short_video_play_time = cap.get(cv2.CAP_PROP_FRAME_COUNT) / cap.get(cv2.CAP_PROP_FPS)
+        self.short_video_play_time = short_video_play_time
+
         os.remove(f'{main_data_path_by_export}short_videos.txt')
         os.remove(f'{main_data_path_by_export}short.mp4')
 
