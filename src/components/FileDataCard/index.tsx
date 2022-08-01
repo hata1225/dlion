@@ -37,12 +37,11 @@ export const FileDataCard = ({
   const [isScaleUpBottomArea, setIsScaleUpButtonArea] = React.useState(false);
   const [bottomAreaDefaultHeight, setBottomAreaDefaultHeight] =
     React.useState(0);
-  const [videoDataStatus, setVideoDataStatus] = React.useState(0);
+  const [videoDataStatus, setVideoDataStatus] = React.useState<any>();
   const [coverImage, setCoverImage] = React.useState(cover_image);
   const [shortVideo, setShortVideo] = React.useState(short_video_path);
   const { user } = React.useContext(UserContext);
   const classes = useStyles();
-
   const bottomAreaRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
@@ -60,6 +59,7 @@ export const FileDataCard = ({
             setCoverImage(newFileData.cover_image);
             if (newVideoDataStatus["allcomplete"] === 1) {
               console.log("all complete");
+              setShortVideo(newFileData.short_video_path);
               clearInterval(getFileDataInterval);
             }
           }
@@ -93,6 +93,7 @@ export const FileDataCard = ({
       <ImageArea
         coverImage={coverImage}
         shortVideo={shortVideo}
+        videoDataStatus={videoDataStatus}
         fileData={fileData}
       />
       <div
