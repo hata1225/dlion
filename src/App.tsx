@@ -11,6 +11,7 @@ import { MainPage } from "pages/MainPage";
 import { SignupAndSigninPage } from "pages/SignupAndSigninPage";
 import { PostModalProvider } from "contexts/PostModalContext";
 import { FileDataProvider } from "contexts/FileDataContexts";
+import { FileDataDetailPage } from "pages/FileDataDetailPage";
 
 export default function App() {
   return (
@@ -36,6 +37,7 @@ const ReactRouter = () => {
       <Routes>
         <Route path="/" element={<MainPage />} />
         <Route path="/auth" element={<SignupAndSigninPage />} />
+        <Route path="/filedata/:id" element={<FileDataDetailPage />} />
       </Routes>
     </BrowserRouter>
   );

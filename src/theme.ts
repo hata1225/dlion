@@ -20,7 +20,7 @@ export const baseStyle = {
     width: "250px",
   },
   maxWidthLayout: {
-    pc: 1350,
+    pc: 1300,
     tb: 980,
     sp: 600,
   },
@@ -71,7 +71,7 @@ export const baseAnimationTransitoin = {
 
 export const fontSize = {
   large: {
-    large: "3rem",
+    large: "2.5rem",
     medium: "2.2rem",
     small: "2rem",
   },

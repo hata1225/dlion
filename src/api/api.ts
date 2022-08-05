@@ -216,6 +216,7 @@ export const getFileData = async (token: string, id: number) => {
   try {
     const result = await get(path, token);
     const fileData: FileData = result.data;
+    fileData.video_data_status = JSON.parse(fileData.video_data_status);
     return fileData;
   } catch (error) {
     console.log("@getFileData: ", error);
