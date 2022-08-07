@@ -45,7 +45,7 @@ export const FileDataDetailPage = ({}: Props) => {
       <div className={classes.descriptionArea}>
         <p>{fileData?.description}</p>
       </div>
-      <DetailPageCard fileData={fileData} />
+      {fileData ? <DetailPageCard fileData={fileData} /> : <></>}
     </div>
   );
 };

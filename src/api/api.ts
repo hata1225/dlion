@@ -22,7 +22,7 @@ const createFormData = (data: any) => {
   return formData;
 };
 
-export const post = async (
+export const postAxios = async (
   path: string,
   data: object,
   token?: string,
@@ -72,7 +72,7 @@ export const post = async (
   }
 };
 
-export const patch = async (path: string, data: object, token: string) => {
+export const patchAxios = async (path: string, data: object, token: string) => {
   axios.defaults.withCredentials = false;
   let patchProps: [string, any, AxiosRequestConfig<any> | undefined];
   let formData = createFormData(data);
@@ -99,7 +99,7 @@ export const patch = async (path: string, data: object, token: string) => {
   }
 };
 
-export const get = async (path: string, token: string) => {
+export const getAxios = async (path: string, token: string) => {
   axios.defaults.withCredentials = false;
   let getProps: [string, AxiosRequestConfig<any> | undefined];
   if (token) {
@@ -122,11 +122,34 @@ export const get = async (path: string, token: string) => {
   }
 };
 
+export const deleteAxios = async (path: string, token: string) => {
+  axios.defaults.withCredentials = false;
+  let deleteProps: [string, AxiosRequestConfig<any> | undefined];
+  if (token) {
+    deleteProps = [
+      `/api${path}`,
+      {
+        headers: {
+          Authorization: `Token ${token}`,
+        },
+      },
+    ];
+  } else {
+    deleteProps = [`/api${path}`, undefined];
+  }
+  try {
+    return await axios.delete(...deleteProps);
+  } catch (error) {
+    console.log("[DELETE] Error: ", error);
+    throw error;
+  }
+};
+
 export const getToken = async (email: string, password: string) => {
   const path = "/user/token/";
   const data = { email, password };
   try {
-    const result = await post(path, data);
+    const result = await postAxios(path, data);
     return result?.data?.token;
   } catch (error) {
     console.log("@getToken Error: ", error);
@@ -137,7 +160,7 @@ export const getToken = async (email: string, password: string) => {
 export const getUserInfo = async (token: string) => {
   const path = "/user/update/";
   try {
-    const result = await get(path, token);
+    const result = await getAxios(path, token);
     return result?.data;
   } catch (error) {
     console.log("@getUserInfo: ", error);
@@ -161,7 +184,7 @@ export const createUser = async (
     name,
   };
   try {
-    await post(path, data);
+    await postAxios(path, data);
   } catch (error) {
     console.log("@createUser Error: ", error);
     throw error;
@@ -176,7 +199,7 @@ export const updateUser = async (
   const path = "/user/update/";
   const data = { email, name };
   try {
-    const result = await patch(path, data, token);
+    const result = await patchAxios(path, data, token);
     return result;
   } catch (error) {
     console.log("@updateUser: ", error);
@@ -187,7 +210,7 @@ export const updateUser = async (
 export const getCategories = async (token: string) => {
   const path = "/categories/";
   try {
-    const result = await get(path, token);
+    const result = await getAxios(path, token);
     return result?.data;
   } catch (error) {
     console.log("@getCategories: ", error);
@@ -198,7 +221,7 @@ export const getCategories = async (token: string) => {
 export const getAllFileData = async (token: string) => {
   const path = "/file_data/";
   try {
-    const result = await get(path, token);
+    const result = await getAxios(path, token);
     const fileData: FileData[] = result.data.results;
     fileData.forEach((item: any) => {
       item.categories = JSON.parse(item.categories);
@@ -214,12 +237,23 @@ export const getAllFileData = async (token: string) => {
 export const getFileData = async (token: string, id: number) => {
   const path = `/file_data/${id}/`;
   try {
-    const result = await get(path, token);
+    const result = await getAxios(path, token);
     const fileData: FileData = result.data;
     fileData.video_data_status = JSON.parse(fileData.video_data_status);
     return fileData;
   } catch (error) {
     console.log("@getFileData: ", error);
+    throw error;
+  }
+};
+
+export const deleteFileData = async (token: string, id: number) => {
+  const path = `/file_data/${id}/`;
+  try {
+    const result = await deleteAxios(path, token);
+    return result;
+  } catch (error) {
+    console.log("@deleteFileData: ", error);
     throw error;
   }
 };
@@ -240,7 +274,7 @@ export const postFileData = async (
 ) => {
   const path = "/file_data/";
   try {
-    const result = await post(
+    const result = await postAxios(
       path,
       data,
       token,

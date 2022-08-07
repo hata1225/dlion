@@ -54,6 +54,10 @@ export const baseStyle = {
       main: "#888888",
       light: "#a8a8a8",
     },
+    red: {
+      main: "rgba(207, 34, 46, 1)",
+      mainButtonHover: "rgba(207, 34, 46, 0.85)",
+    },
   },
 };
 
