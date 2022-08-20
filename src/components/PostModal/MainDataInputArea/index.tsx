@@ -67,7 +67,7 @@ export const MainDataInputArea = React.memo(
           <input
             style={{ display: "none" }}
             type="file"
-            accept="*"
+            accept="video/*,image/*,audio/*,.pdf"
             onChange={(e) => handleChangeMainData(e)}
             onClick={(e: any) => {
               e.target.value = "";

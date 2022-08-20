@@ -5,11 +5,21 @@ import { useWindowSize } from "hooks/useWindowSize";
 import React from "react";
 import { baseStyle } from "theme";
 
-export const MainPage = () => {
+type Props = {
+  reanderedFunc?: () => void;
+};
+
+export const MainPage = ({ reanderedFunc }: Props) => {
   const { fileData } = React.useContext(FileDataContext);
   const [fileDataCardWidth, setFileDataCardWidth] = React.useState("100%");
   const [width] = useWindowSize();
   const classes = useStyles();
+
+  React.useEffect(() => {
+    if (reanderedFunc) {
+      reanderedFunc();
+    }
+  }, []);
 
   React.useEffect(() => {
     let cardRow = 1;

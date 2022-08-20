@@ -2,6 +2,7 @@ import { Button, makeStyles } from "@material-ui/core";
 import { CoverImageAreaByVideoData } from "components/CoverImageAreaByVideoData";
 import { DeleteCheckModal } from "components/DeleteCheckModal";
 import { RedButton } from "components/RedButton";
+import { PostModalContext } from "contexts/PostModalContext";
 import React from "react";
 import { borderRadius, shadow } from "theme";
 import { FileData } from "types/fileData";
@@ -14,8 +15,11 @@ export const DetailPageCard = ({ fileData }: Props) => {
   const classes = useStyles();
   const [isOpenDeleteCheckModal, setIsOpenDeleteCheckModal] =
     React.useState(false);
+  const { handleOpenPostModal } = React.useContext(PostModalContext);
 
-  const handleClickEditButton = () => {};
+  const handleClickEditButton = () => {
+    handleOpenPostModal(fileData);
+  };
 
   const handleClickDeleteButton = () => {
     if (fileData) {

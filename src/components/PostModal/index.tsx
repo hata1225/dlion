@@ -16,7 +16,7 @@ import CloseIcon from "@material-ui/icons/Close";
 import { BaseTextField } from "components/BaseTextField";
 import { CategoryInputArea } from "./CategoryInputArea";
 import { PostModalLine } from "./PostModalLine";
-import { FileDataStatus } from "types/fileData";
+import { FileData, FileDataStatus } from "types/fileData";
 import { postFileData } from "api/api";
 import { UserContext } from "contexts/UserContext";
 import { FileDataInputArea } from "./FileDataInputArea";
@@ -27,6 +27,7 @@ import { countString } from "functions/countString";
 interface Props {
   isOpenPostModal: boolean;
   setIsOpenPostModal: React.Dispatch<React.SetStateAction<boolean>>;
+  fileData?: FileData;
 }
 
 export const PostModal = (props: Props) => {
@@ -81,6 +82,8 @@ export const PostModal = (props: Props) => {
   };
 
   const handlePost = async () => {
+    let newData;
+
     if (coverImage && mainData && user?.token) {
       let data = {
         title,
@@ -89,11 +92,11 @@ export const PostModal = (props: Props) => {
         cover_image: coverImage,
         main_data_size: String(mainData?.size ?? 0),
         main_data_type: mainDataStatus,
+        main_data: mainData,
       };
       if (mainDataStatus === "video") {
-        const newData = {
+        newData = {
           ...{
-            video_data: mainData,
             video_data_status: JSON.stringify({
               lsm3u8: 0,
               shortmp4: 0,
@@ -103,7 +106,13 @@ export const PostModal = (props: Props) => {
           },
           ...data,
         };
-        try {
+      } else {
+        newData = {
+          ...data,
+        };
+      }
+      try {
+        if (newData) {
           await postFileData(
             newData,
             user.token,
@@ -123,10 +132,9 @@ export const PostModal = (props: Props) => {
               createNotification("success", "投稿できました");
             }
           );
-        } catch (error: any) {
-          createNotification("danger", error?.message, "投稿に失敗しました");
         }
-      } else if (mainDataStatus === "image") {
+      } catch (error: any) {
+        createNotification("danger", error?.message, "投稿に失敗しました");
       }
     }
   };

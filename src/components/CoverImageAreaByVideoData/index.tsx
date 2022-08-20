@@ -22,12 +22,19 @@ export const CoverImageAreaByVideoData = ({
   const [isShortVideo, setIsShortVideo] = React.useState(false);
   const [videoDataStatus, setVideoDataStatus] = React.useState<any>();
   const [coverImage, setCoverImage] = React.useState(fileData?.cover_image);
+  const [isVideoTypeByFileData, setIsVideoTypeByFileData] = React.useState(
+    fileData?.main_data_type === "video"
+  );
   const [shortVideo, setShortVideo] = React.useState(
     fileData?.short_video_path
   );
   const [isAllCompleteByEncodeVideo, setIsAllCompleteByEncodeVideo] =
     React.useState<any>();
   const { user } = React.useContext(UserContext);
+
+  React.useEffect(() => {
+    setIsVideoTypeByFileData(fileData?.main_data_type === "video");
+  }, [fileData]);
 
   React.useEffect(() => {
     if (fileData) {
@@ -40,9 +47,7 @@ export const CoverImageAreaByVideoData = ({
           const getFileDataInterval = setInterval(async () => {
             if (user?.token) {
               const newFileData = await getFileData(user.token, fileData.id);
-              const newVideoDataStatus = JSON.parse(
-                newFileData.video_data_status
-              );
+              const newVideoDataStatus = newFileData.video_data_status;
               setVideoDataStatus(newVideoDataStatus);
               setCoverImage(newFileData.cover_image);
               if (newVideoDataStatus["allcomplete"] === 1) {
@@ -57,19 +62,24 @@ export const CoverImageAreaByVideoData = ({
   }, [fileData]);
 
   React.useEffect(() => {
-    if (videoDataStatus) {
+    if (fileData?.main_data_type !== "video") {
+    } else if (videoDataStatus) {
       setIsAllCompleteByEncodeVideo(videoDataStatus["allcomplete"] === 1);
     }
   }, [videoDataStatus]);
 
   const handleClickImage = () => {
-    if (isAllCompleteByEncodeVideo && fileData && !isNotTransitionPage) {
+    if (!isVideoTypeByFileData && fileData) {
+      window.location.href = `/filedata/${fileData.id}`;
+    } else if (isAllCompleteByEncodeVideo && fileData && !isNotTransitionPage) {
       window.location.href = `/filedata/${fileData.id}`;
     }
   };
 
   const onMouseEnterImage = () => {
-    setIsShortVideo(true);
+    if (isVideoTypeByFileData) {
+      setIsShortVideo(true);
+    }
   };
 
   const onMouseOutImage = () => {
@@ -84,7 +94,7 @@ export const CoverImageAreaByVideoData = ({
     >
       {fileData ? (
         <>
-          {isAllCompleteByEncodeVideo ? (
+          {!isVideoTypeByFileData || isAllCompleteByEncodeVideo ? (
             <img
               className={`${classes.image} ${classNameByImage}`}
               src={isShortVideo ? shortVideo : coverImage}
