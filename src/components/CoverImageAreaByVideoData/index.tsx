@@ -43,7 +43,11 @@ export const CoverImageAreaByVideoData = ({
       setCoverImage(fileData.cover_image);
       setShortVideo(fileData.short_video_path);
       (async () => {
-        if (video_data_status["allcomplete"] === 0) {
+        // ファイルデータがvideoタイプかつ、エンコードが終わっていない場合は、fileDataを再取得
+        const isFetchedEncodeStatusByVideoData =
+          video_data_status["allcomplete"] === 0 &&
+          fileData.main_data_type === "video";
+        if (isFetchedEncodeStatusByVideoData) {
           const getFileDataInterval = setInterval(async () => {
             if (user?.token) {
               const newFileData = await getFileData(user.token, fileData.id);

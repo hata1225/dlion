@@ -56,6 +56,8 @@ export const MainDataInputArea = React.memo(
         );
       } else if (mainDataStatus === "pdf") {
         return <div className={`${classes.previewArea}`}></div>;
+      } else if (mainDataStatus === "none") {
+        return <div className={`${classes.previewArea}`}></div>;
       } else {
         return <>{mainDataStatus} cannnot be upload.</>;
       }
