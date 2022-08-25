@@ -43,7 +43,7 @@ export const CoverImageAreaByVideoData = ({
       setCoverImage(fileData.cover_image);
       setShortVideo(fileData.short_video_path);
       (async () => {
-        // ファイルデータがvideoタイプかつ、エンコードが終わっていない場合は、fileDataを再取得
+        // fileDataがvideoタイプかつ、エンコードが終わっていない場合は、fileDataを再取得
         const isFetchedEncodeStatusByVideoData =
           video_data_status["allcomplete"] === 0 &&
           fileData.main_data_type === "video";
