@@ -41,7 +41,7 @@ export const MainDataInputArea = React.memo(
             controls
           />
         );
-      } else if (mainDataStatus === "image" || mainDataStatus === "none") {
+      } else if (mainDataStatus === "image") {
         return (
           <div
             className={classes.previewArea}
@@ -54,6 +54,8 @@ export const MainDataInputArea = React.memo(
             <audio src={mainDataObjectUrl} preload="metadata" controls></audio>
           </div>
         );
+      } else if (mainDataStatus === "pdf") {
+        return <div className={`${classes.previewArea}`}></div>;
       } else {
         return <>{mainDataStatus} cannnot be upload.</>;
       }
