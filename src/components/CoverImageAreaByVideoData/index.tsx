@@ -63,7 +63,7 @@ export const CoverImageAreaByVideoData = ({
         }
       })();
     }
-  }, [fileData]);
+  }, [fileData, user?.token]);
 
   React.useEffect(() => {
     if (fileData?.main_data_type !== "video") {
