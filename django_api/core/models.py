@@ -74,9 +74,9 @@ class FileData(models.Model):
     cover_image = models.FileField(upload_to=saveCoverDataPath, null=True)
     main_data_size = models.CharField(max_length=1000, default=0)
     main_data_type = models.TextField(default="none") # none | video | image | pdf | audio
+    main_data = models.FileField(upload_to=saveMainDataPath, null=True)
 
     #動画 video 単数
-    video_data = models.FileField(upload_to=saveMainDataPath, null=True)
         # lowmp4=>低画質mp4 playlist=>低画質高画質混合m3u8 allcomplete=>エンコード完了 completetotal(0~4)=>エンコード状況
     video_data_status = models.TextField(default=json.dumps({'lsm3u8': 0, 'shortmp4': 0, 'allcomplete': 0, 'completetotal': 0 }))
     short_video_path = models.TextField(default="")
@@ -86,6 +86,8 @@ class FileData(models.Model):
 
     #pdf pdf 単数
 
+    #音楽 audio 単数
+
     def __str__(self):
         return self.title
 
@@ -93,16 +95,16 @@ class FileData(models.Model):
         if self.id is None:
             # アップロードされたファイルを変数に代入しておく
             cover_image = self.cover_image
-            video_data = self.video_data
+            main_data = self.main_data
 
             # 一旦fileフィールドがNullの状態で保存(→インスタンスIDが割り当てられる)
             self.cover_image = None
-            self.video_data = None
+            self.main_data = None
             super().save(*args, **kwargs)
 
             # fileフィールドに値をセット
             self.cover_image = cover_image
-            self.video_data = video_data
+            self.main_data = main_data
             if "force_insert" in kwargs:
                 kwargs.pop("force_insert")
 
@@ -121,110 +123,111 @@ class FileData(models.Model):
             if not file_data_category in all_categories:
                 Categories.objects.create(category=file_data_category, user=self.user)
 
-        # 保存されたvideoData, cover_imageのパス, main_data名, export_path
-        main_data_path = "media/"+str(self.video_data)
-        cover_image_path = "media/"+str(self.cover_image)
-        main_data_name = str(main_data_path).split("/")[-1]
-        main_data_path_by_export = main_data_path.replace(main_data_name, "")
-        cover_image_name = str(cover_image_path).split("/")[-1]
-        cover_image_path_by_export = cover_image_path.replace(cover_image_name, "")
+        if self.main_data_type == "video":
+            # 保存されたvideoData, cover_imageのパス, main_data名, export_path
+            main_data_path = "media/"+str(self.main_data)
+            cover_image_path = "media/"+str(self.cover_image)
+            main_data_name = str(main_data_path).split("/")[-1]
+            main_data_path_by_export = main_data_path.replace(main_data_name, "")
+            cover_image_name = str(cover_image_path).split("/")[-1]
+            cover_image_path_by_export = cover_image_path.replace(cover_image_name, "")
 
-        # cover_imageをwebpに変換
-        cmd = f'ffmpeg -i {cover_image_path} -vf scale=800:-1 -q:v 65 {cover_image_path_by_export}cover_image.webp'
-        code = subprocess.call(cmd.split())
-        print('process=' + str(code))
-        cover_image_path_by_export = cover_image_path_by_export.replace("media/", "")
-        self.cover_image = f'{cover_image_path_by_export}cover_image.webp'
-        super().save(*args, **kwargs)
-
-        # m3u8の作成([input].mp4 -> ls/ls.m3u8)
-        os.makedirs(f'{main_data_path_by_export}ls')
-        cmd = 'ffmpeg'
-        cmd += f' -i {main_data_path}'
-        cmd += ' -codec copy -vbsf h264_mp4toannexb -map 0'
-        cmd += ' -f segment -segment_format mpegts -segment_time 12'
-        cmd += f' -segment_list {main_data_path_by_export}ls/ls.m3u8'
-        cmd += f' {main_data_path_by_export}ls/ls_%5d.ts'
-        code = subprocess.call(cmd.split())
-        print('process=' + str(code))
-        video_data_status = json.loads(self.video_data_status)
-        video_data_status['lsm3u8'] = 1
-        video_data_status['completetotal'] = 1
-        self.video_data_status = json.dumps(video_data_status)
-        super().save(*args, **kwargs)
-
-        # short.mp4, short.webp作成
-        t_while = 1.5 # 切り取り秒数
-        export_video_ren = 5 # shortvideo作成数
-        cap = cv2.VideoCapture(main_data_path)
-        play_time = cap.get(cv2.CAP_PROP_FRAME_COUNT) / cap.get(cv2.CAP_PROP_FPS)
-
-        create_videos = [
-            {"video_id": 1, "ss_t": 5},
-            {"video_id": 2, "ss_t": math.floor(play_time / 4)},
-            {"video_id": 3, "ss_t": math.floor(play_time / 2)},
-            {"video_id": 4, "ss_t": math.floor((play_time / 4) * 3)},
-            {"video_id": 5, "ss_t": math.floor(play_time - 30)},
-        ]
-
-        if play_time < 150:
-            create_videos.pop()
-            export_video_ren = 4
-        elif play_time < 120:
-            t_while = 10
-            create_videos = [{"video_id": 1, "ss_t": 5}]
-            export_video_ren = 1
-        elif play_time < 15:
-            t_while = play_time - 0.5
-            create_videos = [{"video_id": 1, "ss_t": 0}]
-            export_video_ren = 1
-        for item in create_videos:
-            cmd = f'ffmpeg -ss {item["ss_t"]} -i {main_data_path} -t {t_while} -c copy {main_data_path_by_export}short_{item["video_id"]}.mp4'
+            # cover_imageをwebpに変換
+            cmd = f'ffmpeg -i {cover_image_path} -vf scale=800:-1 -q:v 65 {cover_image_path_by_export}cover_image.webp'
             code = subprocess.call(cmd.split())
             print('process=' + str(code))
-        f = open(f'{main_data_path_by_export}short_videos.txt', 'w')
-        video_data_status = json.loads(self.video_data_status)
-        video_data_status['shortmp4'] = 1
-        video_data_status['completetotal'] = 2
-        self.video_data_status = json.dumps(video_data_status)
-        super().save(*args, **kwargs)
+            cover_image_path_by_export = cover_image_path_by_export.replace("media/", "")
+            self.cover_image = f'{cover_image_path_by_export}cover_image.webp'
+            super().save(*args, **kwargs)
 
-        short_videos = []
-        i = 1
-        while i <= export_video_ren:
-            short_videos.append(f"file 'short_{i}.mp4'")
-            i += 1
-        write_text = "\n".join(short_videos)
-        f.write(write_text)
-        f.close()
-        cmd = f'ffmpeg -f concat -safe 0 -i {main_data_path_by_export}short_videos.txt -c copy {main_data_path_by_export}short.mp4'
-        code  = subprocess.call(cmd.split())
-        print('process=' + str(code))
-        cmd = f'ffmpeg -i {main_data_path_by_export}short.mp4  -vb 100k  -vf scale=-1:180  -r 18 -pix_fmt pal8 {main_data_path_by_export}short.webp'
-        code = subprocess.call(cmd.split())
-        print('process=' + str(code))
-        i = 1
-        while i <= export_video_ren:
-            path = f'{main_data_path_by_export}short_{i}.mp4'
-            os.remove(path)
-            i += 1
-        self.short_video_path = f'http://localhost:8000/media/main/example1/{self.id}/short.webp'
+            # m3u8の作成([input].mp4 -> ls/ls.m3u8)
+            os.makedirs(f'{main_data_path_by_export}ls')
+            cmd = 'ffmpeg'
+            cmd += f' -i {main_data_path}'
+            cmd += ' -codec copy -vbsf h264_mp4toannexb -map 0'
+            cmd += ' -f segment -segment_format mpegts -segment_time 12'
+            cmd += f' -segment_list {main_data_path_by_export}ls/ls.m3u8'
+            cmd += f' {main_data_path_by_export}ls/ls_%5d.ts'
+            code = subprocess.call(cmd.split())
+            print('process=' + str(code))
+            video_data_status = json.loads(self.video_data_status)
+            video_data_status['lsm3u8'] = 1
+            video_data_status['completetotal'] = 1
+            self.video_data_status = json.dumps(video_data_status)
+            super().save(*args, **kwargs)
 
-        cap = cv2.VideoCapture(f'{main_data_path_by_export}short.mp4')
-        short_video_play_time = cap.get(cv2.CAP_PROP_FRAME_COUNT) / cap.get(cv2.CAP_PROP_FPS)
-        self.short_video_play_time = short_video_play_time
+            # short.mp4, short.webp作成
+            t_while = 1.5 # 切り取り秒数
+            export_video_ren = 5 # shortvideo作成数
+            cap = cv2.VideoCapture(main_data_path)
+            play_time = cap.get(cv2.CAP_PROP_FRAME_COUNT) / cap.get(cv2.CAP_PROP_FPS)
 
-        os.remove(f'{main_data_path_by_export}short_videos.txt')
-        os.remove(f'{main_data_path_by_export}short.mp4')
+            create_videos = [
+                {"video_id": 1, "ss_t": 5},
+                {"video_id": 2, "ss_t": math.floor(play_time / 4)},
+                {"video_id": 3, "ss_t": math.floor(play_time / 2)},
+                {"video_id": 4, "ss_t": math.floor((play_time / 4) * 3)},
+                {"video_id": 5, "ss_t": math.floor(play_time - 30)},
+            ]
 
-        self.main_data_size = os.path.getsize(main_data_path)
-        main_data_path_by_export = main_data_path_by_export.replace("media/", "")
-        self.video_data = main_data_path_by_export + "ls/ls.m3u8"
-        video_data_status = json.loads(self.video_data_status)
-        video_data_status['allcomplete'] = 1
-        video_data_status['completetotal'] = 3
+            if play_time < 150:
+                create_videos.pop()
+                export_video_ren = 4
+            elif play_time < 120:
+                t_while = 10
+                create_videos = [{"video_id": 1, "ss_t": 5}]
+                export_video_ren = 1
+            elif play_time < 15:
+                t_while = play_time - 0.5
+                create_videos = [{"video_id": 1, "ss_t": 0}]
+                export_video_ren = 1
+            for item in create_videos:
+                cmd = f'ffmpeg -ss {item["ss_t"]} -i {main_data_path} -t {t_while} -c copy {main_data_path_by_export}short_{item["video_id"]}.mp4'
+                code = subprocess.call(cmd.split())
+                print('process=' + str(code))
+            f = open(f'{main_data_path_by_export}short_videos.txt', 'w')
+            video_data_status = json.loads(self.video_data_status)
+            video_data_status['shortmp4'] = 1
+            video_data_status['completetotal'] = 2
+            self.video_data_status = json.dumps(video_data_status)
+            super().save(*args, **kwargs)
 
-        self.video_data_status = json.dumps(video_data_status)
+            short_videos = []
+            i = 1
+            while i <= export_video_ren:
+                short_videos.append(f"file 'short_{i}.mp4'")
+                i += 1
+            write_text = "\n".join(short_videos)
+            f.write(write_text)
+            f.close()
+            cmd = f'ffmpeg -f concat -safe 0 -i {main_data_path_by_export}short_videos.txt -c copy {main_data_path_by_export}short.mp4'
+            code  = subprocess.call(cmd.split())
+            print('process=' + str(code))
+            cmd = f'ffmpeg -i {main_data_path_by_export}short.mp4  -vb 100k  -vf scale=-1:180  -r 18 -pix_fmt pal8 {main_data_path_by_export}short.webp'
+            code = subprocess.call(cmd.split())
+            print('process=' + str(code))
+            i = 1
+            while i <= export_video_ren:
+                path = f'{main_data_path_by_export}short_{i}.mp4'
+                os.remove(path)
+                i += 1
+            self.short_video_path = f'http://localhost:8000/media/main/example1/{self.id}/short.webp'
+
+            cap = cv2.VideoCapture(f'{main_data_path_by_export}short.mp4')
+            short_video_play_time = cap.get(cv2.CAP_PROP_FRAME_COUNT) / cap.get(cv2.CAP_PROP_FPS)
+            self.short_video_play_time = short_video_play_time
+
+            os.remove(f'{main_data_path_by_export}short_videos.txt')
+            os.remove(f'{main_data_path_by_export}short.mp4')
+
+            self.main_data_size = os.path.getsize(main_data_path)
+            main_data_path_by_export = main_data_path_by_export.replace("media/", "")
+            self.main_data = main_data_path_by_export + "ls/ls.m3u8"
+            video_data_status = json.loads(self.video_data_status)
+            video_data_status['allcomplete'] = 1
+            video_data_status['completetotal'] = 3
+
+            self.video_data_status = json.dumps(video_data_status)
         super().save(*args, **kwargs)
 
     def __str__(self):

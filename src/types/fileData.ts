@@ -11,7 +11,7 @@ export type FileData = {
   cover_image: string;
   main_data_size: string;
   main_data_type: FileDataStatus;
-  video_data: string;
+  main_data: string;
   video_data_status: any;
   short_video_path: string;
   short_video_play_time: number;

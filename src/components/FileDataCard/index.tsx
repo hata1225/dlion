@@ -10,7 +10,7 @@ import {
 import ExpandLessIcon from "@material-ui/icons/ExpandLess";
 import { getFileData } from "api/api";
 import { UserContext } from "contexts/UserContext";
-import { ImageArea } from "components/FileDataCard/ImageArea";
+import { CoverImageAreaByVideoData } from "components/CoverImageAreaByVideoData";
 
 type CardProps = React.ComponentProps<typeof Card>;
 type Props = CardProps & {
@@ -37,36 +37,8 @@ export const FileDataCard = ({
   const [isScaleUpBottomArea, setIsScaleUpButtonArea] = React.useState(false);
   const [bottomAreaDefaultHeight, setBottomAreaDefaultHeight] =
     React.useState(0);
-  const [videoDataStatus, setVideoDataStatus] = React.useState(0);
-  const [coverImage, setCoverImage] = React.useState(cover_image);
-  const [shortVideo, setShortVideo] = React.useState(short_video_path);
-  const { user } = React.useContext(UserContext);
   const classes = useStyles();
-
   const bottomAreaRef = React.useRef<HTMLDivElement>(null);
-
-  React.useEffect(() => {
-    setVideoDataStatus(video_data_status);
-    (async () => {
-      if (video_data_status["allcomplete"] === 0) {
-        console.log("not complete");
-        const getFileDataInterval = setInterval(async () => {
-          if (user?.token) {
-            const newFileData = await getFileData(user.token, id);
-            const newVideoDataStatus = JSON.parse(
-              newFileData.video_data_status
-            );
-            setVideoDataStatus(newVideoDataStatus);
-            setCoverImage(newFileData.cover_image);
-            if (newVideoDataStatus["allcomplete"] === 1) {
-              console.log("all complete");
-              clearInterval(getFileDataInterval);
-            }
-          }
-        }, 2000);
-      }
-    })();
-  }, []);
 
   React.useEffect(() => {
     if (!isScaleUpBottomArea && bottomAreaRef.current) {
@@ -90,18 +62,14 @@ export const FileDataCard = ({
         ...style,
       }}
     >
-      <ImageArea
-        coverImage={coverImage}
-        shortVideo={shortVideo}
-        fileData={fileData}
-      />
+      <CoverImageAreaByVideoData fileData={fileData} />
       <div
         ref={bottomAreaRef}
         className={classes.bottomArea}
         style={
           isScaleUpBottomArea
             ? {
-                height: `calc(100% - ${baseStyle.bottomAreaButtonAreaSize.height} - 60px)`,
+                height: `calc(100% - ${baseStyle.bottomAreaButtonAreaSize.height} - 55px)`,
               }
             : {
                 height:
@@ -152,7 +120,7 @@ export const FileDataCard = ({
             }
           >
             {categories.map((item, i) => (
-              <Link className={classes.tagItem} key={i} href="">
+              <Link className={classes.category} key={i} href="">
                 #{item}
               </Link>
             ))}
@@ -197,12 +165,12 @@ const useStyles = makeStyles({
     display: "flex",
     flexDirection: "column",
     justifyContent: "space-between",
-    gap: "5px",
   },
   bottomAreaContnetTop: {
     display: "flex",
     flexDirection: "column",
     gap: "5px",
+    marginBottom: "5px",
   },
   heading: {
     display: "-webkit-box",
@@ -224,9 +192,10 @@ const useStyles = makeStyles({
     WebkitBoxOrient: "vertical",
     minHeight: "1.5rem",
   },
-  tagItem: {
+  category: {
     color: baseStyle.color.gray.main,
     paddingRight: "10px",
+    display: "inline-block",
   },
   button: {
     cursor: "pointer",

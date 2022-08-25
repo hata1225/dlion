@@ -3,23 +3,37 @@ import { Header } from "components/Header";
 import { SubArea } from "components/SubArea";
 import React from "react";
 import { baseStyle } from "theme";
-import { UserContext } from "../../contexts/UserContext";
 
 interface Props {
   children?: React.ReactNode;
-  isAuthPage?: boolean;
 }
 
 export const Layout = (props: Props) => {
-  const { children, isAuthPage } = props;
+  const { children } = props;
+  const [isHiddenSubArea, setIsHiddenSubArea] = React.useState(false);
   const classes = useStyles();
+
+  React.useEffect(() => {
+    const pathname = window.location.pathname;
+    if (pathname === "/auth" || pathname.match(/filedata/)) {
+      setIsHiddenSubArea(true);
+    }
+  }, [window.location.pathname]);
 
   return (
     <>
       <Header />
       <main className={classes.main}>
-        {window.location.pathname === "/auth" ? <></> : <SubArea />}
-        <div className={classes.mainArea}>{children}</div>
+        {isHiddenSubArea ? (
+          <div className={classes.mainArea}>{children}</div>
+        ) : (
+          <>
+            <SubArea />
+            <div className={classes.mainArea}>
+              <div className={classes.mainPage}>{children}</div>
+            </div>
+          </>
+        )}
       </main>
     </>
   );
@@ -46,5 +60,12 @@ const useStyles = makeStyles({
     "&::-webkit-scrollbar": {
       display: "none",
     },
+  },
+  mainPage: {
+    width: "100%",
+    padding: "10px 0px 10px 20px",
+    display: "flex",
+    gap: baseStyle.mainPageFileDataCardGap.main,
+    flexWrap: "wrap",
   },
 });

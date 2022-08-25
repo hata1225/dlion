@@ -4,11 +4,18 @@ import { baseStyle, shadow } from "theme";
 
 export const Header = () => {
   const classes = useStyles();
+
+  const handleClickHeading = () => {
+    window.location.href = `/`;
+  };
+
   return (
     <header className={classes.header}>
       <div className={classes.headerInner}>
         <div>
-          <h1 className={classes.heading}>DLion</h1>
+          <h1 className={classes.heading} onClick={handleClickHeading}>
+            DLion
+          </h1>
         </div>
         <div></div>
       </div>
@@ -34,5 +41,6 @@ const useStyles = makeStyles({
   },
   heading: {
     color: baseStyle.color.white.light,
+    cursor: "pointer",
   },
 });

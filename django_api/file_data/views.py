@@ -6,6 +6,7 @@ from core.models import FileData
 from core.models import Categories
 
 from file_data import serializers
+import shutil
 
 class FileDataPagination(pagination.PageNumberPagination):
     page_size = 20
@@ -29,6 +30,18 @@ class FileDataViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.FileDataSerializer
     queryset = FileData.objects.order_by('-created_at')
     pagination_class = FileDataPagination
+
+    def destroy(self, request, *args, **kwargs):
+        id = self.request.path.split("/")[3]
+        user_name = self.request.user.name
+        mainDataPath = f'media/main/{user_name}/{id}'
+        subDataPath = f'media/sub/{user_name}/{id}'
+        try:
+            shutil.rmtree(mainDataPath)
+            shutil.rmtree(subDataPath)
+        except:
+            print("delete error")
+        return super().destroy(request, *args, **kwargs)
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)

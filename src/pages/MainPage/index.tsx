@@ -5,11 +5,21 @@ import { useWindowSize } from "hooks/useWindowSize";
 import React from "react";
 import { baseStyle } from "theme";
 
-export const MainPage = () => {
+type Props = {
+  reanderedFunc?: () => void;
+};
+
+export const MainPage = ({ reanderedFunc }: Props) => {
   const { fileData } = React.useContext(FileDataContext);
   const [fileDataCardWidth, setFileDataCardWidth] = React.useState("100%");
   const [width] = useWindowSize();
   const classes = useStyles();
+
+  React.useEffect(() => {
+    if (reanderedFunc) {
+      reanderedFunc();
+    }
+  }, []);
 
   React.useEffect(() => {
     let cardRow = 1;
@@ -32,7 +42,7 @@ export const MainPage = () => {
   };
 
   return (
-    <div className={classes.mainPage}>
+    <>
       {fileData.map((data, i) => (
         <FileDataCard
           style={{ width: fileDataCardWidth }}
@@ -41,17 +51,10 @@ export const MainPage = () => {
           key={i}
         />
       ))}
-    </div>
+    </>
   );
 };
 
 const useStyles = makeStyles({
-  mainPage: {
-    width: "100%",
-    padding: "10px 0px 10px 20px",
-    display: "flex",
-    gap: baseStyle.mainPageFileDataCardGap.main,
-    flexWrap: "wrap",
-  },
   fileDataCard: {},
 });
