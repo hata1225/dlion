@@ -123,22 +123,24 @@ class FileData(models.Model):
             if not file_data_category in all_categories:
                 Categories.objects.create(category=file_data_category, user=self.user)
 
-        if self.main_data_type == "video":
-            # 保存されたvideoData, cover_imageのパス, main_data名, export_path
-            main_data_path = "media/"+str(self.main_data)
-            cover_image_path = "media/"+str(self.cover_image)
-            main_data_name = str(main_data_path).split("/")[-1]
-            main_data_path_by_export = main_data_path.replace(main_data_name, "")
-            cover_image_name = str(cover_image_path).split("/")[-1]
-            cover_image_path_by_export = cover_image_path.replace(cover_image_name, "")
+        # 保存されたvideoData, cover_imageのパス, main_data名, export_path
+        main_data_path = "media/"+str(self.main_data)
+        cover_image_path = "media/"+str(self.cover_image)
+        main_data_name = str(main_data_path).split("/")[-1]
+        main_data_path_by_export = main_data_path.replace(main_data_name, "")
+        cover_image_name = str(cover_image_path).split("/")[-1]
+        cover_image_path_by_export = cover_image_path.replace(cover_image_name, "")
 
-            # cover_imageをwebpに変換
-            cmd = f'ffmpeg -i {cover_image_path} -vf scale=800:-1 -q:v 65 {cover_image_path_by_export}cover_image.webp'
-            code = subprocess.call(cmd.split())
-            print('process=' + str(code))
-            cover_image_path_by_export = cover_image_path_by_export.replace("media/", "")
-            self.cover_image = f'{cover_image_path_by_export}cover_image.webp'
-            super().save(*args, **kwargs)
+        # cover_imageをwebpに変換
+        cmd = f'ffmpeg -i {cover_image_path} -vf scale=1000:-1 {cover_image_path_by_export}cover_image.webp'
+        code = subprocess.call(cmd.split())
+        print('process=' + str(code))
+        cover_image_path_by_export = cover_image_path_by_export.replace("media/", "")
+        self.cover_image = f'{cover_image_path_by_export}cover_image.webp'
+        super().save(*args, **kwargs)
+
+        if self.main_data_type == "video":
+
 
             # m3u8の作成([input].mp4 -> ls/ls.m3u8)
             os.makedirs(f'{main_data_path_by_export}ls')
