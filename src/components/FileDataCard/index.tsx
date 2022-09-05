@@ -8,8 +8,6 @@ import {
   fontSize,
 } from "theme";
 import ExpandLessIcon from "@material-ui/icons/ExpandLess";
-import { getFileData } from "api/api";
-import { UserContext } from "contexts/UserContext";
 import { CoverImageAreaByVideoData } from "components/CoverImageAreaByVideoData";
 
 type CardProps = React.ComponentProps<typeof Card>;

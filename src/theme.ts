@@ -40,6 +40,9 @@ export const baseStyle = {
     height: "25px",
     width: "50px",
   },
+  gap: {
+    small: "5px",
+  },
   color: {
     purple: {
       dark: "#2c387e",
@@ -48,11 +51,17 @@ export const baseStyle = {
     },
     white: {
       light: "#ffffff",
+      main: "#dcdcdc",
+      dark: "#b9b9b9",
     },
     gray: {
       dark: "#686868",
       main: "#888888",
       light: "#a8a8a8",
+    },
+    black: {
+      dark: "#111111",
+      main: "#222222",
     },
     red: {
       main: "rgba(207, 34, 46, 1)",
