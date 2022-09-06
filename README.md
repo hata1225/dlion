@@ -182,7 +182,7 @@
 
     sh -c: シェルコマンド （bash -c: バッシュコマンド）
 
-13.  **マイグレーションファイルをもとに、データベースへ反映**
+.  **マイグレーションファイルをもとに、データベースへ反映**
 
         docker-compose run --rm django_app sh -c "python3 manage.py migrate core"
 
