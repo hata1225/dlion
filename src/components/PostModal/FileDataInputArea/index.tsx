@@ -3,6 +3,7 @@ import { makeStyles } from "@material-ui/core";
 import { CoverImageInputArea } from "components/PostModal/CoverImageInputArea";
 import { MainDataInputArea } from "components/PostModal/MainDataInputArea";
 import { FileDataStatus } from "types/fileData";
+import { baseStyle } from "theme";
 
 interface Props {
   coverImage?: File;
@@ -29,6 +30,18 @@ export const FileDataInputArea = React.memo(
     mainDataStatus,
   }: Props) => {
     const classes = useStyles();
+    const [mainDataInputAreaWidth, setMainDataInputAreaWidth] =
+      React.useState(0);
+    const inputAreaRef = React.useRef<HTMLDivElement>(null);
+
+    React.useEffect(() => {
+      if (inputAreaRef?.current?.clientWidth) {
+        const inputAreaWidth = inputAreaRef.current.clientWidth;
+        const newmainDataInputAreaWidth =
+          (inputAreaWidth - parseInt(baseStyle.gap.small, 10)) / 2;
+        setMainDataInputAreaWidth(newmainDataInputAreaWidth);
+      }
+    }, [inputAreaRef]);
 
     const handleChangeFileData = (
       e: React.ChangeEvent<HTMLInputElement>,
@@ -45,7 +58,7 @@ export const FileDataInputArea = React.memo(
 
     return (
       <div>
-        <div className={classes.inputArea}>
+        <div className={classes.inputArea} ref={inputAreaRef}>
           <CoverImageInputArea
             coverImage={coverImage}
             coverImageObjectUrl={coverImageObjectUrl}
@@ -60,6 +73,7 @@ export const FileDataInputArea = React.memo(
               handleChangeFileData(e, setMainData, setMainDataObjectUrl)
             }
             mainDataStatus={mainDataStatus}
+            mainDataInputAreaWidth={mainDataInputAreaWidth}
           />
         </div>
       </div>
@@ -71,6 +85,6 @@ const useStyles = makeStyles({
   inputArea: {
     width: "100%",
     display: "flex",
-    gap: "5px",
+    gap: baseStyle.gap.small,
   },
 });
