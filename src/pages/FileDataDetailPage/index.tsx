@@ -43,10 +43,6 @@ export const FileDataDetailPage = ({}: Props) => {
     })();
   }, [user?.token, id]);
 
-  React.useEffect(() => {
-    console.log("rerendering");
-  }, []);
-
   const handleClickBackIcon = () => {
     if (pdfCurrentPageNum === 1) {
       setPdfCurrentPageNum(pdfPagesNum);
