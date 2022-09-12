@@ -131,8 +131,8 @@ class FileData(models.Model):
         cover_image_name = str(cover_image_path).split("/")[-1]
         cover_image_path_by_export = cover_image_path.replace(cover_image_name, "")
 
-        # cover_imageをwebpに変換
-        cmd = f'ffmpeg -i {cover_image_path} -vf scale=1000:-1 {cover_image_path_by_export}cover_image.webp'
+        # cover_imageをwebpに変換 横幅1200px
+        cmd = f'ffmpeg -i {cover_image_path} -vf scale=1200:-1 {cover_image_path_by_export}cover_image.webp'
         code = subprocess.call(cmd.split())
         print('process=' + str(code))
         cover_image_path_by_export = cover_image_path_by_export.replace("media/", "")
