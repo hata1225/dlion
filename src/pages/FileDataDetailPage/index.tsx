@@ -1,5 +1,5 @@
 import { IconButton, makeStyles } from "@material-ui/core";
-import { getFileData } from "api/api";
+import { getFileData, getMainDataByBlob } from "api/api";
 import React from "react";
 import { useParams } from "react-router-dom";
 import { FileData, FileDataStatus } from "types/fileData";
@@ -7,7 +7,9 @@ import { UserContext } from "../../contexts/UserContext";
 import ReactHlsPlayer from "react-hls-player";
 import { baseStyle, borderRadius, fontSize } from "theme";
 import { DetailPageCard } from "components/DetailPageCard";
-import { Page } from "react-pdf";
+import { Document, Page } from "react-pdf";
+import ArrowBackIcon from "@material-ui/icons/ArrowBack";
+import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
 import ZoomOutMapIcon from "@material-ui/icons/ZoomOutMap";
 import { PdfModal } from "components/PdfModal/PdfModal";
 import { BasePdf } from "components/BasePdf/BasePdf";
@@ -15,7 +17,10 @@ import { BasePdf } from "components/BasePdf/BasePdf";
 interface Props {}
 
 export const FileDataDetailPage = ({}: Props) => {
+  const [pdfPagesNum, setPdfPagesNum] = React.useState(0);
   const [fileData, setFileData] = React.useState<FileData>();
+  const [mainDataBlobUrl, setMainDataBlobUrl] = React.useState("");
+  const [pdfCurrentPageNum, setPdfCurrentPageNum] = React.useState(1);
   const [isOpenByPdfModal, setIsOpenByPdfModal] = React.useState(false);
   const [mainDataType, setMainDataType] = React.useState<
     FileDataStatus | undefined
@@ -26,10 +31,18 @@ export const FileDataDetailPage = ({}: Props) => {
   const playerRef = React.useRef<HTMLVideoElement>(null);
 
   React.useEffect(() => {
-    if (fileData) {
-      setMainDataType(fileData.main_data_type);
-    }
-  }, [fileData]);
+    (async () => {
+      if (fileData && user?.token) {
+        setMainDataType(fileData.main_data_type);
+        console.log("fileData.main_data: ", fileData.main_data);
+        const newMainDataBlobUrl = await getMainDataByBlob(
+          fileData,
+          user.token
+        );
+        setMainDataBlobUrl(newMainDataBlobUrl);
+      }
+    })();
+  }, [user?.token, fileData]);
 
   React.useEffect(() => {
     (async () => {
@@ -40,9 +53,21 @@ export const FileDataDetailPage = ({}: Props) => {
     })();
   }, [user?.token, id]);
 
-  React.useEffect(() => {
-    console.log("rerendering");
-  }, []);
+  const handleClickBackIcon = () => {
+    if (pdfCurrentPageNum === 1) {
+      setPdfCurrentPageNum(pdfPagesNum);
+    } else {
+      setPdfCurrentPageNum((prev) => prev - 1);
+    }
+  };
+
+  const handleClickForwardIcon = () => {
+    if (pdfCurrentPageNum === pdfPagesNum) {
+      setPdfCurrentPageNum(1);
+    } else {
+      setPdfCurrentPageNum((prev) => prev + 1);
+    }
+  };
 
   const handleClickZoomButton = () => {
     setIsOpenByPdfModal(true);
@@ -55,7 +80,7 @@ export const FileDataDetailPage = ({}: Props) => {
       </div>
       {mainDataType === "video" && (
         <ReactHlsPlayer
-          src={fileData ? fileData.main_data : ""}
+          src={fileData ? mainDataBlobUrl : ""}
           playerRef={playerRef}
           autoPlay={false}
           controls={true}
@@ -69,7 +94,7 @@ export const FileDataDetailPage = ({}: Props) => {
       {mainDataType === "audio" && (
         <audio
           className={classes.audio}
-          src={fileData ? fileData.main_data : ""}
+          src={fileData ? mainDataBlobUrl : ""}
           preload="metadata"
           controls
         ></audio>
@@ -88,7 +113,7 @@ export const FileDataDetailPage = ({}: Props) => {
           <PdfModal
             isOpen={isOpenByPdfModal}
             setIsOpen={setIsOpenByPdfModal}
-            fileData={fileData}
+            mainDataBlobUrl={mainDataBlobUrl}
           />
         </>
       )}

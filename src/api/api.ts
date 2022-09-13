@@ -102,6 +102,7 @@ export const patchAxios = async (path: string, data: object, token: string) => {
 export const getAxios = async (path: string, token: string) => {
   axios.defaults.withCredentials = false;
   let getProps: [string, AxiosRequestConfig<any> | undefined];
+  const isPathMatchByHttp = path.match(/http:/)
   if (token) {
     getProps = [
       `/api${path}`,
@@ -113,6 +114,33 @@ export const getAxios = async (path: string, token: string) => {
     ];
   } else {
     getProps = [`/api${path}`, undefined];
+  }
+  if (isPathMatchByHttp) {
+    getProps[0] = path
+  }
+  try {
+    return await axios.get(...getProps);
+  } catch (error) {
+    console.log("[GET] Error: ", error);
+    throw error;
+  }
+};
+
+export const getAxiosByMainDataBlob = async (path: string, token: string) => {
+  axios.defaults.withCredentials = false;
+  let getProps: [string, AxiosRequestConfig<any> | undefined];
+  if (token) {
+    getProps = [
+      `${path}`,
+      {
+        responseType: 'blob',
+        headers: {
+          Authorization: `Token ${token}`,
+        },
+      },
+    ];
+  } else {
+    getProps = [`${path}`, {responseType: 'blob'}];
   }
   try {
     return await axios.get(...getProps);
@@ -287,3 +315,20 @@ export const postFileData = async (
     throw error;
   }
 };
+
+export const getMainDataByBlob = async (
+  fileData: FileData,
+  token: string,
+) => {
+  const path = fileData.main_data
+  try {
+    const result = await getAxiosByMainDataBlob(
+      path,
+      token
+    );
+    return result.data;
+  } catch (error) {
+    console.log("@getMainData: ", error);
+    throw error;
+  }
+}

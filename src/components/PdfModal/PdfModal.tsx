@@ -11,10 +11,10 @@ import { BasePdf } from "components/BasePdf/BasePdf";
 interface Props {
   isOpen: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  fileData?: FileData;
+  mainDataBlobUrl: string;
 }
 
-export const PdfModal = ({ isOpen, setIsOpen, fileData }: Props) => {
+export const PdfModal = ({ isOpen, setIsOpen, mainDataBlobUrl }: Props) => {
   const classes = useStyles();
   const [pdfPagesNum, setPdfPagesNum] = React.useState(0);
   const [pdfCurrentPageNum, setPdfCurrentPageNum] = React.useState(1);
@@ -60,8 +60,8 @@ export const PdfModal = ({ isOpen, setIsOpen, fileData }: Props) => {
     >
       <div className={classes.pdfModalContentArea}>
         <IconButton
-          className={classes.pdfModalCloseButton}
-          onClick={handleClickCloseButton}
+          className={`${classes.pdfModalCloseButton} ${classes.iconButtonWhiteColorHover}`}
+          onClick={handleClicCloseButton}
         >
           <HighlightOffIcon className={classes.HighlightOffIcon} />
         </IconButton>
@@ -79,23 +79,53 @@ const useStyles = makeStyles({
   },
   pdfModalContentArea: {
     position: "relative",
-    height: "90vh",
-    width: "90vw",
-    padding: "10px",
+    paddingTop: "15px",
+    height: "calc(100vh - 15px)",
+    width: "calc(100vw - 30px)",
     maxWidth: `${baseStyle.maxWidthLayout.tb}px`,
     backgroundColor: baseStyle.color.black.main,
     borderRadius: borderRadius.main,
   },
   HighlightOffIcon: {
-    color: baseStyle.color.white.light,
     fontSize: 25,
+  },
+  pdfButtonArea: {
+    width: "100%",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: "20px",
+    padding: "5px",
+    position: "absolute",
+    bottom: 0,
+  },
+  pdfCurrentPageNumArea: {
+    color: baseStyle.color.white.light,
+  },
+  pdfButtonArea: {
+    width: "100%",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: "20px",
+    padding: "5px",
+    position: "absolute",
+    bottom: 0,
+  },
+  pdfCurrentPageNumArea: {
+    color: baseStyle.color.white.light,
   },
   pdfModalCloseButton: {
     position: "absolute",
     right: 0,
     zIndex: 100,
-    margin: "15px",
+    marginRight: "15px",
     padding: "8px",
+  },
+  iconButtonWhiteColor: {
+    color: baseStyle.color.white.light,
+  },
+  iconButtonWhiteColorHover: {
     "&:hover": {
       backgroundColor: "rgba(255, 255, 255, 0.15)",
     },
