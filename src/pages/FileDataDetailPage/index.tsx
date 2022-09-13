@@ -7,18 +7,15 @@ import { UserContext } from "../../contexts/UserContext";
 import ReactHlsPlayer from "react-hls-player";
 import { baseStyle, borderRadius, fontSize } from "theme";
 import { DetailPageCard } from "components/DetailPageCard";
-import { Document, Page } from "react-pdf";
-import ArrowBackIcon from "@material-ui/icons/ArrowBack";
-import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
+import { Page } from "react-pdf";
 import ZoomOutMapIcon from "@material-ui/icons/ZoomOutMap";
 import { PdfModal } from "components/PdfModal/PdfModal";
+import { BasePdf } from "components/BasePdf/BasePdf";
 
 interface Props {}
 
 export const FileDataDetailPage = ({}: Props) => {
-  const [pdfPagesNum, setPdfPagesNum] = React.useState(0);
   const [fileData, setFileData] = React.useState<FileData>();
-  const [pdfCurrentPageNum, setPdfCurrentPageNum] = React.useState(1);
   const [isOpenByPdfModal, setIsOpenByPdfModal] = React.useState(false);
   const [mainDataType, setMainDataType] = React.useState<
     FileDataStatus | undefined
@@ -47,37 +44,9 @@ export const FileDataDetailPage = ({}: Props) => {
     console.log("rerendering");
   }, []);
 
-  const handleClickBackIcon = () => {
-    if (pdfCurrentPageNum === 1) {
-      setPdfCurrentPageNum(pdfPagesNum);
-    } else {
-      setPdfCurrentPageNum((prev) => prev - 1);
-    }
-  };
-
-  const handleClickForwardIcon = () => {
-    if (pdfCurrentPageNum === pdfPagesNum) {
-      setPdfCurrentPageNum(1);
-    } else {
-      setPdfCurrentPageNum((prev) => prev + 1);
-    }
-  };
-
   const handleClickZoomButton = () => {
     setIsOpenByPdfModal(true);
   };
-
-  const PdfPages = [];
-  for (let i = 1; i <= pdfPagesNum; i += 1) {
-    PdfPages.push(
-      <Page
-        className={`${classes.pdfPage} ${
-          i === pdfCurrentPageNum ? classes.pdfPageDisplayFlex : ""
-        }`}
-        pageNumber={i}
-      />
-    );
-  }
 
   return (
     <div className={classes.fileDataDetailPage}>
@@ -115,28 +84,7 @@ export const FileDataDetailPage = ({}: Props) => {
               <ZoomOutMapIcon />
             </IconButton>
           </div>
-          <Document
-            className={classes.pdfDocument}
-            file={fileData?.main_data}
-            onLoadSuccess={({ numPages }) => {
-              setPdfPagesNum(numPages);
-            }}
-          >
-            {PdfPages}
-          </Document>
-          <div className={classes.pdfButtonArea}>
-            <IconButton onClick={handleClickBackIcon}>
-              <ArrowBackIcon />
-            </IconButton>
-            <div>
-              <p>
-                {pdfCurrentPageNum} / {pdfPagesNum}
-              </p>
-            </div>
-            <IconButton onClick={handleClickForwardIcon}>
-              <ArrowForwardIcon />
-            </IconButton>
-          </div>
+          <BasePdf fileData={fileData} />
           <PdfModal
             isOpen={isOpenByPdfModal}
             setIsOpen={setIsOpenByPdfModal}
@@ -173,8 +121,8 @@ const useStyles = makeStyles({
   },
   pdfDocument: {
     position: "relative",
-    backgroundColor: baseStyle.color.gray.light,
     borderRadius: borderRadius.main,
+    backgroundColor: baseStyle.color.gray.light,
     padding: "10px",
   },
   zoomButtonArea: {

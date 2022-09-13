@@ -1,27 +1,19 @@
 import React from "react";
-import { Modal, makeStyles, IconButton } from "@material-ui/core";
+import { makeStyles, IconButton } from "@material-ui/core";
 import { baseStyle, borderRadius } from "theme";
 import { Document, Page } from "react-pdf";
-import HighlightOffIcon from "@material-ui/icons/HighlightOff";
 import { FileData } from "types/fileData";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
-import { BasePdf } from "components/BasePdf/BasePdf";
 
 interface Props {
-  isOpen: boolean;
-  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   fileData?: FileData;
 }
 
-export const PdfModal = ({ isOpen, setIsOpen, fileData }: Props) => {
+export const BasePdf = ({ fileData }: Props) => {
   const classes = useStyles();
   const [pdfPagesNum, setPdfPagesNum] = React.useState(0);
   const [pdfCurrentPageNum, setPdfCurrentPageNum] = React.useState(1);
-
-  const handleClickCloseButton = () => {
-    setIsOpen(false);
-  };
 
   const handleClickBackIcon = () => {
     if (pdfCurrentPageNum === 1) {
@@ -53,21 +45,30 @@ export const PdfModal = ({ isOpen, setIsOpen, fileData }: Props) => {
   }
 
   return (
-    <Modal
-      className={classes.modal}
-      open={isOpen}
-      onClose={() => setIsOpen(false)}
-    >
-      <div className={classes.pdfModalContentArea}>
-        <IconButton
-          className={classes.pdfModalCloseButton}
-          onClick={handleClickCloseButton}
-        >
-          <HighlightOffIcon className={classes.HighlightOffIcon} />
+    <>
+      <Document
+        className={classes.pdfDocument}
+        file={fileData?.main_data}
+        onLoadSuccess={({ numPages }) => {
+          setPdfPagesNum(numPages);
+        }}
+      >
+        {PdfPages}
+      </Document>
+      <div className={classes.pdfButtonArea}>
+        <IconButton onClick={handleClickBackIcon}>
+          <ArrowBackIcon />
         </IconButton>
-        <BasePdf fileData={fileData} />
+        <div>
+          <p>
+            {pdfCurrentPageNum} / {pdfPagesNum}
+          </p>
+        </div>
+        <IconButton onClick={handleClickForwardIcon}>
+          <ArrowForwardIcon />
+        </IconButton>
       </div>
-    </Modal>
+    </>
   );
 };
 

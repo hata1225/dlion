@@ -58,7 +58,7 @@ a {
 }
 
 .react-pdf__Document {
-  height: 100%;
+  height: calc(100% - 15px);
 }
 
 .react-pdf__Page {
@@ -66,4 +66,8 @@ a {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.react-pdf__message--no-data {
+  color: #ffffff;
 }
