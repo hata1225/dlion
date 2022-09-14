@@ -12,10 +12,9 @@ import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
 import ZoomOutMapIcon from "@material-ui/icons/ZoomOutMap";
 import { PdfModal } from "components/PdfModal/PdfModal";
+import { BasePdf } from "components/BasePdf/BasePdf";
 
-interface Props {}
-
-export const FileDataDetailPage = ({}: Props) => {
+export const FileDataDetailPage = () => {
   const [pdfPagesNum, setPdfPagesNum] = React.useState(0);
   const [fileData, setFileData] = React.useState<FileData>();
   const [mainDataBlobUrl, setMainDataBlobUrl] = React.useState("")
@@ -118,28 +117,7 @@ export const FileDataDetailPage = ({}: Props) => {
               <ZoomOutMapIcon />
             </IconButton>
           </div>
-          <Document
-            className={classes.pdfDocument}
-            file={mainDataBlobUrl}
-            onLoadSuccess={({ numPages }) => {
-              setPdfPagesNum(numPages);
-            }}
-          >
-            {PdfPages}
-          </Document>
-          <div className={classes.pdfButtonArea}>
-            <IconButton onClick={handleClickBackIcon}>
-              <ArrowBackIcon />
-            </IconButton>
-            <div>
-              <p>
-                {pdfCurrentPageNum} / {pdfPagesNum}
-              </p>
-            </div>
-            <IconButton onClick={handleClickForwardIcon}>
-              <ArrowForwardIcon />
-            </IconButton>
-          </div>
+          <BasePdf mainDataBlobUrl={mainDataBlobUrl} isBlackByIconButtonColor />
           <PdfModal
             isOpen={isOpenByPdfModal}
             setIsOpen={setIsOpenByPdfModal}

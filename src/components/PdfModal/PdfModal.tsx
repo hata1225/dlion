@@ -3,9 +3,9 @@ import { Modal, makeStyles, IconButton } from "@material-ui/core";
 import { baseStyle, borderRadius } from "theme";
 import { Document, Page } from "react-pdf";
 import HighlightOffIcon from "@material-ui/icons/HighlightOff";
-import { FileData } from "types/fileData";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
+import { BasePdf } from "components/BasePdf/BasePdf";
 
 interface Props {
   isOpen: boolean;
@@ -64,24 +64,7 @@ export const PdfModal = ({ isOpen, setIsOpen, mainDataBlobUrl }: Props) => {
         >
           <HighlightOffIcon className={`${classes.HighlightOffIcon} ${classes.iconButtonWhiteColor}`} />
         </IconButton>
-        <Document className={classes.pdfDocument} file={mainDataBlobUrl} onLoadSuccess={({numPages})=>{
-          setPdfPagesNum(numPages)
-        }}>
-          {PdfPages}
-        </Document>
-        <div className={classes.pdfButtonArea}>
-            <IconButton className={classes.iconButtonWhiteColorHover} onClick={handleClickBackIcon}>
-              <ArrowBackIcon className={classes.iconButtonWhiteColor} />
-            </IconButton>
-            <div>
-              <p className={classes.pdfCurrentPageNumArea}>
-                {pdfCurrentPageNum} / {pdfPagesNum}
-              </p>
-            </div>
-            <IconButton className={classes.iconButtonWhiteColorHover} onClick={handleClickForwardIcon}>
-              <ArrowForwardIcon className={classes.iconButtonWhiteColor} />
-            </IconButton>
-          </div>
+        <BasePdf mainDataBlobUrl={mainDataBlobUrl} />
       </div>
     </Modal>
   );
@@ -127,7 +110,6 @@ const useStyles = makeStyles({
   },
   iconButtonWhiteColor: {
     color: baseStyle.color.white.light,
-
   },
   iconButtonWhiteColorHover: {
     "&:hover": {
