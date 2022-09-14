@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom";
 import { FileData, FileDataStatus } from "types/fileData";
 import { UserContext } from "../../contexts/UserContext";
 import ReactHlsPlayer from "react-hls-player";
-import { baseStyle, borderRadius, fontSize } from "theme";
+import { fontSize } from "theme";
 import { DetailPageCard } from "components/DetailPageCard";
 import ZoomOutMapIcon from "@material-ui/icons/ZoomOutMap";
 import { PdfModal } from "components/PdfModal/PdfModal";
@@ -59,7 +59,7 @@ export const FileDataDetailPage = ({}: Props) => {
       </div>
       {mainDataType === "video" && (
         <ReactHlsPlayer
-          src={fileData ? mainDataBlobUrl : ""}
+          src={fileData ? fileData.main_data : ""}
           playerRef={playerRef}
           autoPlay={false}
           controls={true}
@@ -73,7 +73,7 @@ export const FileDataDetailPage = ({}: Props) => {
       {mainDataType === "audio" && (
         <audio
           className={classes.audio}
-          src={fileData ? mainDataBlobUrl : ""}
+          src={fileData ? fileData.main_data : ""}
           preload="metadata"
           controls
         ></audio>
@@ -99,7 +99,7 @@ export const FileDataDetailPage = ({}: Props) => {
       <div className={classes.descriptionArea}>
         <p>{fileData?.description}</p>
       </div>
-      {fileData ? <DetailPageCard fileData={fileData} /> : <></>}
+      {fileData && <DetailPageCard fileData={fileData} />}
     </div>
   );
 };
@@ -140,23 +140,5 @@ const useStyles = makeStyles({
     "&:hover": {
       backgroundColor: "rgba(0, 0, 0, 0.14)",
     },
-  },
-  pdfButtonArea: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    gap: "20px",
-    padding: "5px",
-  },
-  pdfPageWrap: {
-    height: "100%",
-  },
-  pdfPage: {
-    overflow: "hidden",
-    width: "100%",
-    display: "none",
-  },
-  pdfPageDisplayFlex: {
-    display: "flex",
   },
 });
