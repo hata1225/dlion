@@ -2,15 +2,14 @@ import React from "react";
 import { makeStyles, IconButton } from "@material-ui/core";
 import { baseStyle, borderRadius } from "theme";
 import { Document, Page } from "react-pdf";
-import { FileData } from "types/fileData";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
 
 interface Props {
-  fileData?: FileData;
+  mainDataBlobUrl?: string;
 }
 
-export const BasePdf = ({ fileData }: Props) => {
+export const BasePdf = ({ mainDataBlobUrl }: Props) => {
   const classes = useStyles();
   const [pdfPagesNum, setPdfPagesNum] = React.useState(0);
   const [pdfCurrentPageNum, setPdfCurrentPageNum] = React.useState(1);
@@ -48,7 +47,7 @@ export const BasePdf = ({ fileData }: Props) => {
     <>
       <Document
         className={classes.pdfDocument}
-        file={fileData?.main_data}
+        file={mainDataBlobUrl}
         onLoadSuccess={({ numPages }) => {
           setPdfPagesNum(numPages);
         }}

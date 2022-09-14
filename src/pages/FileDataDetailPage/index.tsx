@@ -7,9 +7,6 @@ import { UserContext } from "../../contexts/UserContext";
 import ReactHlsPlayer from "react-hls-player";
 import { baseStyle, borderRadius, fontSize } from "theme";
 import { DetailPageCard } from "components/DetailPageCard";
-import { Document, Page } from "react-pdf";
-import ArrowBackIcon from "@material-ui/icons/ArrowBack";
-import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
 import ZoomOutMapIcon from "@material-ui/icons/ZoomOutMap";
 import { PdfModal } from "components/PdfModal/PdfModal";
 import { BasePdf } from "components/BasePdf/BasePdf";
@@ -17,10 +14,8 @@ import { BasePdf } from "components/BasePdf/BasePdf";
 interface Props {}
 
 export const FileDataDetailPage = ({}: Props) => {
-  const [pdfPagesNum, setPdfPagesNum] = React.useState(0);
   const [fileData, setFileData] = React.useState<FileData>();
   const [mainDataBlobUrl, setMainDataBlobUrl] = React.useState("");
-  const [pdfCurrentPageNum, setPdfCurrentPageNum] = React.useState(1);
   const [isOpenByPdfModal, setIsOpenByPdfModal] = React.useState(false);
   const [mainDataType, setMainDataType] = React.useState<
     FileDataStatus | undefined
@@ -52,22 +47,6 @@ export const FileDataDetailPage = ({}: Props) => {
       }
     })();
   }, [user?.token, id]);
-
-  const handleClickBackIcon = () => {
-    if (pdfCurrentPageNum === 1) {
-      setPdfCurrentPageNum(pdfPagesNum);
-    } else {
-      setPdfCurrentPageNum((prev) => prev - 1);
-    }
-  };
-
-  const handleClickForwardIcon = () => {
-    if (pdfCurrentPageNum === pdfPagesNum) {
-      setPdfCurrentPageNum(1);
-    } else {
-      setPdfCurrentPageNum((prev) => prev + 1);
-    }
-  };
 
   const handleClickZoomButton = () => {
     setIsOpenByPdfModal(true);
@@ -109,7 +88,7 @@ export const FileDataDetailPage = ({}: Props) => {
               <ZoomOutMapIcon />
             </IconButton>
           </div>
-          <BasePdf fileData={fileData} />
+          <BasePdf mainDataBlobUrl={mainDataBlobUrl} />
           <PdfModal
             isOpen={isOpenByPdfModal}
             setIsOpen={setIsOpenByPdfModal}
