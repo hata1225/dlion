@@ -1,10 +1,7 @@
 import React from "react";
 import { Modal, makeStyles, IconButton } from "@material-ui/core";
 import { baseStyle, borderRadius } from "theme";
-import { Document, Page } from "react-pdf";
 import HighlightOffIcon from "@material-ui/icons/HighlightOff";
-import ArrowBackIcon from "@material-ui/icons/ArrowBack";
-import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
 import { BasePdf } from "components/BasePdf/BasePdf";
 
 interface Props {
@@ -15,41 +12,10 @@ interface Props {
 
 export const PdfModal = ({ isOpen, setIsOpen, mainDataBlobUrl }: Props) => {
   const classes = useStyles();
-  const [pdfPagesNum, setPdfPagesNum] = React.useState(0);
-  const [pdfCurrentPageNum, setPdfCurrentPageNum] = React.useState(1);
 
   const handleClicCloseButton = () => {
     setIsOpen(false);
   };
-
-  const handleClickBackIcon = () => {
-    if (pdfCurrentPageNum === 1) {
-      setPdfCurrentPageNum(pdfPagesNum);
-    } else {
-      setPdfCurrentPageNum((prev) => prev - 1);
-    }
-  };
-
-  const handleClickForwardIcon = () => {
-    if (pdfCurrentPageNum === pdfPagesNum) {
-      setPdfCurrentPageNum(1);
-    } else {
-      setPdfCurrentPageNum((prev) => prev + 1);
-    }
-  };
-
-  const PdfPages = [];
-  for (let i = 1; i <= pdfPagesNum; i += 1) {
-    PdfPages.push(
-      <Page
-        key={i}
-        className={`${classes.pdfPage} ${
-          i === pdfCurrentPageNum ? classes.pdfPageDisplayFlex : ""
-        }`}
-        pageNumber={i}
-      />
-    );
-  }
 
   return (
     <Modal
@@ -88,19 +54,6 @@ const useStyles = makeStyles({
   HighlightOffIcon: {
     fontSize: 25,
   },
-  pdfButtonArea: {
-    width: "100%",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    gap: "20px",
-    padding: "5px",
-    position: "absolute",
-    bottom: 0,
-  },
-  pdfCurrentPageNumArea: {
-    color: baseStyle.color.white.light
-  },
   pdfModalCloseButton: {
     position: "absolute",
     right: 0,
@@ -115,17 +68,5 @@ const useStyles = makeStyles({
     "&:hover": {
       backgroundColor: "rgba(255, 255, 255, 0.15)",
     },
-  },
-  pdfDocument: {
-    position: "relative",
-    height: "calc(100% - 50px)"
-  },
-  pdfPage: {
-    overflow: "hidden",
-    width: "100%",
-    display: "none"
-  },
-  pdfPageDisplayFlex: {
-    display: "flex",
   },
 });

@@ -130,9 +130,7 @@ export const MainDataInputArea = React.memo(
         className={classes.mainDataInputArea}
         ref={previewAreaRef}
       >
-        <div>
-          <PreviewArea />
-        </div>
+        <PreviewArea />
         <Button variant="contained" color="primary" component="label" fullWidth>
           データを{mainData ? "変更" : "追加"}する
           <input
@@ -156,6 +154,7 @@ const useStyles = makeStyles({
     display: "flex",
     flexDirection: "column",
     gap: "5px",
+    justifyContent: "space-between"
   },
   audioWrap: {
     display: "flex",
