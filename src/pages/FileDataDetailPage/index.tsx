@@ -1,19 +1,17 @@
 import { IconButton, makeStyles } from "@material-ui/core";
-import { getFileData, getMainDataByBlob } from "api/api";
 import React from "react";
 import { useParams } from "react-router-dom";
 import { FileData, FileDataStatus } from "types/fileData";
 import { UserContext } from "../../contexts/UserContext";
 import ReactHlsPlayer from "react-hls-player";
-import { fontSize } from "theme";
 import { DetailPageCard } from "components/DetailPageCard";
 import ZoomOutMapIcon from "@material-ui/icons/ZoomOutMap";
 import { PdfModal } from "components/PdfModal/PdfModal";
 import { BasePdf } from "components/BasePdf/BasePdf";
+import { fontSize } from "theme";
+import { getFileData, getMainDataByBlob } from "api/api";
 
-interface Props {}
-
-export const FileDataDetailPage = ({}: Props) => {
+export const FileDataDetailPage = () => {
   const [fileData, setFileData] = React.useState<FileData>();
   const [mainDataBlobUrl, setMainDataBlobUrl] = React.useState("");
   const [isOpenByPdfModal, setIsOpenByPdfModal] = React.useState(false);
@@ -29,7 +27,6 @@ export const FileDataDetailPage = ({}: Props) => {
     (async () => {
       if (fileData && user?.token) {
         setMainDataType(fileData.main_data_type);
-        console.log("fileData.main_data: ", fileData.main_data);
         const newMainDataBlobUrl = await getMainDataByBlob(
           fileData,
           user.token
@@ -88,7 +85,7 @@ export const FileDataDetailPage = ({}: Props) => {
               <ZoomOutMapIcon />
             </IconButton>
           </div>
-          <BasePdf mainDataBlobUrl={mainDataBlobUrl} />
+          <BasePdf mainDataBlobUrl={mainDataBlobUrl} isBlackByIconButtonColor />
           <PdfModal
             isOpen={isOpenByPdfModal}
             setIsOpen={setIsOpenByPdfModal}
@@ -122,12 +119,7 @@ const useStyles = makeStyles({
   },
   audio: {
     width: "100%",
-  },
-  pdfDocument: {
-    position: "relative",
-    borderRadius: borderRadius.main,
-    backgroundColor: baseStyle.color.gray.light,
-    padding: "10px",
+    margin: "100px 0",
   },
   zoomButtonArea: {
     position: "absolute",

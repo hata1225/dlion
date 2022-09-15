@@ -1,15 +1,19 @@
-import React from "react";
 import { makeStyles, IconButton } from "@material-ui/core";
-import { baseStyle, borderRadius } from "theme";
+import React from "react";
 import { Document, Page } from "react-pdf";
 import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
+import { baseStyle } from "theme";
 
 interface Props {
-  mainDataBlobUrl?: string;
+  mainDataBlobUrl: string;
+  isBlackByIconButtonColor?: boolean;
 }
 
-export const BasePdf = ({ mainDataBlobUrl }: Props) => {
+export const BasePdf = ({
+  mainDataBlobUrl,
+  isBlackByIconButtonColor,
+}: Props) => {
   const classes = useStyles();
   const [pdfPagesNum, setPdfPagesNum] = React.useState(0);
   const [pdfCurrentPageNum, setPdfCurrentPageNum] = React.useState(1);
@@ -55,16 +59,38 @@ export const BasePdf = ({ mainDataBlobUrl }: Props) => {
         {PdfPages}
       </Document>
       <div className={classes.pdfButtonArea}>
-        <IconButton onClick={handleClickBackIcon}>
-          <ArrowBackIcon />
+        <IconButton
+          className={`${classes.iconButtonWhiteColorHover} ${
+            isBlackByIconButtonColor && classes.iconButtonGray
+          }`}
+          onClick={handleClickBackIcon}
+        >
+          <ArrowBackIcon
+            className={`${classes.colorWhite} ${
+              isBlackByIconButtonColor && classes.colorBlack
+            }`}
+          />
         </IconButton>
         <div>
-          <p>
+          <p
+            className={`${
+              isBlackByIconButtonColor ? classes.colorBlack : classes.colorWhite
+            }`}
+          >
             {pdfCurrentPageNum} / {pdfPagesNum}
           </p>
         </div>
-        <IconButton onClick={handleClickForwardIcon}>
-          <ArrowForwardIcon />
+        <IconButton
+          className={`${classes.iconButtonWhiteColorHover} ${
+            isBlackByIconButtonColor && classes.iconButtonGray
+          }`}
+          onClick={handleClickForwardIcon}
+        >
+          <ArrowForwardIcon
+            className={`${classes.colorWhite} ${
+              isBlackByIconButtonColor && classes.colorBlack
+            }`}
+          />
         </IconButton>
       </div>
     </>
@@ -72,45 +98,9 @@ export const BasePdf = ({ mainDataBlobUrl }: Props) => {
 };
 
 const useStyles = makeStyles({
-  modal: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  pdfModalContentArea: {
-    position: "relative",
-    height: "90vh",
-    width: "90vw",
-    padding: "10px",
-    maxWidth: `${baseStyle.maxWidthLayout.tb}px`,
-    backgroundColor: baseStyle.color.black.main,
-    borderRadius: borderRadius.main,
-  },
-  HighlightOffIcon: {
-    color: baseStyle.color.white.light,
-    fontSize: 25,
-  },
-  pdfModalCloseButton: {
-    position: "absolute",
-    right: 0,
-    zIndex: 100,
-    margin: "15px",
-    padding: "8px",
-    "&:hover": {
-      backgroundColor: "rgba(255, 255, 255, 0.15)",
-    },
-  },
   pdfDocument: {
     position: "relative",
-    borderRadius: borderRadius.main,
-    padding: "10px",
-  },
-  pdfButtonArea: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    gap: "20px",
-    padding: "5px",
+    height: "calc(100% - 50px)",
   },
   pdfPage: {
     overflow: "hidden",
@@ -119,5 +109,31 @@ const useStyles = makeStyles({
   },
   pdfPageDisplayFlex: {
     display: "flex",
+  },
+  pdfButtonArea: {
+    width: "100%",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: "20px",
+    padding: "5px",
+    bottom: 0,
+  },
+  iconButtonWhiteColorHover: {
+    "&:hover": {
+      backgroundColor: "rgba(255, 255, 255, 0.15)",
+    },
+  },
+  iconButtonGray: {
+    backgroundColor: "rgba(0, 0, 0, 0.05)",
+    "&:hover": {
+      backgroundColor: "rgba(0, 0, 0, 0.14)",
+    },
+  },
+  colorWhite: {
+    color: baseStyle.color.white.light,
+  },
+  colorBlack: {
+    color: baseStyle.color.black.main,
   },
 });
