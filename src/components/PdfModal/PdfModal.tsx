@@ -28,7 +28,9 @@ export const PdfModal = ({ isOpen, setIsOpen, mainDataBlobUrl }: Props) => {
           className={`${classes.pdfModalCloseButton} ${classes.iconButtonWhiteColorHover}`}
           onClick={handleClicCloseButton}
         >
-          <HighlightOffIcon className={classes.HighlightOffIcon} />
+          <HighlightOffIcon
+            className={`${classes.HighlightOffIcon} ${classes.iconButtonWhiteColor}`}
+          />
         </IconButton>
         <BasePdf mainDataBlobUrl={mainDataBlobUrl} />
       </div>
@@ -54,19 +56,6 @@ const useStyles = makeStyles({
   HighlightOffIcon: {
     fontSize: 25,
   },
-  pdfButtonArea: {
-    width: "100%",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    gap: "20px",
-    padding: "5px",
-    position: "absolute",
-    bottom: 0,
-  },
-  pdfCurrentPageNumArea: {
-    color: baseStyle.color.white.light,
-  },
   pdfModalCloseButton: {
     position: "absolute",
     right: 0,
@@ -81,18 +70,5 @@ const useStyles = makeStyles({
     "&:hover": {
       backgroundColor: "rgba(255, 255, 255, 0.15)",
     },
-  },
-  pdfDocument: {
-    position: "relative",
-    borderRadius: borderRadius.main,
-    padding: "10px",
-  },
-  pdfPage: {
-    overflow: "hidden",
-    width: "100%",
-    display: "none",
-  },
-  pdfPageDisplayFlex: {
-    display: "flex",
   },
 });
