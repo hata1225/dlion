@@ -36,10 +36,11 @@ const useStyles = makeStyles({
     flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
-    gap: "30px",
+    gap: "15px",
   },
   headingArea: {
-    paddingTop: "50px",
+    paddingLeft: "7%",
+    paddingTop: "80px",
     width: "100%",
   },
   heading: {
