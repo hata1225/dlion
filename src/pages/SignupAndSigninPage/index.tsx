@@ -1,4 +1,3 @@
-import React from "react";
 import { SignupAndSigninCard } from "components/SignupAndSigninCard";
 import { makeStyles } from "@material-ui/core";
 
