@@ -22,16 +22,7 @@ export const FileDataCard = ({
   style,
   ...props
 }: Props) => {
-  const {
-    id,
-    title,
-    description,
-    created_at,
-    categories,
-    cover_image,
-    short_video_path,
-    video_data_status,
-  } = fileData;
+  const { title, description, categories } = fileData;
   const [isScaleUpBottomArea, setIsScaleUpButtonArea] = React.useState(false);
   const [bottomAreaDefaultHeight, setBottomAreaDefaultHeight] =
     React.useState(0);

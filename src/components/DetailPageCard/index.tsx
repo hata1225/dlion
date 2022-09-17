@@ -1,7 +1,7 @@
 import { Button, makeStyles } from "@material-ui/core";
 import { CoverImageAreaByVideoData } from "components/CoverImageAreaByVideoData";
 import { DeleteCheckModal } from "components/DeleteCheckModal";
-import { RedButton } from "components/RedButton";
+import { DeleteFileDataButton } from "components/DeleteFileDataButton/DeleteFileDataButton";
 import { PostModalContext } from "contexts/PostModalContext";
 import React from "react";
 import { borderRadius, shadow } from "theme";
@@ -19,13 +19,6 @@ export const DetailPageCard = ({ fileData }: Props) => {
 
   const handleClickEditButton = () => {
     handleOpenPostModal(fileData);
-  };
-
-  const handleClickDeleteButton = () => {
-    if (fileData) {
-      console.log("fileData: ", fileData);
-      setIsOpenDeleteCheckModal(true);
-    }
   };
 
   return (
@@ -53,13 +46,7 @@ export const DetailPageCard = ({ fileData }: Props) => {
               >
                 編集
               </Button>
-              <RedButton
-                onClick={handleClickDeleteButton}
-                variant="outlined"
-                color="secondary"
-              >
-                削除
-              </RedButton>
+              <DeleteFileDataButton fileData={fileData} />
             </div>
           </div>
         </div>
