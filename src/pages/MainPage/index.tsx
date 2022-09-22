@@ -42,7 +42,7 @@ export const MainPage = ({ reanderedFunc }: Props) => {
   };
 
   return (
-    <>
+    <div className={classes.mainPage}>
       {fileData.map((data, i) => (
         <FileDataCard
           style={{ width: fileDataCardWidth }}
@@ -51,10 +51,17 @@ export const MainPage = ({ reanderedFunc }: Props) => {
           key={i}
         />
       ))}
-    </>
+    </div>
   );
 };
 
 const useStyles = makeStyles({
   fileDataCard: {},
+  mainPage: {
+    width: "100%",
+    padding: "10px 0px 10px 20px",
+    display: "flex",
+    gap: baseStyle.mainPageFileDataCardGap.main,
+    flexWrap: "wrap",
+  },
 });

@@ -7,12 +7,64 @@ import { baseStyle } from "theme";
 
 export const AuthCard = () => {
   const classes = useStyles();
-  const [isSigninCard, setIsSigninCard] = React.useState(true);
   const [email, setEmail] = React.useState("");
   const [name, setName] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [reinputPassword, setReinputPassword] = React.useState("");
+  const [status, setStatus] = React.useState("signin");
+  const [authCardContent, setAuthCardContent] = React.useState<any>();
   const { signup, signin } = React.useContext(UserContext);
+
+  React.useEffect(() => {
+    authCardContents.forEach((content, i) => {
+      if (content.status === status) {
+        const newAuthCardContent = authCardContents[i];
+        setAuthCardContent(newAuthCardContent);
+      }
+    });
+  }, [status]);
+
+  const authCardContents = [
+    {
+      status: "signin",
+      title: "ログイン",
+      emailForm: true,
+      nameForm: false,
+      passwordForm: true,
+      reinputPasswordForm: false,
+      runButtonText: "ログインをする",
+      runButtonFunc: async () => await handleClickSignin(),
+      statusChangeButton: true,
+      statusChangeButtonText: "アカウントを作成する→",
+      statusChangeFunc: () => handleClickChangeStatus("signup"),
+    },
+    {
+      status: "signup",
+      title: "アカウントを作成",
+      emailForm: true,
+      nameForm: true,
+      passwordForm: true,
+      reinputPasswordForm: true,
+      runButtonText: "アカウントを作成",
+      runButtonFunc: async () => await handleClickSignup(),
+      statusChangeButton: true,
+      statusChangeButtonText: "作成済みのアカウントを使う→",
+      statusChangeFunc: () => handleClickChangeStatus("signin"),
+    },
+    {
+      status: "edit",
+      title: "アカウントを編集",
+      emailForm: true,
+      nameForm: true,
+      passwordForm: false,
+      reinputPasswordForm: false,
+      runButtonText: "アカウントを編集",
+      runButtonFunc: async () => await handleClickEdit(),
+      statusChangeButton: false,
+      statusChangeButtonText: "",
+      statusChangeFunc: () => handleClickChangeStatus(""),
+    },
+  ];
 
   const handleClickSignup = async () => {
     if (password !== reinputPassword) {
@@ -28,31 +80,40 @@ export const AuthCard = () => {
   };
 
   const handleClickSignin = async () => {
+    console.log(email, password);
     const userInfo = await signin(email, password);
     if (userInfo) {
-      window.location.href = "/";
+      // window.location.href = "/";
     }
+  };
+
+  const handleClickEdit = async () => {
+    console.log("アカウントを変更");
+  };
+
+  const handleClickChangeStatus = (status: string) => {
+    setStatus(status);
   };
 
   return (
     <Card className={classes.card}>
-      <h2>{isSigninCard ? "ログイン" : "アカウントを作成"}</h2>
+      <h2>{authCardContent?.title}</h2>
       <div className={classes.inputTextArea}>
-        <BaseTextField
-          label="メールアドレス"
-          variant="outlined"
-          type="email"
-          value={email}
-          setValue={setEmail}
-        />
-        {isSigninCard ? (
-          <></>
-        ) : (
+        {authCardContent?.emailForm && (
+          <BaseTextField
+            label="メールアドレス"
+            variant="outlined"
+            type="email"
+            value={email}
+            setValue={setEmail}
+          />
+        )}
+        {authCardContent?.nameForm && (
           <BaseTextField
             label={
               name.match(/^[A-Za-z0-9]*$/)
                 ? "名前（半角英数）"
-                : "名前 半角英数で入力してください"
+                : "名前 半角英数で入力してください（記号不可）"
             }
             variant="outlined"
             value={name}
@@ -60,16 +121,16 @@ export const AuthCard = () => {
             error={!name.match(/^[A-Za-z0-9]*$/)}
           />
         )}
-        <BaseTextField
-          label="パスワード 8文字以上"
-          variant="outlined"
-          type="password"
-          value={password}
-          setValue={setPassword}
-        />
-        {isSigninCard ? (
-          <></>
-        ) : (
+        {authCardContent?.passwordForm && (
+          <BaseTextField
+            label="パスワード 8文字以上"
+            variant="outlined"
+            type="password"
+            value={password}
+            setValue={setPassword}
+          />
+        )}
+        {authCardContent?.reinputPasswordForm && (
           <BaseTextField
             label="パスワード（再入力）"
             variant="outlined"
@@ -81,20 +142,18 @@ export const AuthCard = () => {
       </div>
       <div className={classes.bottomArea}>
         <Button
-          onClick={isSigninCard ? handleClickSignin : handleClickSignup}
+          onClick={async () => await authCardContent?.runButtonFunc()}
           variant="contained"
           color="primary"
         >
-          <p>{isSigninCard ? "ログインをする" : "アカウントを作成"}</p>
+          <p>{authCardContent?.runButtonText}</p>
         </Button>
         <Button
-          onClick={() => setIsSigninCard((prev) => !prev)}
+          onClick={authCardContent?.statusChangeFunc}
           color="primary"
           className={classes.bottomLink}
         >
-          {isSigninCard
-            ? "アカウントを作成する→"
-            : "作成済みのアカウントを使う→"}
+          {authCardContent?.statusChangeButtonText}
         </Button>
       </div>
     </Card>
