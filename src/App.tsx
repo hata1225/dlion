@@ -13,6 +13,7 @@ import { PostModalProvider } from "contexts/PostModalContext";
 import { FileDataProvider } from "contexts/FileDataContexts";
 import { FileDataDetailPage } from "pages/FileDataDetailPage";
 import { NotFoundPage } from "pages/NotFoundPage/NotFoundPage";
+import { EditUserPage } from "pages/EditUserPage/EditUserPage";
 
 export default function App() {
   return (
@@ -39,6 +40,7 @@ const ReactRouter = () => {
         <Route path="/" element={<MainPage />} />
         <Route path="/auth" element={<SignupAndSigninPage />} />
         <Route path="/filedata/:id" element={<FileDataDetailPage />} />
+        <Route path="/edituser" element={<EditUserPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>

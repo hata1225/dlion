@@ -4,14 +4,14 @@ import { makeStyles } from "@material-ui/core";
 export const SignupAndSigninPage = () => {
   const classes = useStyles();
   return (
-    <div className={classes.root}>
+    <div className={classes.signupAndSigninPage}>
       <SignupAndSigninCard />
     </div>
   );
 };
 
 const useStyles = makeStyles({
-  root: {
+  signupAndSigninPage: {
     height: "100%",
     width: "100%",
     display: "flex",

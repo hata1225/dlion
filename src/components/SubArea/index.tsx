@@ -1,6 +1,7 @@
 import { makeStyles } from "@material-ui/core";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
+import PersonIcon from "@material-ui/icons/Person";
 import { ButtonWithIcon } from "components/ButtonWithIcon";
 import { fontSize, baseStyle, shadow } from "theme";
 import React from "react";
@@ -22,6 +23,10 @@ export const SubArea = () => {
     signout();
   };
 
+  const handleClickUserEditButton = () => {
+    window.location.href = "/edituser";
+  };
+
   const subAreaContents: SubAreaContents = [
     {
       func: handleClickSignout,
@@ -30,8 +35,13 @@ export const SubArea = () => {
     },
     {
       func: handleOpenPostModal,
-      description: "投稿する",
+      description: "データ投稿",
       icon: <CloudUploadIcon style={{ fontSize: fontSize.medium.medium }} />,
+    },
+    {
+      func: handleClickUserEditButton,
+      description: "アカウント編集",
+      icon: <PersonIcon style={{ fontSize: fontSize.medium.medium }} />,
     },
   ];
 
