@@ -17,7 +17,7 @@ import { BaseTextField } from "components/BaseTextField";
 import { CategoryInputArea } from "./CategoryInputArea";
 import { PostModalLine } from "./PostModalLine";
 import { FileData, FileDataStatus } from "types/fileData";
-import { postFileData } from "api/api";
+import { patchFileData, postFileData } from "api/api";
 import { UserContext } from "contexts/UserContext";
 import { FileDataInputArea } from "./FileDataInputArea";
 import { FileDataContext } from "contexts/FileDataContexts";
@@ -31,7 +31,7 @@ interface Props {
 }
 
 export const PostModal = (props: Props) => {
-  const { isOpenPostModal, setIsOpenPostModal } = props;
+  const { isOpenPostModal, setIsOpenPostModal, fileData } = props;
   const [title, setTitle] = React.useState("");
   const [description, setDescription] = React.useState("");
   const [selectedCategories, setSelectedCategories] = React.useState<string[]>(
@@ -58,12 +58,22 @@ export const PostModal = (props: Props) => {
     ];
 
   React.useEffect(() => {
-    if (mainData && coverImage && user?.token) {
+    if (fileData) {
+      const { title, description, categories } = fileData;
+      setTitle(title);
+      setDescription(description);
+      console.log("fileData: ", fileData);
+      setSelectedCategories(categories);
+    }
+  }, [fileData]);
+
+  React.useEffect(() => {
+    if ((mainData && coverImage && user?.token) || fileData) {
       setIsDisabledPostButton(false);
     } else {
       setIsDisabledPostButton(true);
     }
-  }, [mainData, coverImage, user?.token]);
+  }, [mainData, coverImage, user?.token, fileData]);
 
   React.useEffect(() => {
     if (mainData) {
@@ -79,6 +89,22 @@ export const PostModal = (props: Props) => {
 
   const handleClose = () => {
     setIsOpenPostModal(false);
+  };
+
+  const handleEdit = async () => {
+    if (fileData && user?.token) {
+      let newFileData = fileData;
+      newFileData.title = title;
+      newFileData.description = description;
+      newFileData.categories = selectedCategories;
+      try {
+        await patchFileData(newFileData, user.token);
+        setIsOpenPostModal(false);
+        createNotification("success", "更新できました");
+      } catch (error: any) {
+        createNotification("danger", error?.message, "更新に失敗しました");
+      }
+    }
   };
 
   const handlePost = async () => {
@@ -147,7 +173,9 @@ export const PostModal = (props: Props) => {
     >
       <div className={classes.postArea}>
         <div className={classes.postAreaHeader}>
-          <div className={classes.heading}>ファイルを投稿する</div>
+          <div className={classes.heading}>
+            {fileData ? "ファイルを編集する" : "ファイルを投稿する"}
+          </div>
           <IconButton className={classes.iconButton} onClick={handleClose}>
             <CloseIcon style={{ fontSize: fontSize.large.small }} />
           </IconButton>
@@ -175,18 +203,22 @@ export const PostModal = (props: Props) => {
               minRows={2}
             />
           </div>
-          <PostModalLine />
-          <FileDataInputArea
-            coverImage={coverImage}
-            coverImageObjectUrl={coverImageObjectUrl}
-            setCoverImage={setCoverImage}
-            setCoverImageObjectUrl={setCoverImageObjectUrl}
-            mainData={mainData}
-            mainDataObjectUrl={mainDataObjectUrl}
-            setMainData={setMainData}
-            setMainDataObjectUrl={setMainDataObjectUrl}
-            mainDataStatus={mainDataStatus}
-          />
+          {!fileData && (
+            <>
+              <PostModalLine />
+              <FileDataInputArea
+                coverImage={coverImage}
+                coverImageObjectUrl={coverImageObjectUrl}
+                setCoverImage={setCoverImage}
+                setCoverImageObjectUrl={setCoverImageObjectUrl}
+                mainData={mainData}
+                mainDataObjectUrl={mainDataObjectUrl}
+                setMainData={setMainData}
+                setMainDataObjectUrl={setMainDataObjectUrl}
+                mainDataStatus={mainDataStatus}
+              />
+            </>
+          )}
           <PostModalLine />
           <CategoryInputArea
             selectedCategories={selectedCategories}
@@ -208,10 +240,10 @@ export const PostModal = (props: Props) => {
             className={classes.postButton}
             variant="contained"
             color="primary"
-            onClick={handlePost}
+            onClick={fileData ? handleEdit : handlePost}
             disabled={isDisabledPostButton}
           >
-            投稿する
+            {fileData ? "更新する" : "投稿する"}
           </Button>
         </div>
       </div>

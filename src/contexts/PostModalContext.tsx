@@ -5,7 +5,8 @@ import { FileData } from "types/fileData";
 interface PostModalContextInterface {
   isOpenPostModal: boolean;
   setIsOpenPostModal: React.Dispatch<React.SetStateAction<boolean>>;
-  handleOpenPostModal: (fileDataProps?: FileData) => void;
+  handleOpenPostModal: () => void;
+  handleOpenEditModal: (fileDataProps: FileData) => void;
 }
 
 export const PostModalContext = React.createContext<PostModalContextInterface>(
@@ -20,14 +21,23 @@ export const PostModalProvider = ({
   const [isOpenPostModal, setIsOpenPostModal] = React.useState(false);
   const [fileData, setFileData] = React.useState<FileData>();
 
-  const handleOpenPostModal = (fileDataProp?: FileData) => {
+  const handleOpenPostModal = () => {
+    setIsOpenPostModal(true);
+  };
+
+  const handleOpenEditModal = (fileDataProp: FileData) => {
     setIsOpenPostModal(true);
     setFileData(fileDataProp);
   };
 
   return (
     <PostModalContext.Provider
-      value={{ isOpenPostModal, setIsOpenPostModal, handleOpenPostModal }}
+      value={{
+        isOpenPostModal,
+        setIsOpenPostModal,
+        handleOpenPostModal,
+        handleOpenEditModal,
+      }}
     >
       <PostModal
         isOpenPostModal={isOpenPostModal}
