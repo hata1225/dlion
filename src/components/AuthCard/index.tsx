@@ -5,7 +5,7 @@ import { createNotification } from "functions/notification";
 import React from "react";
 import { baseStyle } from "theme";
 
-export const SignupAndSigninCard = () => {
+export const AuthCard = () => {
   const classes = useStyles();
   const [isSigninCard, setIsSigninCard] = React.useState(true);
   const [email, setEmail] = React.useState("");

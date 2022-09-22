@@ -12,8 +12,8 @@ import { SignupAndSigninPage } from "pages/SignupAndSigninPage";
 import { PostModalProvider } from "contexts/PostModalContext";
 import { FileDataProvider } from "contexts/FileDataContexts";
 import { FileDataDetailPage } from "pages/FileDataDetailPage";
-import { NotFoundPage } from "pages/NotFoundPage/NotFoundPage";
-import { EditUserPage } from "pages/EditUserPage/EditUserPage";
+import { NotFoundPage } from "pages/NotFoundPage";
+import { EditUserPage } from "pages/EditUserPage";
 
 export default function App() {
   return (

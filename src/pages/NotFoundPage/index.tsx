@@ -1,5 +1,5 @@
 import { Link, makeStyles } from "@material-ui/core";
-import { NotFound404Lottie } from "components/LottieComponents/NotFound404Lottie/NotFound404Lottie";
+import { NotFound404Lottie } from "components/LottieComponents/NotFound404Lottie";
 import { baseStyle } from "theme";
 
 export const NotFoundPage = () => {

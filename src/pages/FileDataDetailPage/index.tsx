@@ -6,8 +6,8 @@ import { UserContext } from "../../contexts/UserContext";
 import ReactHlsPlayer from "react-hls-player";
 import { DetailPageCard } from "components/DetailPageCard";
 import ZoomOutMapIcon from "@material-ui/icons/ZoomOutMap";
-import { PdfModal } from "components/PdfModal/PdfModal";
-import { BasePdf } from "components/BasePdf/BasePdf";
+import { PdfModal } from "components/PdfModal";
+import { BasePdf } from "components/BasePdf";
 import { fontSize } from "theme";
 import { getFileData, getMainDataByBlob } from "api/api";
 

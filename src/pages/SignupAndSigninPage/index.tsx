@@ -1,11 +1,11 @@
-import { SignupAndSigninCard } from "components/SignupAndSigninCard";
+import { AuthCard } from "components/AuthCard";
 import { makeStyles } from "@material-ui/core";
 
 export const SignupAndSigninPage = () => {
   const classes = useStyles();
   return (
     <div className={classes.signupAndSigninPage}>
-      <SignupAndSigninCard />
+      <AuthCard />
     </div>
   );
 };
