@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig } from "axios";
-import { FileData } from "types/fileData";
+import { FileData, FileDataByEdit } from "types/fileData";
 
 const ENVS = {
   develop: "localhost",
@@ -276,10 +276,15 @@ export const getFileData = async (token: string, id: number) => {
   }
 };
 
-export const patchFileData = async (data: FileData, token: string) => {
+export const patchFileData = async (data: FileDataByEdit, token: string) => {
   const path = `/file_data/${data.id}/`;
+  const newData = {
+    title: data.title,
+    description: data.description,
+    categories: JSON.stringify(data.categories),
+  };
   try {
-    const result = await patchAxios(path, data, token);
+    const result = await patchAxios(path, newData, token);
     return result;
   } catch (error) {
     console.log("@patchFileData: ", error);
@@ -329,7 +334,7 @@ export const postFileData = async (
 };
 
 export const getMainDataByBlob = async (fileData: FileData, token: string) => {
-  const path = fileData.main_data;
+  const path = fileData?.main_data ?? "";
   try {
     const result = await getAxiosByMainDataBlob(path, token);
     return result.data;

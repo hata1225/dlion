@@ -1,7 +1,7 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core";
-import { CoverImageInputArea } from "components/PostModal/CoverImageInputArea";
-import { MainDataInputArea } from "components/PostModal/MainDataInputArea";
+import { CoverImageInputArea } from "components/FileDataModal/CoverImageInputArea";
+import { MainDataInputArea } from "components/FileDataModal/MainDataInputArea";
 import { FileDataStatus } from "types/fileData";
 import { baseStyle } from "theme";
 
