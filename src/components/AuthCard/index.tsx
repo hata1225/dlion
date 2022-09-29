@@ -22,7 +22,7 @@ export const AuthCard = () => {
         setAuthCardContent(newAuthCardContent);
       }
     });
-  }, [status]);
+  }, [status, email, password, name]);
 
   const authCardContents = [
     {
@@ -80,10 +80,10 @@ export const AuthCard = () => {
   };
 
   const handleClickSignin = async () => {
-    console.log(email, password);
+    console.log("value: ", email, password);
     const userInfo = await signin(email, password);
     if (userInfo) {
-      // window.location.href = "/";
+      window.location.href = "/";
     }
   };
 
@@ -142,7 +142,7 @@ export const AuthCard = () => {
       </div>
       <div className={classes.bottomArea}>
         <Button
-          onClick={async () => await authCardContent?.runButtonFunc()}
+          onClick={async () => await authCardContent.runButtonFunc()}
           variant="contained"
           color="primary"
         >
