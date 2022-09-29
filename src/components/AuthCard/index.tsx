@@ -17,7 +17,7 @@ export const AuthCard = ({ statusProp }: Props) => {
   const [reinputPassword, setReinputPassword] = React.useState("");
   const [status, setStatus] = React.useState("signin");
   const [authCardContent, setAuthCardContent] = React.useState<any>();
-  const { signup, signin, user } = React.useContext(UserContext);
+  const { signup, signin, user, editUser } = React.useContext(UserContext);
 
   React.useEffect(() => {
     authCardContents.forEach((content, i) => {
@@ -94,15 +94,25 @@ export const AuthCard = ({ statusProp }: Props) => {
   };
 
   const handleClickSignin = async () => {
-    console.log("value: ", email, password);
     const userInfo = await signin(email, password);
     if (userInfo) {
       window.location.href = "/";
     }
   };
 
+  //
   const handleClickEdit = async () => {
-    console.log("アカウントを変更");
+    try {
+      if (editUser) {
+        const userInfo = await editUser(email, name);
+        if (userInfo) {
+          createNotification("success", "アカウントを編集しました");
+        }
+      }
+    } catch (error) {
+      console.log("@handleClickEdit: ", error);
+      createNotification("danger", "アカウントの編集に失敗しました");
+    }
   };
 
   const handleClickChangeStatus = (status: string) => {

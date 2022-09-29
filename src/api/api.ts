@@ -228,7 +228,7 @@ export const updateUser = async (
   const data = { email, name };
   try {
     const result = await patchAxios(path, data, token);
-    return result;
+    return result?.data;
   } catch (error) {
     console.log("@updateUser: ", error);
     throw error;
