@@ -1,4 +1,4 @@
-import { createUser, getToken, getUserInfo } from "api/api";
+import { createUser, getToken, getUserInfo, updateUser } from "api/api";
 import { createNotification } from "functions/notification";
 import React from "react";
 import { UserInterface } from "../types/User";
@@ -9,6 +9,7 @@ interface UserContextInterface {
   signup: (email: string, name: string, password: string) => Promise<any>;
   signin: (email: string, password: string) => Promise<any>;
   signout: () => void;
+  editUser: (email: string, name: string) => Promise<any>;
 }
 
 export const UserContext = React.createContext<UserContextInterface>(
@@ -70,8 +71,28 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     window.location.href = "/auth";
   };
 
+  // [修正]
+  //   変更前のuserと、引数が同じ場合はapiを叩かないようにしたい
+  const editUser = async (email: string, name: string) => {
+    try {
+      if (user?.email === email && user?.name === name) {
+        // 変更がない場合
+        return user;
+      }
+      let token = localStorage.getItem("token");
+      const userInfo = await updateUser(email, name, token ?? "");
+      setUser((prev) => ({ ...prev, ...userInfo, token }));
+      return userInfo;
+    } catch (error) {
+      console.log("@editUser Error: ", error);
+      throw error;
+    }
+  };
+
   return (
-    <UserContext.Provider value={{ user, setUser, signup, signin, signout }}>
+    <UserContext.Provider
+      value={{ user, setUser, signup, signin, signout, editUser }}
+    >
       {children}
     </UserContext.Provider>
   );

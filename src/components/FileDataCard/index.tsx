@@ -9,6 +9,7 @@ import {
 } from "theme";
 import ExpandLessIcon from "@material-ui/icons/ExpandLess";
 import { CoverImageAreaByVideoData } from "components/CoverImageAreaByVideoData";
+import { BookmarkButton } from "components/BookmarkButton";
 
 type CardProps = React.ComponentProps<typeof Card>;
 type Props = CardProps & {
@@ -70,32 +71,37 @@ export const FileDataCard = ({
       >
         <div className={classes.bottomAreaContnet}>
           <div className={classes.bottomAreaContnetTop}>
-            <h3
-              className={classes.heading}
-              style={
-                isScaleUpBottomArea
-                  ? {
-                      WebkitLineClamp: 2,
-                      height: "auto",
-                    }
-                  : {}
-              }
-            >
-              {title}
-            </h3>
-            <p
-              className={classes.description}
-              style={
-                isScaleUpBottomArea
-                  ? {
-                      WebkitLineClamp: 7,
-                      height: "auto",
-                    }
-                  : {}
-              }
-            >
-              {description}
-            </p>
+            <div className={classes.bottomAreaContentTopLeft}>
+              <h3
+                className={classes.heading}
+                style={
+                  isScaleUpBottomArea
+                    ? {
+                        WebkitLineClamp: 2,
+                        height: "auto",
+                      }
+                    : {}
+                }
+              >
+                {title}
+              </h3>
+              <p
+                className={classes.description}
+                style={
+                  isScaleUpBottomArea
+                    ? {
+                        WebkitLineClamp: 7,
+                        height: "auto",
+                      }
+                    : {}
+                }
+              >
+                {description}
+              </p>
+            </div>
+            <div className={classes.bottomAreaContentTopRight}>
+              <BookmarkButton />
+            </div>
           </div>
           <p
             className={classes.categoriesArea}
@@ -157,10 +163,15 @@ const useStyles = makeStyles({
   },
   bottomAreaContnetTop: {
     display: "flex",
-    flexDirection: "column",
-    gap: "5px",
+    justifyContent: "space-between",
     marginBottom: "5px",
   },
+  bottomAreaContentTopLeft: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "5px",
+  },
+  bottomAreaContentTopRight: {},
   heading: {
     display: "-webkit-box",
     overflow: "hidden",

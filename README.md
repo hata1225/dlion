@@ -32,14 +32,14 @@
 >
 > - docker: 20.10.13
 > - docker-compose: 1.92.2
-> - node: 18.8.0
+> - node: 18.10.0
 >
 > ---
 >
 > ### 使用している Docker イメージについて
 >
 > - ubuntu: 22.04 (LTS)
-> - node: 18.5.0-alpine (最新)
+> - node: 18.10.0-alpine
 > - selenium (docker hub から image を引っ張ってる)
 >
 > ---
@@ -174,15 +174,16 @@
 
     ショートカット: cmd + c
 
-12.  **マイグレーションファイルを作製**
+12. **マイグレーションファイルを作製**
 
         docker-compose run --rm django_app sh -c "python3 manage.py makemigrations core"
 
     --rm: コンテナ停止後、コンテナを削除
 
+
     sh -c: シェルコマンド （bash -c: バッシュコマンド）
 
-.  **マイグレーションファイルをもとに、データベースへ反映**
+. **マイグレーションファイルをもとに、データベースへ反映**
 
         docker-compose run --rm django_app sh -c "python3 manage.py migrate core"
 

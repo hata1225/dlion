@@ -2,7 +2,7 @@ import React from "react";
 import { Modal, makeStyles, IconButton } from "@material-ui/core";
 import { baseStyle, borderRadius } from "theme";
 import HighlightOffIcon from "@material-ui/icons/HighlightOff";
-import { BasePdf } from "components/BasePdf/BasePdf";
+import { BasePdf } from "components/BasePdf";
 
 interface Props {
   isOpen: boolean;

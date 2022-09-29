@@ -1,7 +1,7 @@
 import { Button, makeStyles } from "@material-ui/core";
 import { CoverImageAreaByVideoData } from "components/CoverImageAreaByVideoData";
 import { DeleteCheckModal } from "components/DeleteCheckModal";
-import { DeleteFileDataButton } from "components/DeleteFileDataButton/DeleteFileDataButton";
+import { DeleteFileDataButton } from "components/DeleteFileDataButton";
 import { PostModalContext } from "contexts/PostModalContext";
 import React from "react";
 import { borderRadius, shadow } from "theme";

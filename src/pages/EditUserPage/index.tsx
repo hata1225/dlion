@@ -1,17 +1,17 @@
-import { AuthCard } from "components/AuthCard";
 import { makeStyles } from "@material-ui/core";
+import { AuthCard } from "components/AuthCard";
 
-export const SignupAndSigninPage = () => {
+export const EditUserPage = () => {
   const classes = useStyles();
   return (
-    <div className={classes.signupAndSigninPage}>
-      <AuthCard />
+    <div className={classes.editUserPage}>
+      <AuthCard statusProp={"edit"} />
     </div>
   );
 };
 
 const useStyles = makeStyles({
-  signupAndSigninPage: {
+  editUserPage: {
     height: "100%",
     width: "100%",
     display: "flex",
