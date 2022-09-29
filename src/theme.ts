@@ -67,6 +67,14 @@ export const baseStyle = {
       main: "rgba(207, 34, 46, 1)",
       mainButtonHover: "rgba(207, 34, 46, 0.85)",
     },
+    yellow: {
+      dark: "#b28704",
+      main: "rgba(255, 193, 7, 1)",
+      light: "#ffcd38",
+      buttonHover: {
+        main: "rgba(255, 193, 7, 0.15)",
+      },
+    },
   },
 };
 
@@ -95,6 +103,8 @@ export const fontSize = {
   },
   small: {
     large: "1.2rem",
+    medium: "1rem",
+    small: "0.8rem",
   },
 };
 
