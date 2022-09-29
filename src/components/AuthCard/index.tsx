@@ -5,7 +5,11 @@ import { createNotification } from "functions/notification";
 import React from "react";
 import { baseStyle } from "theme";
 
-export const AuthCard = () => {
+interface Props {
+  statusProp?: "signin" | "signup" | "edit";
+}
+
+export const AuthCard = ({ statusProp }: Props) => {
   const classes = useStyles();
   const [email, setEmail] = React.useState("");
   const [name, setName] = React.useState("");
@@ -13,7 +17,7 @@ export const AuthCard = () => {
   const [reinputPassword, setReinputPassword] = React.useState("");
   const [status, setStatus] = React.useState("signin");
   const [authCardContent, setAuthCardContent] = React.useState<any>();
-  const { signup, signin } = React.useContext(UserContext);
+  const { signup, signin, user } = React.useContext(UserContext);
 
   React.useEffect(() => {
     authCardContents.forEach((content, i) => {
@@ -23,6 +27,16 @@ export const AuthCard = () => {
       }
     });
   }, [status, email, password, name]);
+
+  React.useEffect(() => {
+    if (statusProp) {
+      if (statusProp === "edit" && user?.email && user?.name) {
+        setEmail(user.email);
+        setName(user.name);
+      }
+      setStatus(statusProp);
+    }
+  }, [statusProp, user]);
 
   const authCardContents = [
     {
