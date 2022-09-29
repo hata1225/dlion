@@ -10,7 +10,7 @@ import { PdfModal } from "components/PdfModal";
 import { BasePdf } from "components/BasePdf";
 import { fontSize } from "theme";
 import { getFileData, getMainDataByBlob } from "api/api";
-import { NotFoundPage } from "pages/NotFoundPage/NotFoundPage";
+import { NotFoundPage } from "pages/NotFoundPage";
 
 export const FileDataDetailPage = () => {
   const [fileData, setFileData] = React.useState<FileData>();
