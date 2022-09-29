@@ -24,13 +24,13 @@ export const baseStyle = {
     tb: 980,
     sp: 600,
   },
-  postModalWidth: {
+  fileDataModalWidth: {
     pc: "500px",
   },
-  postModalHeight: {
+  fileDataModalHeight: {
     pc: "650px",
   },
-  postAreaHeader: {
+  modalContentAreaHeader: {
     pc: "33px",
   },
   mainPageFileDataCardGap: {

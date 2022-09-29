@@ -15,9 +15,9 @@ import {
 import CloseIcon from "@material-ui/icons/Close";
 import { BaseTextField } from "components/BaseTextField";
 import { CategoryInputArea } from "./CategoryInputArea";
-import { PostModalLine } from "./PostModalLine";
-import { FileData, FileDataStatus } from "types/fileData";
-import { postFileData } from "api/api";
+import { FileDataModalLine } from "./FileDataModalLine";
+import { FileData, FileDataByEdit, FileDataStatus } from "types/fileData";
+import { patchFileData, postFileData } from "api/api";
 import { UserContext } from "contexts/UserContext";
 import { FileDataInputArea } from "./FileDataInputArea";
 import { FileDataContext } from "contexts/FileDataContexts";
@@ -25,13 +25,15 @@ import { createNotification } from "functions/notification";
 import { countString } from "functions/countString";
 
 interface Props {
-  isOpenPostModal: boolean;
-  setIsOpenPostModal: React.Dispatch<React.SetStateAction<boolean>>;
+  isOpenFileDataModal: boolean;
+  setIsOpenFileDataModal: React.Dispatch<React.SetStateAction<boolean>>;
   fileData?: FileData;
+  setFileData?: React.Dispatch<React.SetStateAction<FileData | undefined>>;
 }
 
-export const PostModal = (props: Props) => {
-  const { isOpenPostModal, setIsOpenPostModal } = props;
+export const FileDataModal = (props: Props) => {
+  const { isOpenFileDataModal, setIsOpenFileDataModal, fileData, setFileData } =
+    props;
   const [title, setTitle] = React.useState("");
   const [description, setDescription] = React.useState("");
   const [selectedCategories, setSelectedCategories] = React.useState<string[]>(
@@ -43,7 +45,8 @@ export const PostModal = (props: Props) => {
   const [mainDataObjectUrl, setMainDataObjectUrl] = React.useState("");
   const [mainDataStatus, setMainDataStatus] =
     React.useState<FileDataStatus>("none");
-  const [isDisabledPostButton, setIsDisabledPostButton] = React.useState(true);
+  const [isDisabledPostEditButton, setIsDisabledPostEditButton] =
+    React.useState(true);
   const [uploadProgressValue, setUploadProgressValue] = React.useState(0);
   const { user } = React.useContext(UserContext);
   const { updateFileData } = React.useContext(FileDataContext);
@@ -58,12 +61,22 @@ export const PostModal = (props: Props) => {
     ];
 
   React.useEffect(() => {
-    if (mainData && coverImage && user?.token) {
-      setIsDisabledPostButton(false);
-    } else {
-      setIsDisabledPostButton(true);
+    if (fileData) {
+      const { title, description, categories } = fileData;
+      setTitle(title);
+      setDescription(description);
+      console.log("fileData: ", fileData);
+      setSelectedCategories(categories);
     }
-  }, [mainData, coverImage, user?.token]);
+  }, [fileData]);
+
+  React.useEffect(() => {
+    if ((mainData && coverImage && user?.token) || fileData) {
+      setIsDisabledPostEditButton(false);
+    } else {
+      setIsDisabledPostEditButton(true);
+    }
+  }, [mainData, coverImage, user?.token, fileData]);
 
   React.useEffect(() => {
     if (mainData) {
@@ -78,7 +91,28 @@ export const PostModal = (props: Props) => {
   }, [mainData]);
 
   const handleClose = () => {
-    setIsOpenPostModal(false);
+    setIsOpenFileDataModal(false);
+  };
+
+  const handleEdit = async () => {
+    if (fileData && user?.token) {
+      const newFileData: FileDataByEdit = {
+        id: fileData.id,
+        title,
+        description,
+        categories: selectedCategories,
+      };
+      if (setFileData) {
+        setFileData({ ...fileData, ...newFileData });
+      }
+      try {
+        await patchFileData(newFileData, user.token);
+        createNotification("success", "更新できました");
+        setIsOpenFileDataModal(false);
+      } catch (error: any) {
+        createNotification("danger", error?.message, "更新に失敗しました");
+      }
+    }
   };
 
   const handlePost = async () => {
@@ -127,7 +161,7 @@ export const PostModal = (props: Props) => {
               setMainData(undefined);
               setMainDataObjectUrl("");
               setMainDataStatus("none");
-              setIsDisabledPostButton(true);
+              setIsDisabledPostEditButton(true);
               setUploadProgressValue(0);
               createNotification("success", "投稿できました");
             }
@@ -142,12 +176,14 @@ export const PostModal = (props: Props) => {
   return (
     <Modal
       className={classes.modal}
-      open={isOpenPostModal}
+      open={isOpenFileDataModal}
       onClose={handleClose}
     >
-      <div className={classes.postArea}>
-        <div className={classes.postAreaHeader}>
-          <div className={classes.heading}>ファイルを投稿する</div>
+      <div className={classes.modalContentArea}>
+        <div className={classes.modalContentAreaHeader}>
+          <div className={classes.heading}>
+            {fileData ? "ファイルを編集する" : "ファイルを投稿する"}
+          </div>
           <IconButton className={classes.iconButton} onClick={handleClose}>
             <CloseIcon style={{ fontSize: fontSize.large.small }} />
           </IconButton>
@@ -175,24 +211,28 @@ export const PostModal = (props: Props) => {
               minRows={2}
             />
           </div>
-          <PostModalLine />
-          <FileDataInputArea
-            coverImage={coverImage}
-            coverImageObjectUrl={coverImageObjectUrl}
-            setCoverImage={setCoverImage}
-            setCoverImageObjectUrl={setCoverImageObjectUrl}
-            mainData={mainData}
-            mainDataObjectUrl={mainDataObjectUrl}
-            setMainData={setMainData}
-            setMainDataObjectUrl={setMainDataObjectUrl}
-            mainDataStatus={mainDataStatus}
-          />
-          <PostModalLine />
+          {!fileData && (
+            <>
+              <FileDataModalLine />
+              <FileDataInputArea
+                coverImage={coverImage}
+                coverImageObjectUrl={coverImageObjectUrl}
+                setCoverImage={setCoverImage}
+                setCoverImageObjectUrl={setCoverImageObjectUrl}
+                mainData={mainData}
+                mainDataObjectUrl={mainDataObjectUrl}
+                setMainData={setMainData}
+                setMainDataObjectUrl={setMainDataObjectUrl}
+                mainDataStatus={mainDataStatus}
+              />
+            </>
+          )}
+          <FileDataModalLine />
           <CategoryInputArea
             selectedCategories={selectedCategories}
             setSelectedCategories={setSelectedCategories}
           />
-          <PostModalLine />
+          <FileDataModalLine />
           {uploadProgressValue ? (
             <div>
               {`${Math.floor(uploadProgressValue)}%`}
@@ -205,13 +245,13 @@ export const PostModal = (props: Props) => {
             <></>
           )}
           <Button
-            className={classes.postButton}
+            className={classes.postEditButton}
             variant="contained"
             color="primary"
-            onClick={handlePost}
-            disabled={isDisabledPostButton}
+            onClick={fileData ? handleEdit : handlePost}
+            disabled={isDisabledPostEditButton}
           >
-            投稿する
+            {fileData ? "更新する" : "投稿する"}
           </Button>
         </div>
       </div>
@@ -225,15 +265,15 @@ const useStyles = makeStyles({
     justifyContent: "center",
     alignItems: "center",
   },
-  postArea: {
-    height: baseStyle.postModalHeight.pc,
-    width: baseStyle.postModalWidth.pc,
+  modalContentArea: {
+    height: baseStyle.fileDataModalHeight.pc,
+    width: baseStyle.fileDataModalWidth.pc,
     backgroundColor: baseStyle.color.white.light,
     borderRadius: borderRadius.main,
     padding: "10px",
   },
-  postAreaHeader: {
-    height: baseStyle.postAreaHeader.pc,
+  modalContentAreaHeader: {
+    height: baseStyle.modalContentAreaHeader.pc,
     display: "flex",
     justifyContent: "space-between",
   },
@@ -245,7 +285,7 @@ const useStyles = makeStyles({
     padding: "6px",
   },
   main: {
-    height: `calc(100% - ${baseStyle.postAreaHeader.pc})`,
+    height: `calc(100% - ${baseStyle.modalContentAreaHeader.pc})`,
     paddingTop: "10px",
     overflow: "scroll",
     msOverflowStyle: "none",
@@ -264,7 +304,7 @@ const useStyles = makeStyles({
   inputDescription: {
     lineHeight: "1.2",
   },
-  postButton: {
+  postEditButton: {
     width: "100%",
     fontSize: fontSize.medium.small,
   },

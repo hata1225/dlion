@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig } from "axios";
-import { FileData } from "types/fileData";
+import { FileData, FileDataByEdit } from "types/fileData";
 
 const ENVS = {
   develop: "localhost",
@@ -102,7 +102,7 @@ export const patchAxios = async (path: string, data: object, token: string) => {
 export const getAxios = async (path: string, token: string) => {
   axios.defaults.withCredentials = false;
   let getProps: [string, AxiosRequestConfig<any> | undefined];
-  const isPathMatchByHttp = path.match(/http:/)
+  const isPathMatchByHttp = path.match(/http:/);
   if (token) {
     getProps = [
       `/api${path}`,
@@ -116,7 +116,7 @@ export const getAxios = async (path: string, token: string) => {
     getProps = [`/api${path}`, undefined];
   }
   if (isPathMatchByHttp) {
-    getProps[0] = path
+    getProps[0] = path;
   }
   try {
     return await axios.get(...getProps);
@@ -133,14 +133,14 @@ export const getAxiosByMainDataBlob = async (path: string, token: string) => {
     getProps = [
       `${path}`,
       {
-        responseType: 'blob',
+        responseType: "blob",
         headers: {
           Authorization: `Token ${token}`,
         },
       },
     ];
   } else {
-    getProps = [`${path}`, {responseType: 'blob'}];
+    getProps = [`${path}`, { responseType: "blob" }];
   }
   try {
     return await axios.get(...getProps);
@@ -267,10 +267,27 @@ export const getFileData = async (token: string, id: number) => {
   try {
     const result = await getAxios(path, token);
     const fileData: FileData = result.data;
-    fileData.video_data_status = JSON.parse(fileData.video_data_status);
+    fileData.video_data_status = JSON.parse(result.data.video_data_status);
+    fileData.categories = JSON.parse(result.data.categories);
     return fileData;
   } catch (error) {
     console.log("@getFileData: ", error);
+    throw error;
+  }
+};
+
+export const patchFileData = async (data: FileDataByEdit, token: string) => {
+  const path = `/file_data/${data.id}/`;
+  const newData = {
+    title: data.title,
+    description: data.description,
+    categories: JSON.stringify(data.categories),
+  };
+  try {
+    const result = await patchAxios(path, newData, token);
+    return result;
+  } catch (error) {
+    console.log("@patchFileData: ", error);
     throw error;
   }
 };
@@ -316,19 +333,13 @@ export const postFileData = async (
   }
 };
 
-export const getMainDataByBlob = async (
-  fileData: FileData,
-  token: string,
-) => {
-  const path = fileData.main_data
+export const getMainDataByBlob = async (fileData: FileData, token: string) => {
+  const path = fileData?.main_data ?? "";
   try {
-    const result = await getAxiosByMainDataBlob(
-      path,
-      token
-    );
+    const result = await getAxiosByMainDataBlob(path, token);
     return result.data;
   } catch (error) {
     console.log("@getMainData: ", error);
     throw error;
   }
-}
+};

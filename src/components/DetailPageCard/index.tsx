@@ -15,10 +15,10 @@ export const DetailPageCard = ({ fileData }: Props) => {
   const classes = useStyles();
   const [isOpenDeleteCheckModal, setIsOpenDeleteCheckModal] =
     React.useState(false);
-  const { handleOpenPostModal } = React.useContext(PostModalContext);
+  const { handleOpenEditModal } = React.useContext(PostModalContext);
 
   const handleClickEditButton = () => {
-    handleOpenPostModal(fileData);
+    handleOpenEditModal(fileData);
   };
 
   return (

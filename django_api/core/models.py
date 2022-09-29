@@ -132,15 +132,19 @@ class FileData(models.Model):
         cover_image_path_by_export = cover_image_path.replace(cover_image_name, "")
 
         # cover_imageをwebpに変換 横幅1200px
-        cmd = f'ffmpeg -i {cover_image_path} -vf scale=1200:-1 {cover_image_path_by_export}cover_image.webp'
-        code = subprocess.call(cmd.split())
-        print('process=' + str(code))
-        cover_image_path_by_export = cover_image_path_by_export.replace("media/", "")
-        self.cover_image = f'{cover_image_path_by_export}cover_image.webp'
+        if "webp" in self.cover_image:
+            cmd = f'ffmpeg -i {cover_image_path} -vf scale=1200:-1 {cover_image_path_by_export}cover_image.webp'
+            code = subprocess.call(cmd.split())
+            print('process=' + str(code))
+            cover_image_path_by_export = cover_image_path_by_export.replace("media/", "")
+            self.cover_image = f'{cover_image_path_by_export}cover_image.webp'
+
         super().save(*args, **kwargs)
 
-        if self.main_data_type == "video":
+        video_data_status = json.loads(self.video_data_status)
 
+        # 動画は編集を想定していない
+        if self.main_data_type == "video" and video_data_status["allcomplete"] == 0:
 
             # m3u8の作成([input].mp4 -> ls/ls.m3u8)
             os.makedirs(f'{main_data_path_by_export}ls')
@@ -152,7 +156,6 @@ class FileData(models.Model):
             cmd += f' {main_data_path_by_export}ls/ls_%5d.ts'
             code = subprocess.call(cmd.split())
             print('process=' + str(code))
-            video_data_status = json.loads(self.video_data_status)
             video_data_status['lsm3u8'] = 1
             video_data_status['completetotal'] = 1
             self.video_data_status = json.dumps(video_data_status)
