@@ -44,6 +44,7 @@ export const PostModalProvider = ({
         isOpenFileDataModal={isOpenFileDataModal}
         setIsOpenFileDataModal={setIsOpenFileDataModal}
         fileData={fileData}
+        setFileData={setFileData}
       />
       {children}
     </PostModalContext.Provider>
