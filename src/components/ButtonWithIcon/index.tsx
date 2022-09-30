@@ -6,15 +6,16 @@ interface Props {
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
   description: string;
   icon: React.ReactNode;
+  fontWeight?: number;
 }
 
 export const ButtonWithIcon = (props: Props) => {
-  const { onClick, description, icon } = props;
+  const { onClick, description, icon, fontWeight = 400 } = props;
   const classes = useStyles();
   return (
     <Button className={classes.button} onClick={onClick} color="primary">
       <div className={classes.iconArea}>{icon}</div>
-      {description}
+      <p style={{ fontWeight: fontWeight }}>{description}</p>
     </Button>
   );
 };

@@ -108,4 +108,9 @@ export const fontSize = {
   },
 };
 
+export const fontWeight = {
+  normal: 400,
+  bold: 700,
+};
+
 export const fileDataTitleMaxLength = 70;

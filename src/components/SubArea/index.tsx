@@ -2,6 +2,7 @@ import { makeStyles } from "@material-ui/core";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 import PersonIcon from "@material-ui/icons/Person";
+import HomeIcon from "@material-ui/icons/Home";
 import { ButtonWithIcon } from "components/ButtonWithIcon";
 import { fontSize, baseStyle, shadow } from "theme";
 import React from "react";
@@ -19,6 +20,10 @@ export const SubArea = () => {
   const { handleOpenPostModal } = React.useContext(PostModalContext);
   const { signout } = React.useContext(UserContext);
 
+  const handleClickHomeIcon = () => {
+    window.location.href = "/";
+  };
+
   const handleClickSignout = () => {
     signout();
   };
@@ -28,6 +33,11 @@ export const SubArea = () => {
   };
 
   const subAreaContents: SubAreaContents = [
+    {
+      func: handleClickHomeIcon,
+      description: "ホーム",
+      icon: <HomeIcon style={{ fontSize: fontSize.medium.medium }} />,
+    },
     {
       func: handleClickSignout,
       description: "ログアウト",
