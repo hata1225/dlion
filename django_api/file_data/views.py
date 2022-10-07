@@ -33,9 +33,9 @@ class FileDataViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         id = self.request.path.split("/")[3]
-        user_name = self.request.user.name
-        mainDataPath = f'media/main/{user_name}/{id}'
-        subDataPath = f'media/sub/{user_name}/{id}'
+        user_id = self.request.user.id
+        mainDataPath = f'media/main/{user_id}/{id}'
+        subDataPath = f'media/sub/{user_id}/{id}'
         try:
             shutil.rmtree(mainDataPath)
             shutil.rmtree(subDataPath)

@@ -262,7 +262,7 @@ export const getAllFileData = async (token: string) => {
   }
 };
 
-export const getFileData = async (token: string, id: number) => {
+export const getFileData = async (token: string, id: string) => {
   const path = `/file_data/${id}/`;
   try {
     const result = await getAxios(path, token);
@@ -292,7 +292,7 @@ export const patchFileData = async (data: FileDataByEdit, token: string) => {
   }
 };
 
-export const deleteFileData = async (token: string, id: number) => {
+export const deleteFileData = async (token: string, id: string) => {
   const path = `/file_data/${id}/`;
   try {
     const result = await deleteAxios(path, token);

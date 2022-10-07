@@ -2,7 +2,7 @@ import { UserInterface } from "./User";
 export type FileDataStatus = "none" | "video" | "image" | "pdf" | "audio";
 
 export type FileData = {
-  id: number;
+  id: string;
   user?: UserInterface;
   title: string;
   description: string;
@@ -18,7 +18,7 @@ export type FileData = {
 };
 
 export type FileDataByEdit = {
-  id: number;
+  id: string;
   title: string;
   description: string;
   categories: string[];

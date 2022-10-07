@@ -43,7 +43,7 @@ export const FileDataDetailPage = () => {
       if (user?.token && id) {
         try {
           setIsNotFoundPage(false);
-          const newFileData = await getFileData(user.token, Number(id));
+          const newFileData = await getFileData(user.token, id);
           setFileData(newFileData);
         } catch (error) {
           setIsNotFoundPage(true);

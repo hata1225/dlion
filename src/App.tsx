@@ -14,6 +14,7 @@ import { FileDataProvider } from "contexts/FileDataContexts";
 import { FileDataDetailPage } from "pages/FileDataDetailPage";
 import { NotFoundPage } from "pages/NotFoundPage";
 import { EditUserPage } from "pages/EditUserPage";
+import { ChatPage } from "pages/ChatPage";
 
 export default function App() {
   return (
@@ -41,6 +42,7 @@ const ReactRouter = () => {
         <Route path="/auth" element={<SignupAndSigninPage />} />
         <Route path="/filedata/:id" element={<FileDataDetailPage />} />
         <Route path="/edituser" element={<EditUserPage />} />
+        <Route path="/chat" element={<ChatPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>

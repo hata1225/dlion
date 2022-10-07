@@ -2,6 +2,7 @@ import { makeStyles } from "@material-ui/core";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 import PersonIcon from "@material-ui/icons/Person";
+import MailOutlineIcon from "@material-ui/icons/MailOutline";
 import HomeIcon from "@material-ui/icons/Home";
 import { ButtonWithIcon } from "components/ButtonWithIcon";
 import { fontSize, baseStyle, shadow } from "theme";
@@ -32,6 +33,10 @@ export const SubArea = () => {
     window.location.href = "/edituser";
   };
 
+  const handleClickChatIcon = () => {
+    window.location.href = "/chat";
+  };
+
   const subAreaContents: SubAreaContents = [
     {
       func: handleClickHomeIcon,
@@ -52,6 +57,11 @@ export const SubArea = () => {
       func: handleClickUserEditButton,
       description: "アカウント編集",
       icon: <PersonIcon style={{ fontSize: fontSize.medium.medium }} />,
+    },
+    {
+      func: handleClickChatIcon,
+      description: "チャット",
+      icon: <MailOutlineIcon style={{ fontSize: fontSize.medium.medium }} />,
     },
   ];
 
