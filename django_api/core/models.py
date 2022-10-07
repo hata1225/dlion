@@ -49,7 +49,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     icon_image = models.FileField(upload_to=saveIconImagePath, null=True)
-    description = models.CharField(max_length=255, null=False)
+    description = models.CharField(max_length=255, null=True)
 
     objects = UserManager()
 
