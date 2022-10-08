@@ -20,6 +20,10 @@ def saveIconImagePath(instance, filename):
     ext = filename.split('.')[-1]
     return f'icon/{instance.user.id}/{instance.id}/{instance.id}.{ext}'
 
+def saveBackgroundImagePath(instance, filename):
+    ext = filename.split('.')[-1]
+    return f'background/{instance.user.id}/{instance.id}/{instance.id}.{ext}'
+
 class UserManager(BaseUserManager):
 
     def create_user(self, email, password=None, **extra_fields):
@@ -49,6 +53,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     icon_image = models.FileField(upload_to=saveIconImagePath, null=True)
+    background_image = models.FileField(upload_to=saveBackgroundImagePath, null=True)
     description = models.CharField(max_length=255, null=True)
 
     objects = UserManager()
