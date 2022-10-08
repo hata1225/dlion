@@ -4,6 +4,7 @@ import { UserContext } from "contexts/UserContext";
 import { createNotification } from "functions/notification";
 import React from "react";
 import { baseStyle } from "theme";
+import { ImageArea } from "./ImageArea";
 
 interface Props {
   statusProp?: "signin" | "signup" | "edit";
@@ -13,6 +14,11 @@ export const AuthCard = ({ statusProp }: Props) => {
   const classes = useStyles();
   const [email, setEmail] = React.useState("");
   const [name, setName] = React.useState("");
+  const [description, setDescription] = React.useState<string | undefined>();
+  const [iconImage, setIconImage] = React.useState<string | undefined>();
+  const [backgroundImage, setBackgroundImage] = React.useState<
+    string | undefined
+  >();
   const [password, setPassword] = React.useState("");
   const [reinputPassword, setReinputPassword] = React.useState("");
   const [status, setStatus] = React.useState("signin");
@@ -31,8 +37,11 @@ export const AuthCard = ({ statusProp }: Props) => {
   React.useEffect(() => {
     if (statusProp) {
       if (statusProp === "edit" && user?.email && user?.name) {
-        setEmail(user.email);
-        setName(user.name);
+        setEmail(user?.email);
+        setName(user?.name);
+        setDescription(user?.description);
+        setIconImage(user?.icon_image);
+        setBackgroundImage(user?.background_image);
       }
       setStatus(statusProp);
     }
@@ -43,9 +52,7 @@ export const AuthCard = ({ statusProp }: Props) => {
       status: "signin",
       title: "ログイン",
       emailForm: true,
-      nameForm: false,
       passwordForm: true,
-      reinputPasswordForm: false,
       runButtonText: "ログインをする",
       runButtonFunc: async () => await handleClickSignin(),
       statusChangeButton: true,
@@ -68,13 +75,12 @@ export const AuthCard = ({ statusProp }: Props) => {
     {
       status: "edit",
       title: "アカウントを編集",
+      imageArea: true,
+      descriptionForm: true,
       emailForm: true,
       nameForm: true,
-      passwordForm: false,
-      reinputPasswordForm: false,
       runButtonText: "アカウントを編集",
       runButtonFunc: async () => await handleClickEdit(),
-      statusChangeButton: false,
       statusChangeButtonText: "",
       statusChangeFunc: () => handleClickChangeStatus(""),
     },
@@ -100,7 +106,6 @@ export const AuthCard = ({ statusProp }: Props) => {
     }
   };
 
-  //
   const handleClickEdit = async () => {
     try {
       if (editUser) {
@@ -123,15 +128,7 @@ export const AuthCard = ({ statusProp }: Props) => {
     <Card className={classes.card}>
       <h2>{authCardContent?.title}</h2>
       <div className={classes.inputTextArea}>
-        {authCardContent?.emailForm && (
-          <BaseTextField
-            label="メールアドレス"
-            variant="outlined"
-            type="email"
-            value={email}
-            setValue={setEmail}
-          />
-        )}
+        {authCardContent?.imageArea && <ImageArea />}
         {authCardContent?.nameForm && (
           <BaseTextField
             label={
@@ -143,6 +140,26 @@ export const AuthCard = ({ statusProp }: Props) => {
             value={name}
             setValue={setName}
             error={!name.match(/^[A-Za-z0-9]*$/)}
+          />
+        )}
+        {authCardContent?.descriptionForm && (
+          <BaseTextField
+            label={`自己紹介 (${description?.length ?? 0}/255)`}
+            variant="outlined"
+            value={description ?? ""}
+            setValue={setDescription}
+            multiline
+            minRows={3}
+            error={description ? description.length > 255 : false}
+          />
+        )}
+        {authCardContent?.emailForm && (
+          <BaseTextField
+            label="メールアドレス"
+            variant="outlined"
+            type="email"
+            value={email}
+            setValue={setEmail}
           />
         )}
         {authCardContent?.passwordForm && (

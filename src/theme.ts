@@ -40,6 +40,9 @@ export const baseStyle = {
     height: "25px",
     width: "50px",
   },
+  editPageUserIconSize: {
+    main: "72px",
+  },
   gap: {
     small: "5px",
   },
