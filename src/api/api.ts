@@ -17,7 +17,9 @@ const createFormData = (data: any) => {
   let formData = new FormData();
   const objectKeys = Object.keys(data);
   objectKeys.forEach((objectKey) => {
-    formData.append(`${objectKey}`, data[objectKey]);
+    if (data[objectKey]) {
+      formData.append(`${objectKey}`, data[objectKey]);
+    }
   });
   return formData;
 };
@@ -222,10 +224,20 @@ export const createUser = async (
 export const updateUser = async (
   email: string,
   name: string,
+  description: string | undefined,
+  iconImage: File | undefined,
+  backgroundImage: File | undefined,
   token: string
 ) => {
+  console.log("description232: ", description);
   const path = "/user/update/";
-  const data = { email, name };
+  const data = {
+    email,
+    name,
+    description: description ?? "",
+    icon_image: iconImage ?? null,
+    background_image: backgroundImage ?? null,
+  };
   try {
     const result = await patchAxios(path, data, token);
     return result?.data;

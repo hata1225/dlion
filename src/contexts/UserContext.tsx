@@ -9,7 +9,13 @@ interface UserContextInterface {
   signup: (email: string, name: string, password: string) => Promise<any>;
   signin: (email: string, password: string) => Promise<any>;
   signout: () => void;
-  editUser: (email: string, name: string) => Promise<any>;
+  editUser: (
+    email: string,
+    name: string,
+    description?: string,
+    iconImage?: File,
+    backgroundImage?: File
+  ) => Promise<any>;
 }
 
 export const UserContext = React.createContext<UserContextInterface>(
@@ -73,14 +79,24 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
   // [修正]
   //   変更前のuserと、引数が同じ場合はapiを叩かないようにしたい
-  const editUser = async (email: string, name: string) => {
+  const editUser = async (
+    email: string,
+    name: string,
+    description?: string,
+    iconImage?: File,
+    backgroundImage?: File
+  ) => {
+    console.log("description80: ", description);
     try {
-      if (user?.email === email && user?.name === name) {
-        // 変更がない場合
-        return user;
-      }
       let token = localStorage.getItem("token");
-      const userInfo = await updateUser(email, name, token ?? "");
+      const userInfo = await updateUser(
+        email,
+        name,
+        description ?? "",
+        iconImage,
+        backgroundImage,
+        token ?? ""
+      );
       setUser((prev) => ({ ...prev, ...userInfo, token }));
       return userInfo;
     } catch (error) {

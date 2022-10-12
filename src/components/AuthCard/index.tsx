@@ -5,6 +5,7 @@ import { createNotification } from "functions/notification";
 import React from "react";
 import { baseStyle } from "theme";
 import { ImageArea } from "./ImageArea";
+import userIconImageDefault from "./userIconImageDefault.webp";
 
 interface Props {
   statusProp?: "signin" | "signup" | "edit";
@@ -14,16 +15,21 @@ export const AuthCard = ({ statusProp }: Props) => {
   const classes = useStyles();
   const [email, setEmail] = React.useState("");
   const [name, setName] = React.useState("");
-  const [description, setDescription] = React.useState<string | undefined>();
-  const [iconImage, setIconImage] = React.useState<string | undefined>();
-  const [backgroundImage, setBackgroundImage] = React.useState<
-    string | undefined
-  >();
+  const [description, setDescription] = React.useState("");
+  const [userBackgroundImage, setUserBackgroundImage] = React.useState<File>();
+  const [userBackgroundImageUrl, setUserBackgroundImageUrl] =
+    React.useState<string>();
+  const [userIconImage, setUserIconImage] = React.useState<File>();
+  const [userIconImageUrl, setUserIconImageUrl] = React.useState<string>();
   const [password, setPassword] = React.useState("");
   const [reinputPassword, setReinputPassword] = React.useState("");
   const [status, setStatus] = React.useState("signin");
   const [authCardContent, setAuthCardContent] = React.useState<any>();
   const { signup, signin, user, editUser } = React.useContext(UserContext);
+
+  React.useEffect(() => {
+    console.log("description: ", description);
+  }, [description]);
 
   React.useEffect(() => {
     authCardContents.forEach((content, i) => {
@@ -39,9 +45,9 @@ export const AuthCard = ({ statusProp }: Props) => {
       if (statusProp === "edit" && user?.email && user?.name) {
         setEmail(user?.email);
         setName(user?.name);
-        setDescription(user?.description);
-        setIconImage(user?.icon_image);
-        setBackgroundImage(user?.background_image);
+        setDescription(user?.description ?? "");
+        setUserBackgroundImageUrl(user?.background_image);
+        setUserIconImageUrl(user?.icon_image ?? userIconImageDefault);
       }
       setStatus(statusProp);
     }
@@ -109,7 +115,14 @@ export const AuthCard = ({ statusProp }: Props) => {
   const handleClickEdit = async () => {
     try {
       if (editUser) {
-        const userInfo = await editUser(email, name);
+        console.log("description118: ", description);
+        const userInfo = await editUser(
+          email,
+          name,
+          description,
+          userIconImage,
+          userBackgroundImage
+        );
         if (userInfo) {
           createNotification("success", "アカウントを編集しました");
         }
@@ -128,7 +141,16 @@ export const AuthCard = ({ statusProp }: Props) => {
     <Card className={classes.card}>
       <h2>{authCardContent?.title}</h2>
       <div className={classes.inputTextArea}>
-        {authCardContent?.imageArea && <ImageArea />}
+        {authCardContent?.imageArea && (
+          <ImageArea
+            setUserBackgroundImage={setUserBackgroundImage}
+            setUserBackgroundImageUrl={setUserBackgroundImageUrl}
+            userBackgroundImageUrl={userBackgroundImageUrl}
+            setUserIconImage={setUserIconImage}
+            setUserIconImageUrl={setUserIconImageUrl}
+            userIconImageUrl={userIconImageUrl}
+          />
+        )}
         {authCardContent?.nameForm && (
           <BaseTextField
             label={
@@ -146,7 +168,7 @@ export const AuthCard = ({ statusProp }: Props) => {
           <BaseTextField
             label={`自己紹介 (${description?.length ?? 0}/255)`}
             variant="outlined"
-            value={description ?? ""}
+            value={description}
             setValue={setDescription}
             multiline
             minRows={3}
