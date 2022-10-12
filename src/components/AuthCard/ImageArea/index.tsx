@@ -12,10 +12,6 @@ export const ImageArea = () => {
   const [isHoverUserIconImage, setIsHoverUserIconImage] = React.useState(false);
   const { user } = React.useContext(UserContext);
 
-  React.useEffect(() => {
-    console.log("isHoverUserBackgroundImage: ", isHoverUserBackgroundImage);
-  }, [isHoverUserBackgroundImage]);
-
   return (
     <>
       <div className={classes.imageArea}>
