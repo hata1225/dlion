@@ -10,6 +10,8 @@ import {
 import ExpandLessIcon from "@material-ui/icons/ExpandLess";
 import { CoverImageAreaByVideoData } from "components/CoverImageAreaByVideoData";
 import { BookmarkButton } from "components/BookmarkButton";
+import { UserContext } from "contexts/UserContext";
+import userIconImageDefault from "userIconImageDefault.webp";
 
 type CardProps = React.ComponentProps<typeof Card>;
 type Props = CardProps & {
@@ -29,6 +31,7 @@ export const FileDataCard = ({
     React.useState(0);
   const classes = useStyles();
   const bottomAreaRef = React.useRef<HTMLDivElement>(null);
+  const { user } = React.useContext(UserContext);
 
   React.useEffect(() => {
     if (!isScaleUpBottomArea && bottomAreaRef.current) {
@@ -52,6 +55,18 @@ export const FileDataCard = ({
         ...style,
       }}
     >
+      <div className={classes.userInfoArea}>
+        <div>
+          <img
+            className={classes.userIconImage}
+            src={user?.icon_image ?? userIconImageDefault}
+            alt=""
+          />
+        </div>
+        <div>
+          <p>{user?.name}</p>
+        </div>
+      </div>
       <CoverImageAreaByVideoData fileData={fileData} />
       <div
         ref={bottomAreaRef}
@@ -138,6 +153,18 @@ const useStyles = makeStyles({
     fontSize: 0, // imgとbottomAreaの間の隙間をなくす
     position: "relative",
     height: "100%",
+  },
+  userInfoArea: {
+    display: "flex",
+    alignItems: "center",
+    padding: "5px 7px 5px 7px",
+    gap: "5px",
+  },
+  userIconImage: {
+    width: baseStyle.userIconSize.small,
+    height: baseStyle.userIconSize.small,
+    borderRadius: "50%",
+    objectFit: "cover",
   },
   img: {
     width: "100%",
