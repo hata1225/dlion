@@ -163,13 +163,15 @@ export const AuthCard = ({ statusProp }: Props) => {
           <BaseTextField
             label={
               name.match(/^[A-Za-z0-9]*$/)
-                ? "名前（半角英数）"
+                ? name.length > 50
+                  ? `名前 50文字以内で入力してください (${name.length}/50)`
+                  : "名前（半角英数）"
                 : "名前 半角英数で入力してください（記号不可）"
             }
             variant="outlined"
             value={name}
             setValue={setName}
-            error={!name.match(/^[A-Za-z0-9]*$/)}
+            error={!name.match(/^[A-Za-z0-9]*$/) || name.length > 50}
           />
         )}
         {authCardContent?.descriptionForm && (
@@ -180,6 +182,7 @@ export const AuthCard = ({ statusProp }: Props) => {
             setValue={setDescription}
             multiline
             minRows={3}
+            maxRows={3}
             error={description ? description.length > 255 : false}
           />
         )}
