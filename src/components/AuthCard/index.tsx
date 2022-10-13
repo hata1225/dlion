@@ -5,7 +5,7 @@ import { createNotification } from "functions/notification";
 import React from "react";
 import { baseStyle } from "theme";
 import { ImageArea } from "./ImageArea";
-import userIconImageDefault from "./userIconImageDefault.webp";
+import userIconImageDefault from "userIconImageDefault.webp";
 
 interface Props {
   statusProp?: "signin" | "signup" | "edit";
@@ -28,24 +28,28 @@ export const AuthCard = ({ statusProp }: Props) => {
   const { signup, signin, user, editUser } = React.useContext(UserContext);
 
   React.useEffect(() => {
-    console.log("description: ", description);
-  }, [description]);
-
-  React.useEffect(() => {
     authCardContents.forEach((content, i) => {
       if (content.status === status) {
         const newAuthCardContent = authCardContents[i];
         setAuthCardContent(newAuthCardContent);
       }
     });
-  }, [status, email, password, name]);
+  }, [
+    status,
+    email,
+    password,
+    name,
+    description,
+    userBackgroundImage,
+    userIconImage,
+  ]);
 
   React.useEffect(() => {
     if (statusProp) {
       if (statusProp === "edit" && user?.email && user?.name) {
         setEmail(user?.email);
         setName(user?.name);
-        setDescription(user?.description ?? "");
+        setDescription(user.description ?? "");
         setUserBackgroundImageUrl(user?.background_image);
         setUserIconImageUrl(user?.icon_image ?? userIconImageDefault);
       }

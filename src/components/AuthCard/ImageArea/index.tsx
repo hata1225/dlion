@@ -82,7 +82,7 @@ export const ImageArea = ({
             <img
               className={classes.userBackgroundImage}
               src={userBackgroundImageUrl}
-              alt=""
+              alt={user?.name ?? ""}
             />
           )}
           {isHoverUserBackgroundImage && (
@@ -128,7 +128,7 @@ export const ImageArea = ({
 const useStyles = makeStyles({
   imageArea: {
     position: "relative",
-    marginBottom: `calc(${baseStyle.editPageUserIconSize.main} / 3)`,
+    marginBottom: `calc(${baseStyle.userIconSize.main} / 3)`,
   },
   changeView: {
     height: "100%",
@@ -157,11 +157,11 @@ const useStyles = makeStyles({
     borderRadius: borderRadius.main,
   },
   userIconImageArea: {
-    width: baseStyle.editPageUserIconSize.main,
-    height: baseStyle.editPageUserIconSize.main,
+    width: baseStyle.userIconSize.main,
+    height: baseStyle.userIconSize.main,
     borderRadius: "50%",
     backgroundColor: baseStyle.color.gray.main,
-    bottom: `calc(-${baseStyle.editPageUserIconSize.main} / 3)`,
+    bottom: `calc(-${baseStyle.userIconSize.main} / 3)`,
     position: "absolute",
     marginLeft: "10px",
     cursor: "pointer",

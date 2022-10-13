@@ -18,11 +18,11 @@ def saveMainDataPath(instance, filename):
 
 def saveIconImagePath(instance, filename):
     ext = filename.split('.')[-1]
-    return f'icon/{instance.user.id}/{instance.id}/{instance.id}.{ext}'
+    return f'icon/{instance.id}/{instance.id}/{instance.id}.{ext}'
 
 def saveBackgroundImagePath(instance, filename):
     ext = filename.split('.')[-1]
-    return f'background/{instance.user.id}/{instance.id}/{instance.id}.{ext}'
+    return f'background/{instance.id}/{instance.id}/{instance.id}.{ext}'
 
 class UserManager(BaseUserManager):
 
