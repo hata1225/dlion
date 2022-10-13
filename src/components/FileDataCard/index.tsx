@@ -10,7 +10,6 @@ import {
 import ExpandLessIcon from "@material-ui/icons/ExpandLess";
 import { CoverImageAreaByVideoData } from "components/CoverImageAreaByVideoData";
 import { BookmarkButton } from "components/BookmarkButton";
-import { UserContext } from "contexts/UserContext";
 import userIconImageDefault from "userIconImageDefault.webp";
 
 type CardProps = React.ComponentProps<typeof Card>;
@@ -25,13 +24,12 @@ export const FileDataCard = ({
   style,
   ...props
 }: Props) => {
-  const { title, description, categories } = fileData;
+  const { title, description, categories, user } = fileData;
   const [isScaleUpBottomArea, setIsScaleUpButtonArea] = React.useState(false);
   const [bottomAreaDefaultHeight, setBottomAreaDefaultHeight] =
     React.useState(0);
   const classes = useStyles();
   const bottomAreaRef = React.useRef<HTMLDivElement>(null);
-  const { user } = React.useContext(UserContext);
 
   React.useEffect(() => {
     if (!isScaleUpBottomArea && bottomAreaRef.current) {

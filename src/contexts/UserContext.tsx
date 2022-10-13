@@ -13,6 +13,7 @@ interface UserContextInterface {
     email: string,
     name: string,
     description?: string,
+    isPrivate?: boolean,
     iconImage?: File,
     backgroundImage?: File
   ) => Promise<any>;
@@ -83,16 +84,17 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     email: string,
     name: string,
     description?: string,
+    isPrivate?: boolean,
     iconImage?: File,
     backgroundImage?: File
   ) => {
-    console.log("description80: ", description);
     try {
       let token = localStorage.getItem("token");
       const userInfo = await updateUser(
         email,
         name,
         description ?? "",
+        isPrivate ?? false,
         iconImage,
         backgroundImage,
         token ?? ""

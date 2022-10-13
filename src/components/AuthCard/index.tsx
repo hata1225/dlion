@@ -1,4 +1,4 @@
-import { Button, Card, makeStyles } from "@material-ui/core";
+import { Button, Card, makeStyles, Switch } from "@material-ui/core";
 import { BaseTextField } from "components/BaseTextField";
 import { UserContext } from "contexts/UserContext";
 import { createNotification } from "functions/notification";
@@ -16,6 +16,7 @@ export const AuthCard = ({ statusProp }: Props) => {
   const [email, setEmail] = React.useState("");
   const [name, setName] = React.useState("");
   const [description, setDescription] = React.useState("");
+  const [isPrivate, setIsPrivate] = React.useState(false);
   const [userBackgroundImage, setUserBackgroundImage] = React.useState<File>();
   const [userBackgroundImageUrl, setUserBackgroundImageUrl] =
     React.useState<string>();
@@ -40,6 +41,7 @@ export const AuthCard = ({ statusProp }: Props) => {
     password,
     name,
     description,
+    isPrivate,
     userBackgroundImage,
     userIconImage,
   ]);
@@ -50,6 +52,7 @@ export const AuthCard = ({ statusProp }: Props) => {
         setEmail(user?.email);
         setName(user?.name);
         setDescription(user.description ?? "");
+        setIsPrivate(user.is_private ?? false);
         setUserBackgroundImageUrl(user?.background_image);
         setUserIconImageUrl(user?.icon_image ?? userIconImageDefault);
       }
@@ -89,6 +92,7 @@ export const AuthCard = ({ statusProp }: Props) => {
       descriptionForm: true,
       emailForm: true,
       nameForm: true,
+      isPrivateSwitch: true,
       runButtonText: "アカウントを編集",
       runButtonFunc: async () => await handleClickEdit(),
       statusChangeButtonText: "",
@@ -119,11 +123,11 @@ export const AuthCard = ({ statusProp }: Props) => {
   const handleClickEdit = async () => {
     try {
       if (editUser) {
-        console.log("description118: ", description);
         const userInfo = await editUser(
           email,
           name,
           description,
+          isPrivate,
           userIconImage,
           userBackgroundImage
         );
@@ -188,6 +192,16 @@ export const AuthCard = ({ statusProp }: Props) => {
             setValue={setEmail}
           />
         )}
+        {authCardContent?.isPrivateSwitch && (
+          <div className={classes.isPrivateArea}>
+            <p>アカウントをプライベートにする</p>
+            <Switch
+              checked={isPrivate}
+              onChange={() => setIsPrivate((prev) => !prev)}
+              color="primary"
+            />
+          </div>
+        )}
         {authCardContent?.passwordForm && (
           <BaseTextField
             label="パスワード 8文字以上"
@@ -241,6 +255,12 @@ const useStyles = makeStyles({
     display: "flex",
     flexDirection: "column",
     gap: "15px",
+  },
+  isPrivateArea: {
+    padding: "10px 0",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   bottomArea: {
     width: "100%",

@@ -17,7 +17,7 @@ const createFormData = (data: any) => {
   let formData = new FormData();
   const objectKeys = Object.keys(data);
   objectKeys.forEach((objectKey) => {
-    if (data[objectKey]) {
+    if (data[objectKey] === false || data[objectKey]) {
       formData.append(`${objectKey}`, data[objectKey]);
     }
   });
@@ -225,16 +225,17 @@ export const updateUser = async (
   email: string,
   name: string,
   description: string | undefined,
+  isPrivate: boolean,
   iconImage: File | undefined,
   backgroundImage: File | undefined,
   token: string
 ) => {
-  console.log("description232: ", description);
   const path = "/user/update/";
   const data = {
     email,
     name,
     description: description ?? "",
+    is_private: isPrivate,
     icon_image: iconImage ?? null,
     background_image: backgroundImage ?? null,
   };

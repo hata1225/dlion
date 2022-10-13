@@ -1,6 +1,7 @@
 from rest_framework import viewsets, pagination, response
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
+from django.db.models import Q
 
 from core.models import FileData
 from core.models import Categories
@@ -47,7 +48,7 @@ class FileDataViewSet(viewsets.ModelViewSet):
         serializer.save(user=self.request.user)
 
     def get_queryset(self):
-        return FileData.objects.filter(user=self.request.user)
+        return FileData.objects.filter(Q(user__is_private=False)|Q(user=self.request.user))
 
 class CategoriesViewSet(viewsets.ModelViewSet):
     authentication_classes = (TokenAuthentication,)
