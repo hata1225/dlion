@@ -2,6 +2,8 @@ from django.contrib.auth import get_user_model, authenticate
 
 from rest_framework import serializers
 
+from core.models import Followee
+
 
 class UserSerializer(serializers.ModelSerializer):
 
@@ -47,3 +49,12 @@ class AuthTokenSerializer(serializers.Serializer):
 
         attrs['user'] = user
         return attrs
+
+class FolloweeSerializer(serializers.ModelSerializer):
+
+    user = UserSerializer(read_only=True)
+
+    class Meta:
+        model = Followee
+        fields = ('id','user','followee','created_at',)
+        read_only_fields = ('id', 'user',)
