@@ -4,12 +4,9 @@ from rest_framework.settings import api_settings
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 
-from user.serializers import UserSerializer, AuthTokenSerializer
+from user.serializers import UserSerializer, AuthTokenSerializer, FolloweeSerializer
 
-from core.models import Followee
-
-from user import serializers
-
+from core.models import Followee, User
 
 class CreateUserView(generics.CreateAPIView):
     serializer_class = UserSerializer
@@ -26,10 +23,17 @@ class ManageUserView(generics.RetrieveUpdateAPIView):
     def get_object(self):
         return self.request.user
 
+class GetUserView(generics.RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+    lookup_field='pk'
+
 class FolloweeViewSet(viewsets.ModelViewSet):
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
-    serializer_class = serializers.FolloweeSerializer
+    serializer_class = FolloweeSerializer
     queryset = Followee.objects.order_by('-created_at')
 
     def perform_create(self, serializer):
