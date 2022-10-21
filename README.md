@@ -38,8 +38,8 @@
 >
 > ### 使用している Docker イメージについて
 >
-> - ubuntu: 22.04 (LTS)
-> - node: 18.10.0-alpine
+> - ubuntu: 22.10
+> - node: 18.11.0-alpine
 > - selenium (docker hub から image を引っ張ってる)
 >
 > ---
@@ -179,7 +179,6 @@
         docker-compose run --rm django_app sh -c "python3 manage.py makemigrations core"
 
     --rm: コンテナ停止後、コンテナを削除
-
 
     sh -c: シェルコマンド （bash -c: バッシュコマンド）
 
