@@ -44,6 +44,10 @@ export const FileDataCard = ({
     setIsScaleUpButtonArea((prev) => !prev);
   };
 
+  const handleClickUserIcon = () => {
+    window.location.href = `/profile/${fileData?.user?.id}`;
+  };
+
   return (
     <Card
       className={`${classes.fileDataCard} ${className}`}
@@ -59,6 +63,7 @@ export const FileDataCard = ({
             className={classes.userIconImage}
             src={user?.icon_image ?? userIconImageDefault}
             alt=""
+            onClick={handleClickUserIcon}
           />
         </div>
         <div>
@@ -163,6 +168,7 @@ const useStyles = makeStyles({
     height: baseStyle.userIconSize.small,
     borderRadius: "50%",
     objectFit: "cover",
+    cursor: "pointer",
   },
   img: {
     width: "100%",

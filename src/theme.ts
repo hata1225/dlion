@@ -30,6 +30,9 @@ export const baseStyle = {
   fileDataModalHeight: {
     pc: "650px",
   },
+  profilePageInnerWidth: {
+    main: "600px",
+  },
   modalContentAreaHeader: {
     pc: "33px",
   },

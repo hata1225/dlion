@@ -187,17 +187,28 @@ export const getToken = async (email: string, password: string) => {
   }
 };
 
-export const getUserInfo = async (token: string) => {
-  const path = "/user/update/";
+export const getCurrentUserInfo = async (token: string) => {
+  let path = "/user/update/";
+  try {
+    const result = await getAxios(path, token);
+    return result?.data;
+  } catch (error) {
+    console.log("@getCurrentUserInfo: ", error);
+    if (window.location.pathname !== "/auth") {
+      localStorage.clear();
+      window.location.href = "/auth";
+    }
+    throw error;
+  }
+};
+
+export const getUserInfo = async (token: string, id: string) => {
+  let path = `/user/get/${id}/`;
   try {
     const result = await getAxios(path, token);
     return result?.data;
   } catch (error) {
     console.log("@getUserInfo: ", error);
-    if (window.location.pathname !== "/auth") {
-      localStorage.clear();
-      window.location.href = "/auth";
-    }
     throw error;
   }
 };

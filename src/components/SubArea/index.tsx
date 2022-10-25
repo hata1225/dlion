@@ -19,7 +19,7 @@ type SubAreaContents = {
 export const SubArea = () => {
   const classes = useStyles();
   const { handleOpenPostModal } = React.useContext(PostModalContext);
-  const { signout } = React.useContext(UserContext);
+  const { signout, user } = React.useContext(UserContext);
 
   const handleClickHomeIcon = () => {
     window.location.href = "/";
@@ -31,6 +31,10 @@ export const SubArea = () => {
 
   const handleClickUserEditButton = () => {
     window.location.href = "/edituser";
+  };
+
+  const handleClickUserProfileButton = () => {
+    window.location.href = `/profile/${user?.id}`;
   };
 
   const handleClickChatIcon = () => {
@@ -54,8 +58,13 @@ export const SubArea = () => {
       icon: <CloudUploadIcon style={{ fontSize: fontSize.medium.medium }} />,
     },
     {
+      func: handleClickUserProfileButton,
+      description: "プロフィール",
+      icon: <PersonIcon style={{ fontSize: fontSize.medium.medium }} />,
+    },
+    {
       func: handleClickUserEditButton,
-      description: "アカウント編集",
+      description: "アカウント設定",
       icon: <PersonIcon style={{ fontSize: fontSize.medium.medium }} />,
     },
     {

@@ -1,4 +1,4 @@
-import { createUser, getToken, getUserInfo, updateUser } from "api/api";
+import { createUser, getToken, getCurrentUserInfo, updateUser } from "api/api";
 import { createNotification } from "functions/notification";
 import React from "react";
 import { UserInterface } from "../types/User";
@@ -38,7 +38,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         window.location.href = "/auth";
       }
       if (token) {
-        const userInfo = await getUserInfo(token);
+        const userInfo = await getCurrentUserInfo(token);
         setUser((prev) => ({ ...prev, ...userInfo, token }));
       }
       if (!token && user?.email && user?.password) {
@@ -51,7 +51,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const signin = async (email: string, password: string) => {
     try {
       const token = await getToken(email, password);
-      const userInfo = await getUserInfo(token);
+      const userInfo = await getCurrentUserInfo(token);
       localStorage.setItem("token", token);
       return { ...userInfo, token };
     } catch (error) {
