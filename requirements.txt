@@ -1,4 +1,2 @@
 Django==3.2.15
 djangorestframework==3.11.2
-drf_social_oauth2==1.2.1
-python-decouple==3.6
