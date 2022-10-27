@@ -19,5 +19,7 @@ RUN mkdir /django_api
 
 WORKDIR /django_api
 COPY ./django_api /django_api
+ARG SUPER_USER_PASS
+ARG SUPER_USER_EMAIL
 RUN cd /django_api && \
-    DJANGO_SUPERUSER_PASSWORD=${SUPER_USER_PASS} python3 manage.py createsuperuser --no-input --email ${SUPER_USER_EMAIL} ; exit 0
+    DJANGO_SUPERUSER_PASSWORD=${SUPER_USER_PASS} python3 manage.py createsuperuser --no-input --email=${SUPER_USER_EMAIL};

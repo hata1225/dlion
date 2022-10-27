@@ -55,7 +55,6 @@ INSTALLED_APPS = [
 #viewにて、フィルタリングした上でレスポンスするために追加
 REST_FRAMEWORK = {
    'DEFAULT_AUTHENTICATION_CLASSES': (
-      'django_filters.rest_framework.DjangoFilterBackend'
       'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
       'drf_social_oauth2.authentication.SocialAuthentication',
    ),

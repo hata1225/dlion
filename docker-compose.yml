@@ -1,5 +1,4 @@
 version: "3"
-
 services:
   react-app:
     build:
@@ -16,11 +15,14 @@ services:
     tty: true
   django_app:
     build:
+      args:
+        SUPER_USER_PASS: ${SUPER_USER_PASS}
+        SUPER_USER_EMAIL: ${SUPER_USER_EMAIL}
       context: .
       dockerfile: ./Dockerfiles/django.Dockerfile
     container_name: django_app
     environment:
-      SELENIUM_URL: http://selenium:4444/wd/hub
+      SELENIUM_URL: "http://selenium:4444/wd/hub"
     ports:
       - "8000:8000"
     volumes:
