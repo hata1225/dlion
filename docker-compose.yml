@@ -15,11 +15,10 @@ services:
     tty: true
   django_app:
     build:
-      args:
-        SUPER_USER_PASS: ${SUPER_USER_PASS}
-        SUPER_USER_EMAIL: ${SUPER_USER_EMAIL}
       context: .
       dockerfile: ./Dockerfiles/django.Dockerfile
+    env_file:
+      - ./.env
     container_name: django_app
     environment:
       SELENIUM_URL: "http://selenium:4444/wd/hub"
@@ -30,9 +29,11 @@ services:
     command: >
       sh -c "python3 manage.py makemigrations &&
              python3 manage.py migrate &&
-             python3 -u manage.py runserver 0.0.0.0:8000"
-    env_file:
-      - ./.env
+             trap 'python3 -u manage.py runserver 0.0.0.0:8000' EXIT &&
+             export DJANGO_SUPERUSER_USERNAME=${SUPER_USER_NAME} &&
+             export DJANGO_SUPERUSER_EMAIL=${SUPER_USER_EMAIL} &&
+             export DJANGO_SUPERUSER_PASSWORD=${SUPER_USER_PASS} &&
+             python3 manage.py createsuperuser --no-input"
     tty: true
   selenium:
     image: seleniarm/standalone-chromium
