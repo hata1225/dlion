@@ -5,7 +5,9 @@ import { createNotification } from "functions/notification";
 import React from "react";
 import { baseStyle } from "theme";
 import { ImageArea } from "./ImageArea";
+import { GoogleLogin } from "@react-oauth/google";
 import userIconImageDefault from "userIconImageDefault.webp";
+import jwt_decode from "jwt-decode";
 
 interface Props {
   statusProp?: "signin" | "signup" | "edit";
@@ -45,6 +47,10 @@ export const AuthCard = ({ statusProp }: Props) => {
     userBackgroundImage,
     userIconImage,
   ]);
+
+  const responseGoogle = (response: any) => {
+    console.log(response);
+  };
 
   React.useEffect(() => {
     if (statusProp) {
@@ -223,6 +229,15 @@ export const AuthCard = ({ statusProp }: Props) => {
             setValue={setReinputPassword}
           />
         )}
+        <GoogleLogin
+          onSuccess={(response: any) => {
+            let responsePayload = jwt_decode(response?.credential);
+            console.log(responsePayload);
+          }}
+          onError={() => {
+            console.log("Login Failed");
+          }}
+        />
       </div>
       <div className={classes.bottomArea}>
         <Button

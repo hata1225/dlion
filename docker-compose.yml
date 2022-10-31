@@ -4,6 +4,8 @@ services:
     build:
       context: .
       dockerfile: ./Dockerfiles/react.Dockerfile
+    env_file:
+      - ./.env
     volumes:
       - ./:/src
     command: sh -c "yarn start"

@@ -2,6 +2,7 @@ import React from "react";
 import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { UserProvider } from "contexts/UserContext";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 import "react-notifications-component/dist/theme.css";
 import "animate.css/animate.min.css";
 
@@ -18,17 +19,24 @@ import { ChatPage } from "pages/ChatPage";
 import { ProfilePage } from "pages/ProfilePage";
 
 export default function App() {
+  React.useEffect(() => {
+    console.log(process.env.REACT_APP_SOCIAL_AUTH_GOOGLE_OAUTH2_KEY);
+  }, []);
   return (
-    <UserProvider>
-      <FileDataProvider>
-        <PostModalProvider>
-          <ReactNotifications />
-          <Layout>
-            <ReactRouter />
-          </Layout>
-        </PostModalProvider>
-      </FileDataProvider>
-    </UserProvider>
+    <GoogleOAuthProvider
+      clientId={`${process.env.REACT_APP_SOCIAL_AUTH_GOOGLE_OAUTH2_KEY}`}
+    >
+      <UserProvider>
+        <FileDataProvider>
+          <PostModalProvider>
+            <ReactNotifications />
+            <Layout>
+              <ReactRouter />
+            </Layout>
+          </PostModalProvider>
+        </FileDataProvider>
+      </UserProvider>
+    </GoogleOAuthProvider>
   );
 }
 
