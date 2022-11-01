@@ -48,10 +48,6 @@ export const AuthCard = ({ statusProp }: Props) => {
     userIconImage,
   ]);
 
-  const responseGoogle = (response: any) => {
-    console.log(response);
-  };
-
   React.useEffect(() => {
     if (statusProp) {
       if (statusProp === "edit" && user?.email && user?.name) {
@@ -237,6 +233,7 @@ export const AuthCard = ({ statusProp }: Props) => {
           onError={() => {
             console.log("Login Failed");
           }}
+          size="large"
         />
       </div>
       <div className={classes.bottomArea}>

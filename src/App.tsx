@@ -19,13 +19,8 @@ import { ChatPage } from "pages/ChatPage";
 import { ProfilePage } from "pages/ProfilePage";
 
 export default function App() {
-  React.useEffect(() => {
-    console.log(process.env.REACT_APP_SOCIAL_AUTH_GOOGLE_OAUTH2_KEY);
-  }, []);
   return (
-    <GoogleOAuthProvider
-      clientId={`${process.env.REACT_APP_SOCIAL_AUTH_GOOGLE_OAUTH2_KEY}`}
-    >
+    <GoogleOAuthProvider clientId={`${process.env.REACT_APP_GOOGLE_CLIENT_ID}`}>
       <UserProvider>
         <FileDataProvider>
           <PostModalProvider>

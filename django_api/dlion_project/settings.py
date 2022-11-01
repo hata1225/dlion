@@ -24,6 +24,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 env = environ.Env()
 env.read_env('.env')
 SECRET_KEY = env('SECRET_KEY')
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = env("REACT_APP_GOOGLE_CLIENT_ID")
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = env("SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -40,9 +42,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'oauth2_provider',
-    'social_django',
-    'drf_social_oauth2',
     'rest_framework.authtoken',
     'django_cleanup',
     'core',
@@ -50,32 +49,32 @@ INSTALLED_APPS = [
     'file_data',
     'corsheaders',
     'django_filters',
+    'drf_social_oauth2',
+    'social_django',
+    'oauth2_provider',
 ]
 
 #viewにて、フィルタリングした上でレスポンスするために追加
 REST_FRAMEWORK = {
-   'DEFAULT_AUTHENTICATION_CLASSES': (
-      'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
-      'drf_social_oauth2.authentication.SocialAuthentication',
-   ),
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend',
+        'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
+        'drf_social_oauth2.authentication.SocialAuthentication',
+        ],
 }
+
 AUTHENTICATION_BACKENDS = (
-    # Google OAuth2
+    # Google OAuth2 の認証バックエンド
     'social_core.backends.google.GoogleOAuth2',
-    # drf-social-oauth2
+    # Django REST framework の認証バックエンド
     'drf_social_oauth2.backends.DjangoOAuth2',
-    # Django
+    # Django の認証バックエンド
     'django.contrib.auth.backends.ModelBackend',
 )
 
-# Google configuration
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = env("SOCIAL_AUTH_GOOGLE_OAUTH2_KEY")
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = env("SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET")
-
-# Define SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE to get extra permissions from Google.
 SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
-   'https://www.googleapis.com/auth/userinfo.email',
-   'https://www.googleapis.com/auth/userinfo.profile',
+    'https://www.googleapis.com/auth/userinfo.email',
+    'https://www.googleapis.com/auth/userinfo.profile',
 ]
 
 MIDDLEWARE = [
@@ -92,6 +91,7 @@ CORS_ORIGIN_WHITELIST = (
     'http://localhost:3000',
     'http://localhost:4444',
 )
+
 
 CORS_ALLOW_HEADERS = (
   'accept',
@@ -156,8 +156,6 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
-
 
 
 # Internationalization
