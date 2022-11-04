@@ -1,11 +1,17 @@
-import { Button, Card, makeStyles, Switch } from "@material-ui/core";
+import {
+  Button,
+  ButtonBase,
+  Card,
+  makeStyles,
+  Switch,
+} from "@material-ui/core";
 import { BaseTextField } from "components/BaseTextField";
 import { UserContext } from "contexts/UserContext";
 import { createNotification } from "functions/notification";
 import React from "react";
 import { baseStyle } from "theme";
 import { ImageArea } from "./ImageArea";
-import { GoogleLogin } from "@react-oauth/google";
+import { GoogleLogin, useGoogleLogin } from "@react-oauth/google";
 import userIconImageDefault from "userIconImageDefault.webp";
 import jwt_decode from "jwt-decode";
 
@@ -29,6 +35,9 @@ export const AuthCard = ({ statusProp }: Props) => {
   const [status, setStatus] = React.useState("signin");
   const [authCardContent, setAuthCardContent] = React.useState<any>();
   const { signup, signin, user, editUser } = React.useContext(UserContext);
+  const login = useGoogleLogin({
+    onSuccess: (tokenResponse) => console.log(tokenResponse),
+  });
 
   React.useEffect(() => {
     authCardContents.forEach((content, i) => {
@@ -225,16 +234,19 @@ export const AuthCard = ({ statusProp }: Props) => {
             setValue={setReinputPassword}
           />
         )}
-        <GoogleLogin
-          onSuccess={(response: any) => {
-            let responsePayload = jwt_decode(response?.credential);
-            console.log(responsePayload);
-          }}
-          onError={() => {
-            console.log("Login Failed");
-          }}
-          size="large"
-        />
+        <div className={classes.googleLoginArea}>
+          {/* <GoogleLogin
+            onSuccess={(response: any) => {
+              let responseByGoogleLogin = jwt_decode(response?.credential);
+              console.log("response ", responseByGoogleLogin);
+            }}
+            onError={() => {
+              console.log("Login Failed");
+            }}
+            size="large"
+          /> */}
+          <Button onClick={() => login()}>googleへのログイン</Button>
+        </div>
       </div>
       <div className={classes.bottomArea}>
         <Button
@@ -276,6 +288,11 @@ const useStyles = makeStyles({
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
+  },
+  googleLoginArea: {
+    width: "100%",
+    display: "flex",
+    justifyContent: "center",
   },
   bottomArea: {
     width: "100%",
