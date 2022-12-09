@@ -19,6 +19,9 @@ import { ChatPage } from "pages/ChatPage";
 import { ProfilePage } from "pages/ProfilePage";
 
 export default function App() {
+  React.useEffect(() => {
+    console.log(process.env.REACT_APP_GOOGLE_CLIENT_ID);
+  }, [process.env.REACT_APP_GOOGLE_CLIENT_ID]);
   return (
     <GoogleOAuthProvider clientId={`${process.env.REACT_APP_GOOGLE_CLIENT_ID}`}>
       <UserProvider>

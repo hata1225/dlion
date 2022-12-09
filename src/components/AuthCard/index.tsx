@@ -14,6 +14,7 @@ import { ImageArea } from "./ImageArea";
 import { GoogleLogin, useGoogleLogin } from "@react-oauth/google";
 import userIconImageDefault from "userIconImageDefault.webp";
 import jwt_decode from "jwt-decode";
+import { googleOauth } from "api/api";
 
 interface Props {
   statusProp?: "signin" | "signup" | "edit";
@@ -36,7 +37,11 @@ export const AuthCard = ({ statusProp }: Props) => {
   const [authCardContent, setAuthCardContent] = React.useState<any>();
   const { signup, signin, user, editUser } = React.useContext(UserContext);
   const login = useGoogleLogin({
-    onSuccess: (tokenResponse) => console.log(tokenResponse),
+    onSuccess: async (tokenResponse) => {
+      console.log(tokenResponse);
+      const authresponse = await googleOauth(tokenResponse);
+      console.log("authres: ", authresponse);
+    },
   });
 
   React.useEffect(() => {
@@ -235,17 +240,20 @@ export const AuthCard = ({ statusProp }: Props) => {
           />
         )}
         <div className={classes.googleLoginArea}>
-          {/* <GoogleLogin
+          <GoogleLogin
             onSuccess={(response: any) => {
+              console.log("response: ", response);
               let responseByGoogleLogin = jwt_decode(response?.credential);
-              console.log("response ", responseByGoogleLogin);
+              console.log("response - jwt_decode: ", responseByGoogleLogin);
             }}
             onError={() => {
               console.log("Login Failed");
             }}
             size="large"
-          /> */}
-          <Button onClick={() => login()}>googleへのログイン</Button>
+          />
+          <Button onClick={async () => await login()}>
+            googleへのログイン
+          </Button>
         </div>
       </div>
       <div className={classes.bottomArea}>
