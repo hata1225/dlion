@@ -1,20 +1,12 @@
-import {
-  Button,
-  ButtonBase,
-  Card,
-  makeStyles,
-  Switch,
-} from "@material-ui/core";
+import { Button, Card, makeStyles, Switch } from "@material-ui/core";
 import { BaseTextField } from "components/BaseTextField";
 import { UserContext } from "contexts/UserContext";
 import { createNotification } from "functions/notification";
 import React from "react";
 import { baseStyle } from "theme";
 import { ImageArea } from "./ImageArea";
-import { GoogleLogin, useGoogleLogin } from "@react-oauth/google";
 import userIconImageDefault from "userIconImageDefault.webp";
-import jwt_decode from "jwt-decode";
-import { googleOauth } from "api/api";
+import { GoogleAuthButton } from "components/GoogleAuthButton";
 
 interface Props {
   statusProp?: "signin" | "signup" | "edit";
@@ -36,13 +28,6 @@ export const AuthCard = ({ statusProp }: Props) => {
   const [status, setStatus] = React.useState("signin");
   const [authCardContent, setAuthCardContent] = React.useState<any>();
   const { signup, signin, user, editUser } = React.useContext(UserContext);
-  const login = useGoogleLogin({
-    onSuccess: async (tokenResponse) => {
-      console.log(tokenResponse);
-      const authresponse = await googleOauth(tokenResponse);
-      console.log("authres: ", authresponse);
-    },
-  });
 
   React.useEffect(() => {
     authCardContents.forEach((content, i) => {
@@ -83,6 +68,7 @@ export const AuthCard = ({ statusProp }: Props) => {
       emailForm: true,
       passwordForm: true,
       runButtonText: "ログインをする",
+      googleAuthButton: true,
       runButtonFunc: async () => await handleClickSignin(),
       statusChangeButton: true,
       statusChangeButtonText: "アカウントを作成する→",
@@ -96,6 +82,8 @@ export const AuthCard = ({ statusProp }: Props) => {
       passwordForm: true,
       reinputPasswordForm: true,
       runButtonText: "アカウントを作成",
+      googleAuthButton: true,
+      googleAuthButtonText: "Googleでアカウント作成",
       runButtonFunc: async () => await handleClickSignup(),
       statusChangeButton: true,
       statusChangeButtonText: "作成済みのアカウントを使う→",
@@ -239,23 +227,12 @@ export const AuthCard = ({ statusProp }: Props) => {
             setValue={setReinputPassword}
           />
         )}
-        <div className={classes.googleLoginArea}>
-          <GoogleLogin
-            onSuccess={(response: any) => {
-              console.log("response: ", response);
-              let responseByGoogleLogin = jwt_decode(response?.credential);
-              console.log("response - jwt_decode: ", responseByGoogleLogin);
-            }}
-            onError={() => {
-              console.log("Login Failed");
-            }}
-            size="large"
-          />
-          <Button onClick={async () => await login()}>
-            googleへのログイン
-          </Button>
-        </div>
       </div>
+      {authCardContent?.googleAuthButton && (
+        <div className={classes.googleLoginArea}>
+          <GoogleAuthButton text={authCardContent?.googleAuthButtonText} />
+        </div>
+      )}
       <div className={classes.bottomArea}>
         <Button
           onClick={async () => await authCardContent.runButtonFunc()}
