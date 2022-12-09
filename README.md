@@ -32,14 +32,14 @@
 >
 > - docker: 20.10.13
 > - docker-compose: 1.92.2
-> - node: 18.10.0
+> - node: 18.12.1
 >
 > ---
 >
 > ### 使用している Docker イメージについて
 >
 > - ubuntu: 22.10
-> - node: 18.11.0-alpine
+> - node: 18.12.1-alpine
 > - selenium (docker hub から image を引っ張ってる)
 >
 > ---
