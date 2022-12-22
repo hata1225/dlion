@@ -6,7 +6,6 @@ import React from "react";
 import { baseStyle } from "theme";
 import { ImageArea } from "./ImageArea";
 import userIconImageDefault from "userIconImageDefault.webp";
-import { GoogleAuthButton } from "components/GoogleAuthButton";
 
 interface Props {
   statusProp?: "signin" | "signup" | "edit";
@@ -28,6 +27,11 @@ export const AuthCard = ({ statusProp }: Props) => {
   const [status, setStatus] = React.useState("signin");
   const [authCardContent, setAuthCardContent] = React.useState<any>();
   const { signup, signin, user, editUser } = React.useContext(UserContext);
+
+  React.useEffect(() => {
+    console.log("password: ", password);
+    console.log("reinputpassword: ", reinputPassword);
+  }, [password, reinputPassword]);
 
   React.useEffect(() => {
     authCardContents.forEach((content, i) => {
@@ -82,8 +86,6 @@ export const AuthCard = ({ statusProp }: Props) => {
       passwordForm: true,
       reinputPasswordForm: true,
       runButtonText: "アカウントを作成",
-      googleAuthButton: true,
-      googleAuthButtonText: "Googleでアカウント作成",
       runButtonFunc: async () => await handleClickSignup(),
       statusChangeButton: true,
       statusChangeButtonText: "作成済みのアカウントを使う→",
@@ -105,6 +107,7 @@ export const AuthCard = ({ statusProp }: Props) => {
   ];
 
   const handleClickSignup = async () => {
+    console.log("handleClickSignup pass: ", password, " ", reinputPassword);
     if (password !== reinputPassword) {
       createNotification("danger", "パスワードが一致しません");
       return;
@@ -228,11 +231,6 @@ export const AuthCard = ({ statusProp }: Props) => {
           />
         )}
       </div>
-      {authCardContent?.googleAuthButton && (
-        <div className={classes.googleLoginArea}>
-          <GoogleAuthButton text={authCardContent?.googleAuthButtonText} />
-        </div>
-      )}
       <div className={classes.bottomArea}>
         <Button
           onClick={async () => await authCardContent.runButtonFunc()}
