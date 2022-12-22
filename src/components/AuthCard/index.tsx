@@ -29,6 +29,11 @@ export const AuthCard = ({ statusProp }: Props) => {
   const { signup, signin, user, editUser } = React.useContext(UserContext);
 
   React.useEffect(() => {
+    console.log("password: ", password);
+    console.log("reinputpassword: ", reinputPassword);
+  }, [password, reinputPassword]);
+
+  React.useEffect(() => {
     authCardContents.forEach((content, i) => {
       if (content.status === status) {
         const newAuthCardContent = authCardContents[i];
@@ -67,6 +72,7 @@ export const AuthCard = ({ statusProp }: Props) => {
       emailForm: true,
       passwordForm: true,
       runButtonText: "ログインをする",
+      googleAuthButton: true,
       runButtonFunc: async () => await handleClickSignin(),
       statusChangeButton: true,
       statusChangeButtonText: "アカウントを作成する→",
@@ -101,6 +107,7 @@ export const AuthCard = ({ statusProp }: Props) => {
   ];
 
   const handleClickSignup = async () => {
+    console.log("handleClickSignup pass: ", password, " ", reinputPassword);
     if (password !== reinputPassword) {
       createNotification("danger", "パスワードが一致しません");
       return;
@@ -264,6 +271,11 @@ const useStyles = makeStyles({
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
+  },
+  googleLoginArea: {
+    width: "100%",
+    display: "flex",
+    justifyContent: "center",
   },
   bottomArea: {
     width: "100%",

@@ -40,7 +40,7 @@ export const postAxios = async (
   const formData = createFormData(data);
   if (token) {
     postProps = [
-      `/api${path}`,
+      `${path}`,
       formData,
       {
         headers: {
@@ -63,7 +63,7 @@ export const postAxios = async (
       },
     ];
   } else {
-    postProps = [`api${path}`, formData, undefined];
+    postProps = [`${path}`, formData, undefined];
   }
   try {
     console.log("postProps: ", postProps);
@@ -80,7 +80,7 @@ export const patchAxios = async (path: string, data: object, token: string) => {
   let formData = createFormData(data);
   if (token) {
     patchProps = [
-      `/api${path}`,
+      `${path}`,
       formData,
       {
         headers: {
@@ -89,7 +89,7 @@ export const patchAxios = async (path: string, data: object, token: string) => {
       },
     ];
   } else {
-    patchProps = [`/api${path}`, formData, undefined];
+    patchProps = [`${path}`, formData, undefined];
   }
 
   try {
@@ -107,7 +107,7 @@ export const getAxios = async (path: string, token: string) => {
   const isPathMatchByHttp = path.match(/http:/);
   if (token) {
     getProps = [
-      `/api${path}`,
+      `${path}`,
       {
         headers: {
           Authorization: `Token ${token}`,
@@ -115,7 +115,7 @@ export const getAxios = async (path: string, token: string) => {
       },
     ];
   } else {
-    getProps = [`/api${path}`, undefined];
+    getProps = [`${path}`, undefined];
   }
   if (isPathMatchByHttp) {
     getProps[0] = path;
@@ -157,7 +157,7 @@ export const deleteAxios = async (path: string, token: string) => {
   let deleteProps: [string, AxiosRequestConfig<any> | undefined];
   if (token) {
     deleteProps = [
-      `/api${path}`,
+      `${path}`,
       {
         headers: {
           Authorization: `Token ${token}`,
@@ -165,7 +165,7 @@ export const deleteAxios = async (path: string, token: string) => {
       },
     ];
   } else {
-    deleteProps = [`/api${path}`, undefined];
+    deleteProps = [`${path}`, undefined];
   }
   try {
     return await axios.delete(...deleteProps);
@@ -176,7 +176,7 @@ export const deleteAxios = async (path: string, token: string) => {
 };
 
 export const getToken = async (email: string, password: string) => {
-  const path = "/user/token/";
+  const path = "/api/user/token/";
   const data = { email, password };
   try {
     const result = await postAxios(path, data);
@@ -187,23 +187,8 @@ export const getToken = async (email: string, password: string) => {
   }
 };
 
-export const getCurrentUserInfo = async (token: string) => {
-  let path = "/user/update/";
-  try {
-    const result = await getAxios(path, token);
-    return result?.data;
-  } catch (error) {
-    console.log("@getCurrentUserInfo: ", error);
-    if (window.location.pathname !== "/auth") {
-      localStorage.clear();
-      window.location.href = "/auth";
-    }
-    throw error;
-  }
-};
-
-export const getUserInfo = async (token: string, id: string) => {
-  let path = `/user/get/${id}/`;
+export const getUserInfo = async (token: string) => {
+  const path = "/api/user/update/";
   try {
     const result = await getAxios(path, token);
     return result?.data;
@@ -218,7 +203,7 @@ export const createUser = async (
   password: string,
   name: string
 ) => {
-  const path = "/user/create/";
+  const path = "/api/user/create/";
   const data = {
     email,
     password,
@@ -241,7 +226,7 @@ export const updateUser = async (
   backgroundImage: File | undefined,
   token: string
 ) => {
-  const path = "/user/update/";
+  const path = "/api/user/update/";
   const data = {
     email,
     name,
@@ -260,7 +245,7 @@ export const updateUser = async (
 };
 
 export const getCategories = async (token: string) => {
-  const path = "/categories/";
+  const path = "/api/categories/";
   try {
     const result = await getAxios(path, token);
     return result?.data;
@@ -271,7 +256,7 @@ export const getCategories = async (token: string) => {
 };
 
 export const getAllFileData = async (token: string) => {
-  const path = "/file_data/";
+  const path = "/api/file_data/";
   try {
     const result = await getAxios(path, token);
     const fileData: FileData[] = result.data.results;
@@ -287,7 +272,7 @@ export const getAllFileData = async (token: string) => {
 };
 
 export const getFileData = async (token: string, id: string) => {
-  const path = `/file_data/${id}/`;
+  const path = `/api/file_data/${id}/`;
   try {
     const result = await getAxios(path, token);
     const fileData: FileData = result.data;
@@ -301,7 +286,7 @@ export const getFileData = async (token: string, id: string) => {
 };
 
 export const patchFileData = async (data: FileDataByEdit, token: string) => {
-  const path = `/file_data/${data.id}/`;
+  const path = `/api/file_data/${data.id}/`;
   const newData = {
     title: data.title,
     description: data.description,
@@ -317,7 +302,7 @@ export const patchFileData = async (data: FileDataByEdit, token: string) => {
 };
 
 export const deleteFileData = async (token: string, id: string) => {
-  const path = `/file_data/${id}/`;
+  const path = `/api/file_data/${id}/`;
   try {
     const result = await deleteAxios(path, token);
     return result;
@@ -341,7 +326,7 @@ export const postFileData = async (
   setUploadProgressValue?: React.Dispatch<React.SetStateAction<number>> | null,
   endOfUploadFunc?: any
 ) => {
-  const path = "/file_data/";
+  const path = "/api/file_data/";
   try {
     const result = await postAxios(
       path,
@@ -364,6 +349,30 @@ export const getMainDataByBlob = async (fileData: FileData, token: string) => {
     return result.data;
   } catch (error) {
     console.log("@getMainData: ", error);
+    throw error;
+  }
+};
+
+/**
+ * google認証のための関数
+ * @param response
+ * @returns
+ */
+export const googleOauth = async (response: any) => {
+  const path = "http://localhost:8000/auth/convert-token";
+  const data = {
+    token: response.access_token,
+    backend: "google-oauth2",
+    grant_type: "convert_token",
+    client_id: process.env.REACT_APP_DRF_GOOGLE_OAUTH_CLIENT_ID,
+    client_secret: process.env.REACT_APP_DRF_GOOGLE_OAUTH_CLIENT_SECRET,
+  };
+  console.log("@googleOauth sendData: ", data);
+  try {
+    const result = await postAxios(path, data);
+    return result.data;
+  } catch (error) {
+    console.log("@googleOauth: ", error);
     throw error;
   }
 };
