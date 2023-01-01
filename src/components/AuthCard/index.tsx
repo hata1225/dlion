@@ -99,7 +99,7 @@ export const AuthCard = ({ statusProp }: Props) => {
       emailForm: true,
       nameForm: true,
       isPrivateSwitch: true,
-      runButtonText: "アカウントを編集",
+      runButtonText: "更新する",
       runButtonFunc: async () => await handleClickEdit(),
       statusChangeButtonText: "",
       statusChangeFunc: () => handleClickChangeStatus(""),

@@ -36,7 +36,7 @@ export const baseStyle = {
   modalContentAreaHeader: {
     pc: "33px",
   },
-  mainPageFileDataCardGap: {
+  fileAreaFileDataCardGap: {
     main: "10px",
   },
   bottomAreaButtonAreaSize: {

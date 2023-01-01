@@ -42,6 +42,7 @@ const useStyles = makeStyles({
   main: {
     height: `calc(100vh -  ${baseStyle.header.height})`,
     display: "flex",
+    gap: "15px",
     justifyContent: "center",
     alignItems: "center",
     padding: `0 ${baseStyle.pagePaddingHorizontal.main}`,

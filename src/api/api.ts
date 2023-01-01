@@ -271,6 +271,26 @@ export const getAllFileData = async (token: string) => {
   }
 };
 
+export const getFileDataByUserId = async (token: string, user_id: string) => {
+  let path = "/api/file_data/";
+  if (user_id) {
+    path = `/api/file_data/?user_id=${user_id}`;
+  }
+  try {
+    console.log(token);
+    const result = await getAxios(path, token);
+    const fileData: FileData[] = result.data.results;
+    fileData.forEach((item: any) => {
+      item.categories = JSON.parse(item.categories);
+      item.video_data_status = JSON.parse(item.video_data_status);
+    });
+    return result?.data?.results;
+  } catch (error) {
+    console.log("@getMineFileData: ", error);
+    throw error;
+  }
+};
+
 export const getFileData = async (token: string, id: string) => {
   const path = `/api/file_data/${id}/`;
   try {

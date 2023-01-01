@@ -1,10 +1,11 @@
-from rest_framework import viewsets, pagination, response
+from rest_framework import viewsets, pagination, response, generics
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from django.db.models import Q
 
 from core.models import FileData
 from core.models import Categories
+from core.models import User
 
 from file_data import serializers
 import shutil
@@ -48,6 +49,9 @@ class FileDataViewSet(viewsets.ModelViewSet):
         serializer.save(user=self.request.user)
 
     def get_queryset(self):
+        user_id = self.request.GET.get("user_id")
+        if user_id:
+            return FileData.objects.filter(user__id=user_id)
         return FileData.objects.filter(Q(user__is_private=False)|Q(user=self.request.user))
 
 class CategoriesViewSet(viewsets.ModelViewSet):

@@ -7,10 +7,12 @@ import { baseStyle } from "theme";
 
 type Props = {
   reanderedFunc?: () => void;
+  isMine?: boolean;
+  className?: string;
 };
 
-export const MainPage = ({ reanderedFunc }: Props) => {
-  const { fileData } = React.useContext(FileDataContext);
+export const FileArea = ({ reanderedFunc, isMine, className }: Props) => {
+  const { allFileData, mineFileData } = React.useContext(FileDataContext);
   const [fileDataCardWidth, setFileDataCardWidth] = React.useState("100%");
   const [width] = useWindowSize();
   const classes = useStyles();
@@ -35,15 +37,15 @@ export const MainPage = ({ reanderedFunc }: Props) => {
   }, [width]);
 
   const fileDataCardExceptByGapFunc = (cardRow: number) => {
-    const num = `${baseStyle.mainPageFileDataCardGap.main} * ${
+    const num = `${baseStyle.fileAreaFileDataCardGap.main} * ${
       cardRow - 1
     } / ${cardRow}`;
     return num;
   };
 
   return (
-    <div className={classes.mainPage}>
-      {fileData.map((data, i) => (
+    <div className={`${classes.fileArea} ${className}`}>
+      {(isMine ? mineFileData : allFileData).map((data, i) => (
         <FileDataCard
           style={{ width: fileDataCardWidth }}
           className={classes.fileDataCard}
@@ -57,11 +59,11 @@ export const MainPage = ({ reanderedFunc }: Props) => {
 
 const useStyles = makeStyles({
   fileDataCard: {},
-  mainPage: {
+  fileArea: {
     width: "100%",
-    padding: "10px 0px 10px 20px",
+    padding: 0,
     display: "flex",
-    gap: baseStyle.mainPageFileDataCardGap.main,
+    gap: baseStyle.fileAreaFileDataCardGap.main,
     flexWrap: "wrap",
   },
 });
