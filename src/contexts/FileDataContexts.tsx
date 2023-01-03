@@ -9,6 +9,7 @@ interface FileDataContextInterface {
   allFileData: FileData[];
   setAllFileData: React.Dispatch<React.SetStateAction<FileData[]>>;
   updateFileData: () => Promise<void>;
+  fileDataByUserId: (userId: string) => any;
 }
 
 export const FileDataContext = React.createContext<FileDataContextInterface>(
@@ -45,6 +46,14 @@ export const FileDataProvider = ({
     }
   };
 
+  const fileDataByUserId = async (userId: string) => {
+    let newFileDataByUserId = [];
+    if (userId && user?.token) {
+      newFileDataByUserId = await getFileDataByUserId(user?.token, userId);
+    }
+    return newFileDataByUserId;
+  };
+
   return (
     <FileDataContext.Provider
       value={{
@@ -53,6 +62,7 @@ export const FileDataProvider = ({
         allFileData,
         setAllFileData,
         updateFileData,
+        fileDataByUserId,
       }}
     >
       {children}

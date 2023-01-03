@@ -2,18 +2,23 @@ import { Button, makeStyles } from "@material-ui/core";
 import React from "react";
 import { fontSize } from "theme";
 
-interface Props {
+type Props = React.ComponentProps<typeof Button> & {
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
   description: string;
   icon: React.ReactNode;
   fontWeight?: number;
-}
+};
 
 export const ButtonWithIcon = (props: Props) => {
-  const { onClick, description, icon, fontWeight = 400 } = props;
+  const { onClick, description, icon, fontWeight = 400, className } = props;
   const classes = useStyles();
   return (
-    <Button className={classes.button} onClick={onClick} color="primary">
+    <Button
+      className={`${classes.button} ${className}`}
+      onClick={onClick}
+      color="primary"
+      {...props}
+    >
       <div className={classes.iconArea}>{icon}</div>
       <p style={{ fontWeight: fontWeight }}>{description}</p>
     </Button>

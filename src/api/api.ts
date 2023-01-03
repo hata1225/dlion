@@ -187,8 +187,13 @@ export const getToken = async (email: string, password: string) => {
   }
 };
 
-export const getUserInfo = async (token: string) => {
-  const path = "/api/user/update/";
+export const getUserInfo = async (token: string, id?: string) => {
+  let path = "";
+  if (id) {
+    path = `/api/user/get/${id}/`;
+  } else {
+    path = "/api/user/update/";
+  }
   try {
     const result = await getAxios(path, token);
     return result?.data;
