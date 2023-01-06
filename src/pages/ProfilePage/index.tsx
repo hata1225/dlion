@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, makeStyles } from "@material-ui/core";
+import { makeStyles } from "@material-ui/core";
 import { useParams } from "react-router-dom";
 import { UserInterface } from "types/User";
 import { getUserInfo } from "api/api";
@@ -10,20 +10,22 @@ import { FileArea } from "pages/FileArea";
 import { ButtonWithIcon } from "components/ButtonWithIcon";
 import PersonIcon from "@material-ui/icons/Person";
 import { fontSize } from "theme";
+import { FollowButton } from "components/FollowButton";
 
 export const ProfilePage = () => {
   const classes = useStyles();
   const { id } = useParams();
   const { user } = React.useContext(UserContext);
   const [userInfo, setUserInfo] = React.useState<UserInterface>();
+  const [isOwnUserId, setIsOwnUserId] = React.useState<boolean>(false);
 
   React.useEffect(() => {
-    console.log("id: ", id);
-  }, [id]);
+    setIsOwnUserId(id === user.id);
+  }, [id, user]);
 
   React.useEffect(() => {
     const f = async () => {
-      let userId = id ?? user?.id;
+      let userId = id ?? user.id;
       if (userId && user?.token) {
         const newUserInfo = await getUserInfo(user.token, userId);
         setUserInfo(newUserInfo);
@@ -47,7 +49,7 @@ export const ProfilePage = () => {
           />
         </div>
         <div className={classes.userInfoArea}>
-          <div className={classes.userInfoAreaLeft}>
+          <div className={classes.userInfoAreaTop}>
             <div className={classes.iconImageWrap}>
               <img
                 className={classes.iconImage}
@@ -55,21 +57,21 @@ export const ProfilePage = () => {
                 alt=""
               />
             </div>
-            <div className={classes.followInfoArea}>
-              <div>
-                <p>フォロー</p>
-                <p>2134</p>
+            <div className={classes.friendshipArea}>
+              <div className={classes.friendshipContent}>
+                <h5>フォロー</h5>
+                <p>{user.followees.length}</p>
               </div>
-              <div>
-                <p>フォロワー</p>
-                <p>3581</p>
+              <div className={classes.friendshipContent}>
+                <h5>フォロワー</h5>
+                <p>{user.followers.length}</p>
               </div>
             </div>
           </div>
           <div className={classes.userInfoTextArea}>
             <div className={classes.UserInfoTextAreaTop}>
               <h3>{userInfo?.name}</h3>
-              {id === user?.id && (
+              {isOwnUserId ? (
                 <ButtonWithIcon
                   className={classes.editButton}
                   onClick={handleClickEditButton}
@@ -79,6 +81,8 @@ export const ProfilePage = () => {
                   }
                   variant="outlined"
                 />
+              ) : (
+                <FollowButton />
               )}
             </div>
             <p>{userInfo?.description}</p>
@@ -130,18 +134,30 @@ const useStyles = makeStyles({
     borderRadius: "100%",
     backgroundColor: baseStyle.color.white.light,
   },
-  followInfoArea: {
+  friendshipArea: {
     display: "flex",
+    alignItems: "center",
+    gap: "15px",
+  },
+  friendshipContent: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: "3px",
   },
   userInfoArea: {
     width: "100%",
     marginTop: "20px",
     padding: "0 5px",
     display: "flex",
-    gap: "10px",
+    flexDirection: "column",
     alignItems: "start",
   },
-  userInfoAreaLeft: {},
+  userInfoAreaTop: {
+    width: "100%",
+    display: "flex",
+    justifyContent: "space-between",
+  },
   userInfoTextArea: {
     width: "100%",
     display: "flex",
@@ -155,7 +171,7 @@ const useStyles = makeStyles({
     justifyContent: "space-between",
   },
   editButton: {
-    width: "120px",
+    width: baseStyle.button.width.main,
   },
   fileArea: {
     padding: 0,

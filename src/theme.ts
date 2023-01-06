@@ -19,6 +19,11 @@ export const baseStyle = {
   subArea: {
     width: "250px",
   },
+  button: {
+    width: {
+      main: "120px",
+    },
+  },
   maxWidthLayout: {
     pc: 1300,
     tb: 980,

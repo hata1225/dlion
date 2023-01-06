@@ -4,7 +4,7 @@ import { FileDataContext } from "contexts/FileDataContexts";
 import { useWindowSize } from "hooks/useWindowSize";
 import React from "react";
 import { baseStyle } from "theme";
-import { FileData } from "../../types/fileData";
+import { FileData } from "types/fileData";
 
 type Props = {
   reanderedFunc?: () => void;

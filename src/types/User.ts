@@ -8,4 +8,6 @@ export interface UserInterface {
   icon_image?: string;
   background_image?: string;
   description?: string;
+  followees: any[];
+  followers: any[];
 }

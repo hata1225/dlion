@@ -4,8 +4,8 @@ import React from "react";
 import { UserInterface } from "../types/User";
 
 interface UserContextInterface {
-  user?: UserInterface;
-  setUser: React.Dispatch<React.SetStateAction<UserInterface | undefined>>;
+  user: UserInterface;
+  setUser: React.Dispatch<React.SetStateAction<UserInterface>>;
   signup: (email: string, name: string, password: string) => Promise<any>;
   signin: (email: string, password: string) => Promise<any>;
   signout: () => void;
@@ -24,7 +24,11 @@ export const UserContext = React.createContext<UserContextInterface>(
 );
 
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = React.useState<UserInterface>();
+  const [user, setUser] = React.useState<UserInterface>({
+    id: "",
+    followees: [],
+    followers: [],
+  });
 
   React.useEffect(() => {
     const f = async () => {
@@ -74,7 +78,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signout = () => {
     localStorage.clear();
-    setUser({ id: "" });
+    setUser({ id: "", followees: [], followers: [] });
     window.location.href = "/auth";
   };
 
