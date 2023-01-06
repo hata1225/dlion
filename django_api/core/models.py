@@ -57,20 +57,26 @@ class User(AbstractBaseUser, PermissionsMixin):
     icon_image = models.FileField(upload_to=saveIconImagePath, null=True)
     background_image = models.FileField(upload_to=saveBackgroundImagePath, null=True)
     description = models.CharField(max_length=255, null=True)
+    followees = models.ManyToManyField(
+        'User', verbose_name='フォロー中のユーザー', through='FriendShip',
+        related_name='+', through_fields=('follower', 'followee')
+    )
+    followers = models.ManyToManyField(
+        'User', verbose_name='フォローされているユーザー', through='FriendShip',
+        related_name='+', through_fields=('followee', 'follower')
+    )
 
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
 
-
-class Followee(models.Model):
+class FriendShip(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE
-    )
-    followee = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_followee")
-    created_at = models.DateField(auto_now_add=True)
+    follower = models.ForeignKey(User, on_delete=models.CASCADE, related_name='followee_friendships')
+    followee = models.ForeignKey(User, on_delete=models.CASCADE, related_name='follower_friendships')
+
+    class Meta:
+        unique_together = ('follower', 'followee')
 
 
 class Categories(models.Model):

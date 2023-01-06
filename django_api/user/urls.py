@@ -7,7 +7,7 @@ from user import views
 app_name = 'user'
 
 router = DefaultRouter()
-router.register('followee', views.FolloweeViewSet)
+router.register("friendship", views.FriendShipViewSet)
 
 urlpatterns = [
      path('create/', views.CreateUserView.as_view(), name='create'),

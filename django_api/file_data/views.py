@@ -1,11 +1,9 @@
-from rest_framework import viewsets, pagination, response, generics
+from rest_framework import viewsets, pagination, response
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from django.db.models import Q
 
-from core.models import FileData
-from core.models import Categories
-from core.models import User
+from core.models import FileData, Categories
 
 from file_data import serializers
 import shutil

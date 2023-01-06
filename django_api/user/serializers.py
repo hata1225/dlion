@@ -1,15 +1,14 @@
 from django.contrib.auth import get_user_model, authenticate
 
 from rest_framework import serializers
-
-from core.models import Followee
+from core.models import FriendShip
 
 
 class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = get_user_model()
-        fields = ('id', 'email', 'password', 'name', 'is_private', 'icon_image', 'background_image', 'description')
+        fields = ('id', 'email', 'password', 'name', 'is_private', 'icon_image', 'background_image', 'description', 'followees', 'followers')
         extra_kwargs = {'password': {'write_only': True, 'min_length': 8}}
 
     def create(self, validated_data):
@@ -26,6 +25,15 @@ class UserSerializer(serializers.ModelSerializer):
             user.save()
 
         return user
+
+class FriendShipSerializer(serializers.ModelSerializer):
+    follower=UserSerializer()
+    followee=UserSerializer()
+
+    class Meta:
+        model = FriendShip
+        fields = ("id", "follower", "followee")
+        read_only_fields = ("id", "created_user")
 
 class AuthTokenSerializer(serializers.Serializer):
     email = serializers.CharField()
@@ -49,12 +57,3 @@ class AuthTokenSerializer(serializers.Serializer):
 
         attrs['user'] = user
         return attrs
-
-class FolloweeSerializer(serializers.ModelSerializer):
-
-    user = UserSerializer(read_only=True)
-
-    class Meta:
-        model = Followee
-        fields = ('id','user','followee','created_at',)
-        read_only_fields = ('id', 'user',)
