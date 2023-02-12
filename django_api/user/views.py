@@ -4,19 +4,19 @@ from rest_framework.settings import api_settings
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 
-from user.serializers import UserSerializer, AuthTokenSerializer, FriendShipSerializer
+from user import serializers
 
-from core.models import User, FriendShip
+from core import models
 
 class CreateUserView(generics.CreateAPIView):
-    serializer_class = UserSerializer
+    serializer_class = serializers.UserSerializer
 
 class CreateTokenView(ObtainAuthToken):
-    serializer_class = AuthTokenSerializer
+    serializer_class = serializers.AuthTokenSerializer
     renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES
 
 class ManageUserView(generics.RetrieveUpdateAPIView):
-    serializer_class = UserSerializer
+    serializer_class = serializers.UserSerializer
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
 
@@ -26,14 +26,23 @@ class ManageUserView(generics.RetrieveUpdateAPIView):
 class FriendShipViewSet(viewsets.ModelViewSet):
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
-    serializer_class = FriendShipSerializer
-    queryset = FriendShip.objects.all()
+    serializer_class = serializers.FriendShipSerializer
+    queryset = models.FriendShip.objects.all()
     def get_queryset(self):
-        return FriendShip.objects.filter(user=self.request.user)
+        return models.FriendShip.objects.filter(user=self.request.user)
+    # def create(self, request):
+    #     # return models.FriendShip.objects.filter(user=self.request.user)
+    def perform_create(self, serializer):
+        followee = self.request.GET.get("user_id")
+        # followee = self.request
+        print("followee: ", followee)
+        # serializer.save(followee=followee, follower=self.request.user)
+
+
 
 class GetUserView(generics.RetrieveAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
+    queryset = models.User.objects.all()
+    serializer_class = serializers.UserSerializer
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
     lookup_field='pk'

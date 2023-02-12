@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model, authenticate
 
 from rest_framework import serializers
-from core.models import FriendShip
+from core import models
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -9,6 +9,8 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
         fields = ('id', 'email', 'password', 'name', 'is_private', 'icon_image', 'background_image', 'description', 'followees', 'followers')
+        # fields = ('id', 'email', 'password', 'name', 'is_private', 'icon_image', 'background_image', 'description')
+
         extra_kwargs = {'password': {'write_only': True, 'min_length': 8}}
 
     def create(self, validated_data):
@@ -27,11 +29,11 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
 class FriendShipSerializer(serializers.ModelSerializer):
-    follower=UserSerializer()
-    followee=UserSerializer()
+    # follower=UserSerializer()
+    # followee=UserSerializer()
 
     class Meta:
-        model = FriendShip
+        model = models.FriendShip
         fields = ("id", "follower", "followee")
         read_only_fields = ("id", "created_user")
 

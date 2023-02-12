@@ -378,26 +378,16 @@ export const getMainDataByBlob = async (fileData: FileData, token: string) => {
   }
 };
 
-/**
- * google認証のための関数
- * @param response
- * @returns
- */
-export const googleOauth = async (response: any) => {
-  const path = "http://localhost:8000/auth/convert-token";
+export const createFriendShip = async (token: string, userId: string) => {
+  const path = `/api/user/friendship/?user_id=${userId}`;
   const data = {
-    token: response.access_token,
-    backend: "google-oauth2",
-    grant_type: "convert_token",
-    client_id: process.env.REACT_APP_DRF_GOOGLE_OAUTH_CLIENT_ID,
-    client_secret: process.env.REACT_APP_DRF_GOOGLE_OAUTH_CLIENT_SECRET,
+    user_id: userId,
   };
-  console.log("@googleOauth sendData: ", data);
   try {
-    const result = await postAxios(path, data);
+    const result = await postAxios(path, data, token);
     return result.data;
   } catch (error) {
-    console.log("@googleOauth: ", error);
+    console.log(`@createFriendShip: `, error);
     throw error;
   }
 };

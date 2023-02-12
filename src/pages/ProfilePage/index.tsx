@@ -18,21 +18,28 @@ export const ProfilePage = () => {
   const { user } = React.useContext(UserContext);
   const [userInfo, setUserInfo] = React.useState<UserInterface>();
   const [isOwnUserId, setIsOwnUserId] = React.useState<boolean>(false);
+  const [profilePageUserId, setProfilePageUserId] = React.useState("");
 
   React.useEffect(() => {
-    setIsOwnUserId(id === user.id);
-  }, [id, user]);
+    setIsOwnUserId(profilePageUserId === user.id);
+  }, [profilePageUserId, user]);
 
   React.useEffect(() => {
     const f = async () => {
-      let userId = id ?? user.id;
+      let userId = profilePageUserId ?? user.id;
       if (userId && user?.token) {
         const newUserInfo = await getUserInfo(user.token, userId);
         setUserInfo(newUserInfo);
       }
     };
     f();
-  }, [id, user]);
+  }, [profilePageUserId, user]);
+
+  React.useEffect(() => {
+    if (id) {
+      setProfilePageUserId(id);
+    }
+  }, [id]);
 
   const handleClickEditButton = () => {
     window.location.href = "/edituser";
@@ -82,7 +89,7 @@ export const ProfilePage = () => {
                   variant="outlined"
                 />
               ) : (
-                <FollowButton />
+                <FollowButton userId={profilePageUserId} />
               )}
             </div>
             <p>{userInfo?.description}</p>
