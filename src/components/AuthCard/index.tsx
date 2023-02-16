@@ -11,7 +11,14 @@ interface Props {
   statusProp?: "signin" | "signup" | "edit";
 }
 
-export const AuthCard = ({ statusProp }: Props) => {
+const defaultStatus = "signin";
+
+/**
+ * statusPropのデフォルト値は、"signin"
+ * @param param0
+ * @returns
+ */
+export const AuthCard = ({ statusProp = defaultStatus }: Props) => {
   const classes = useStyles();
   const [email, setEmail] = React.useState("");
   const [name, setName] = React.useState("");
@@ -24,14 +31,9 @@ export const AuthCard = ({ statusProp }: Props) => {
   const [userIconImageUrl, setUserIconImageUrl] = React.useState<string>();
   const [password, setPassword] = React.useState("");
   const [reinputPassword, setReinputPassword] = React.useState("");
-  const [status, setStatus] = React.useState("signin");
+  const [status, setStatus] = React.useState(defaultStatus);
   const [authCardContent, setAuthCardContent] = React.useState<any>();
   const { signup, signin, user, editUser } = React.useContext(UserContext);
-
-  React.useEffect(() => {
-    console.log("password: ", password);
-    console.log("reinputpassword: ", reinputPassword);
-  }, [password, reinputPassword]);
 
   React.useEffect(() => {
     authCardContents.forEach((content, i) => {
@@ -44,6 +46,7 @@ export const AuthCard = ({ statusProp }: Props) => {
     status,
     email,
     password,
+    reinputPassword,
     name,
     description,
     isPrivate,
@@ -52,18 +55,20 @@ export const AuthCard = ({ statusProp }: Props) => {
   ]);
 
   React.useEffect(() => {
-    if (statusProp) {
-      if (statusProp === "edit" && user?.email && user?.name) {
-        setEmail(user?.email);
-        setName(user?.name);
-        setDescription(user.description ?? "");
-        setIsPrivate(user.is_private ?? false);
-        setUserBackgroundImageUrl(user?.background_image);
-        setUserIconImageUrl(user?.icon_image ?? userIconImageDefault);
-      }
-      setStatus(statusProp);
+    setStatus(statusProp);
+  }, [statusProp]);
+
+  // statusがeditの場合、値をセットする
+  React.useEffect(() => {
+    if (status === "edit" && user?.email && user?.name) {
+      setEmail(user?.email);
+      setName(user?.name);
+      setDescription(user.description ?? "");
+      setIsPrivate(user.is_private ?? false);
+      setUserBackgroundImageUrl(user?.background_image);
+      setUserIconImageUrl(user?.icon_image ?? userIconImageDefault);
     }
-  }, [statusProp, user]);
+  }, [status, user]);
 
   const authCardContents = [
     {
