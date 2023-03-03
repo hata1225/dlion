@@ -8,7 +8,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = get_user_model()
-        fields = ('id', 'email', 'password', 'name', 'is_private', 'icon_image', 'background_image', 'description', 'followees', 'followers')
+        fields = ('id', 'email', 'password', 'name', 'is_private', 'icon_image', 'background_image', 'description')
         # fields = ('id', 'email', 'password', 'name', 'is_private', 'icon_image', 'background_image', 'description')
 
         extra_kwargs = {'password': {'write_only': True, 'min_length': 8}}
@@ -28,14 +28,11 @@ class UserSerializer(serializers.ModelSerializer):
 
         return user
 
-class FriendShipSerializer(serializers.ModelSerializer):
-    # follower=UserSerializer()
-    # followee=UserSerializer()
-
-    class Meta:
-        model = models.FriendShip
-        fields = ("id", "follower", "followee")
-        read_only_fields = ("id", "created_user")
+class FriendShipSerializer(serializers.Serializer):
+    def create(self, validated_data):
+        created_user = self.context['request'].user
+        followed_user = models.User.objects.get(id=self.context['request'].GET.get('user_id'))
+        return models.FriendShip.objects.create(created_user=created_user, followed_user=followed_user)
 
 class AuthTokenSerializer(serializers.Serializer):
     email = serializers.CharField()
