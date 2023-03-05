@@ -31,8 +31,8 @@ class UserSerializer(serializers.ModelSerializer):
 class FriendShipSerializer(serializers.Serializer):
     def create(self, validated_data):
         created_user = self.context['request'].user
-        followed_user = models.User.objects.get(id=self.context['request'].GET.get('user_id'))
-        return models.FriendShip.objects.create(created_user=created_user, followed_user=followed_user)
+        following_user = models.User.objects.get(id=self.context['request'].GET.get('user_id'))
+        return models.FriendShip.objects.create(created_user=created_user, following_user=following_user)
 
 class AuthTokenSerializer(serializers.Serializer):
     email = serializers.CharField()

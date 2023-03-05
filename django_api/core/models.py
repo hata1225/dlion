@@ -60,13 +60,18 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
     USERNAME_FIELD = 'email'
 
+
 class FriendShip(models.Model):
+    """
+    @created_user: apiを叩いたユーザー(ログインユーザー)
+    @following_user: apiのクエリパラメーター(user_id)
+    """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    created_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='followed_user_friendships')
-    followed_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_user_friendships')
+    created_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='following_user_friendships')
+    following_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_user_friendships')
     created_at = models.DateTimeField(auto_now_add=True)
     class Meta:
-        unique_together = ('created_user', 'followed_user')
+        unique_together = ('created_user', 'following_user')
 
 
 class Categories(models.Model):
