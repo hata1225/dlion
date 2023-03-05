@@ -1,6 +1,6 @@
 import { Button } from "@material-ui/core";
 import { makeStyles } from "@material-ui/styles";
-import { createFriendShip } from "api/api";
+import { followUser, unfollowUser } from "api/api";
 import { UserContext } from "contexts/UserContext";
 import React from "react";
 import { baseStyle } from "theme";
@@ -11,23 +11,32 @@ interface Props {
 
 export const FollowButton = ({ userId }: Props) => {
   const classes = useStyles();
-  const [isFollowed, setIsFollowed] = React.useState(false);
+  // すでにフォローをしている場合はtrue, フォローをしていない場合はfalseとする
+  const [isFollowing, setIsFollowing] = React.useState(false);
   const { user } = React.useContext(UserContext);
 
+  React.useEffect(() => {
+    const userFollowing = user.following;
+    userFollowing.find((user) => {
+      if (user.id === userId) {
+        setIsFollowing(true);
+      }
+    });
+  }, [user.following, userId]);
+
   const follow = async () => {
-    if (user?.token) {
-      await createFriendShip(user?.token, userId);
-      setIsFollowed(true);
-    }
+    await followUser(user.token, userId);
+    setIsFollowing(true);
   };
 
-  const unFollow = () => {
-    setIsFollowed(false);
+  const unFollow = async () => {
+    await unfollowUser(user.token, userId);
+    setIsFollowing(false);
   };
 
   return (
     <>
-      {isFollowed ? (
+      {isFollowing ? (
         <Button
           className={classes.followButton}
           color="primary"

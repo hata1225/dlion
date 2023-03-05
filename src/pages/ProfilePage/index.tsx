@@ -1,8 +1,12 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core";
 import { useParams } from "react-router-dom";
-import { UserInterface } from "types/User";
-import { getUserInfo } from "api/api";
+import { UserInterfaceAndUserFollowInterface } from "types/User";
+import {
+  getFollowerListByUserId,
+  getFollowingListByUserId,
+  getUserInfo,
+} from "api/api";
 import { UserContext } from "contexts/UserContext";
 import { baseStyle, borderRadius } from "theme";
 import userIconImageDefault from "userIconImageDefault.webp";
@@ -16,7 +20,8 @@ export const ProfilePage = () => {
   const classes = useStyles();
   const { id } = useParams();
   const { user } = React.useContext(UserContext);
-  const [userInfo, setUserInfo] = React.useState<UserInterface>();
+  const [userInfo, setUserInfo] =
+    React.useState<UserInterfaceAndUserFollowInterface>();
   const [isOwnUserId, setIsOwnUserId] = React.useState<boolean>(false);
   const [profilePageUserId, setProfilePageUserId] = React.useState("");
 
@@ -27,10 +32,17 @@ export const ProfilePage = () => {
   React.useEffect(() => {
     const f = async () => {
       let userId = profilePageUserId ?? user.id;
-      if (userId && user?.token) {
-        const newUserInfo = await getUserInfo(user.token, userId);
-        setUserInfo(newUserInfo);
-      }
+      const newUserInfo = await getUserInfo(user.token, userId);
+      const newFollowingList = await getFollowingListByUserId(
+        user.token,
+        userId
+      );
+      const newFollowerList = await getFollowerListByUserId(user.token, userId);
+      setUserInfo({
+        ...newUserInfo,
+        following: newFollowingList,
+        followers: newFollowerList,
+      });
     };
     f();
   }, [profilePageUserId, user]);
@@ -67,11 +79,11 @@ export const ProfilePage = () => {
             <div className={classes.friendshipArea}>
               <div className={classes.friendshipContent}>
                 <h5>フォロー</h5>
-                <p>{user.followees.length}</p>
+                <p>{userInfo?.following?.length ?? "0"}</p>
               </div>
               <div className={classes.friendshipContent}>
                 <h5>フォロワー</h5>
-                <p>{user.followers.length}</p>
+                <p>{userInfo?.followers?.length ?? "0"}</p>
               </div>
             </div>
           </div>

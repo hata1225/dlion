@@ -3,11 +3,17 @@ export interface UserInterface {
   name?: string;
   password?: string;
   email?: string;
-  token?: string;
+  token: string;
   is_private?: boolean;
   icon_image?: string;
   background_image?: string;
   description?: string;
-  followees: any[];
-  followers: any[];
 }
+
+export interface UserFollowInterface {
+  following: UserInterface[];
+  followers: UserInterface[];
+}
+
+export type UserInterfaceAndUserFollowInterface = UserInterface &
+  UserFollowInterface;

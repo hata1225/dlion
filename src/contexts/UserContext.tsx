@@ -1,11 +1,22 @@
-import { createUser, getToken, getUserInfo, updateUser } from "api/api";
+import {
+  createUser,
+  getFollowerListByCurrentUser,
+  getFollowingListByCurrentUser,
+  getToken,
+  getUserInfo,
+  updateUser,
+  followUser as followUserByAPI,
+  unfollowUser as unfollowUserByAPI,
+} from "api/api";
 import { createNotification } from "functions/notification";
 import React from "react";
-import { UserInterface } from "../types/User";
+import { UserInterfaceAndUserFollowInterface } from "types/User";
 
 interface UserContextInterface {
-  user: UserInterface;
-  setUser: React.Dispatch<React.SetStateAction<UserInterface>>;
+  user: UserInterfaceAndUserFollowInterface;
+  setUser: React.Dispatch<
+    React.SetStateAction<UserInterfaceAndUserFollowInterface>
+  >;
   signup: (email: string, name: string, password: string) => Promise<any>;
   signin: (email: string, password: string) => Promise<any>;
   signout: () => void;
@@ -17,6 +28,8 @@ interface UserContextInterface {
     iconImage?: File,
     backgroundImage?: File
   ) => Promise<any>;
+  followUser: (userId: string) => Promise<void>;
+  unfollowUser: (userId: string) => Promise<void>;
 }
 
 export const UserContext = React.createContext<UserContextInterface>(
@@ -24,9 +37,10 @@ export const UserContext = React.createContext<UserContextInterface>(
 );
 
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = React.useState<UserInterface>({
+  const [user, setUser] = React.useState<UserInterfaceAndUserFollowInterface>({
     id: "",
-    followees: [],
+    token: "",
+    following: [],
     followers: [],
   });
 
@@ -43,7 +57,15 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       }
       if (token) {
         const userInfo = await getUserInfo(token);
-        setUser((prev) => ({ ...prev, ...userInfo, token }));
+        const following = await getFollowingListByCurrentUser(token);
+        const followers = await getFollowerListByCurrentUser(token);
+        setUser((prev) => ({
+          ...prev,
+          ...userInfo,
+          token,
+          following,
+          followers,
+        }));
       }
       if (!token && user?.email && user?.password) {
         token = await signin(user.email, user?.password);
@@ -78,7 +100,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signout = () => {
     localStorage.clear();
-    setUser({ id: "", followees: [], followers: [] });
+    setUser({ id: "", token: "", following: [], followers: [] });
     window.location.href = "/auth";
   };
 
@@ -111,9 +133,26 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const followUser = async (userId: string) => {
+    await followUserByAPI(user.token, userId);
+  };
+
+  const unfollowUser = async (userId: string) => {
+    await unfollowUserByAPI(user.token, userId);
+  };
+
   return (
     <UserContext.Provider
-      value={{ user, setUser, signup, signin, signout, editUser }}
+      value={{
+        user,
+        setUser,
+        signup,
+        signin,
+        signout,
+        editUser,
+        followUser,
+        unfollowUser,
+      }}
     >
       {children}
     </UserContext.Provider>

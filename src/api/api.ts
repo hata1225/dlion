@@ -282,7 +282,6 @@ export const getFileDataByUserId = async (token: string, user_id: string) => {
     path = `/api/file_data/?user_id=${user_id}`;
   }
   try {
-    console.log(token);
     const result = await getAxios(path, token);
     const fileData: FileData[] = result.data.results;
     fileData.forEach((item: any) => {
@@ -378,8 +377,14 @@ export const getMainDataByBlob = async (fileData: FileData, token: string) => {
   }
 };
 
-export const createFriendShip = async (token: string, userId: string) => {
-  const path = `/api/user/friendship/?user_id=${userId}`;
+/**
+ * フォロー機能
+ * @param token
+ * @param userId
+ * @returns
+ */
+export const followUser = async (token: string, userId: string) => {
+  const path = `/api/user/follow/?user_id=${userId}`;
   const data = {
     user_id: userId,
   };
@@ -387,7 +392,90 @@ export const createFriendShip = async (token: string, userId: string) => {
     const result = await postAxios(path, data, token);
     return result.data;
   } catch (error) {
-    console.log(`@createFriendShip: `, error);
+    console.log(`@followUser: `, error);
+    throw error;
+  }
+};
+
+/**
+ * フォローを外す機能
+ * @param token
+ * @param userId
+ * @returns
+ */
+export const unfollowUser = async (token: string, userId: string) => {
+  const path = `/api/user/unfollow/?user_id=${userId}`;
+  try {
+    const result = await deleteAxios(path, token);
+    return result.data;
+  } catch (error) {
+    console.log(`@unfollowUser: `, error);
+    throw error;
+  }
+};
+
+/**
+ * currentUserがフォローしているユーザー一覧
+ * @param token
+ */
+export const getFollowingListByCurrentUser = async (token: string) => {
+  const path = `/api/user/followinglist/`;
+  try {
+    const result = await getAxios(path, token);
+    return result.data;
+  } catch (error) {
+    console.log("@getFollowingListByCurrentUser: ", error);
+    throw error;
+  }
+};
+
+/**
+ * currentUserをフォローしているユーザー一覧
+ * @param token
+ */
+export const getFollowerListByCurrentUser = async (token: string) => {
+  const path = `/api/user/followerlist/`;
+  try {
+    const result = await getAxios(path, token);
+    return result.data;
+  } catch (error) {
+    console.log("@getFollowerListByCurrentUser: ", error);
+    throw error;
+  }
+};
+
+/**
+ * currentUserがフォローしているユーザー一覧
+ * @param token
+ */
+export const getFollowingListByUserId = async (
+  token: string,
+  userId: string
+) => {
+  const path = `/api/user/followinglist/?user_id=${userId}`;
+  try {
+    const result = await getAxios(path, token);
+    return result.data;
+  } catch (error) {
+    console.log("@getFollowingListByUserId: ", error);
+    throw error;
+  }
+};
+
+/**
+ * currentUserをフォローしているユーザー一覧
+ * @param token
+ */
+export const getFollowerListByUserId = async (
+  token: string,
+  userId: string
+) => {
+  const path = `/api/user/followerlist/?user_id=${userId}`;
+  try {
+    const result = await getAxios(path, token);
+    return result.data;
+  } catch (error) {
+    console.log("@getFollowerListByUserId: ", error);
     throw error;
   }
 };
