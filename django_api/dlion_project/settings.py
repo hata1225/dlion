@@ -49,7 +49,20 @@ INSTALLED_APPS = [
     'file_data',
     'corsheaders',
     'django_filters',
+    'channels',
+    'channels_redis',
 ]
+
+ASGI_APPLICATION = 'dlion_project.asgi.application'
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [('0.0.0.0', 6379)],
+        },
+    }
+}
 
 #viewにて、フィルタリングした上でレスポンスするために追加
 REST_FRAMEWORK = {

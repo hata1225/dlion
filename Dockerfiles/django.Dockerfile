@@ -12,8 +12,8 @@ RUN apt-get -y update \
 COPY ./requirements.txt /requirements.txt
 RUN pip3 install -r /requirements.txt
 RUN pip3 install django-cleanup django-cors-headers django-filter opencv-python \
-                opencv-contrib-python requests beautifulsoup4 selenium \
-                ffmpeg-python django-environ python-decouple djangochannelsrestframework
+                opencv-contrib-python requests beautifulsoup4 selenium channels \
+                ffmpeg-python django-environ python-decouple channels-redis
 
 RUN mkdir /django_api
 

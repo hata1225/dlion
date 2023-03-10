@@ -2,11 +2,7 @@ import React from "react";
 import { makeStyles } from "@material-ui/core";
 import { useParams } from "react-router-dom";
 import { UserInterfaceAndUserFollowInterface } from "types/User";
-import {
-  getFollowerListByUserId,
-  getFollowingListByUserId,
-  getUserInfo,
-} from "api/api";
+import { getUserInfo } from "api/api";
 import { UserContext } from "contexts/UserContext";
 import { baseStyle, borderRadius } from "theme";
 import userIconImageDefault from "userIconImageDefault.webp";
@@ -15,6 +11,7 @@ import { ButtonWithIcon } from "components/ButtonWithIcon";
 import PersonIcon from "@material-ui/icons/Person";
 import { fontSize } from "theme";
 import { FollowButton } from "components/FollowButton";
+import { useWSFollowInfo } from "dataService/userData";
 
 export const ProfilePage = () => {
   const classes = useStyles();
@@ -24,6 +21,12 @@ export const ProfilePage = () => {
     React.useState<UserInterfaceAndUserFollowInterface>();
   const [isOwnUserId, setIsOwnUserId] = React.useState<boolean>(false);
   const [profilePageUserId, setProfilePageUserId] = React.useState("");
+  const { followingList, followerList } = useWSFollowInfo(profilePageUserId);
+
+  React.useEffect(() => {
+    console.log("followingList: ", followerList);
+    console.log("followerList: ", followerList);
+  }, [followingList, followerList]);
 
   React.useEffect(() => {
     setIsOwnUserId(profilePageUserId === user.id);
@@ -32,17 +35,13 @@ export const ProfilePage = () => {
   React.useEffect(() => {
     const f = async () => {
       let userId = profilePageUserId ?? user.id;
-      const newUserInfo = await getUserInfo(user.token, userId);
-      const newFollowingList = await getFollowingListByUserId(
-        user.token,
-        userId
-      );
-      const newFollowerList = await getFollowerListByUserId(user.token, userId);
-      setUserInfo({
-        ...newUserInfo,
-        following: newFollowingList,
-        followers: newFollowerList,
-      });
+      if (user.token) {
+        const newUserInfo = await getUserInfo(user.token, userId);
+        setUserInfo((prev) => ({
+          ...prev,
+          ...newUserInfo,
+        }));
+      }
     };
     f();
   }, [profilePageUserId, user]);
