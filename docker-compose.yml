@@ -35,10 +35,14 @@ services:
              export DJANGO_SUPERUSER_USERNAME=${SUPER_USER_NAME} &&
              export DJANGO_SUPERUSER_EMAIL=${SUPER_USER_EMAIL} &&
              export DJANGO_SUPERUSER_PASSWORD=${SUPER_USER_PASS} &&
-             python3 manage.py createsuperuser --no-input"
+             python3 manage.py createsuperuser --no-input &&
+             daphne -b 0.0.0.0 -p 8000 dlion_project.asgi:application"
+    depends_on:
+      - "redis"
     tty: true
   selenium:
     image: seleniarm/standalone-chromium
+    container_name: selenium
     environment:
       - SE_NODE_MAX_SESSIONS=3
     ports:
@@ -46,3 +50,10 @@ services:
       - 15900:5900
     volumes:
       - /dev/shm:/dev/shm
+    depends_on:
+      - "django_app"
+  redis:
+    image: "redis:latest"
+    container_name: redis
+    ports:
+      - "6379:6379"

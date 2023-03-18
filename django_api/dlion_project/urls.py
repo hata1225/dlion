@@ -19,6 +19,7 @@ from django.conf.urls import url
 from django.views.static import serve
 from django.conf import settings
 from django.conf.urls.static import static
+from user.consumers import FollowConsumer
 
 urlpatterns = [
     path('admin/', admin.site.urls),
