@@ -32,15 +32,16 @@
 >
 > - docker: 20.10.13
 > - docker-compose: 1.92.2
-> - node: 18.12.1
+> - node: 18.15.0
 >
 > ---
 >
 > ### 使用している Docker イメージについて
 >
 > - ubuntu: 22.10
-> - node: 18.12.1-alpine
-> - selenium (docker hub から image を引っ張ってる)
+> - node: 18.15.0-slim
+> - selenium (docker hub から最新の image を引っ張ってる)
+> - redis: redis:latest
 >
 > ---
 >
