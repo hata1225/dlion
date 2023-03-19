@@ -17,13 +17,14 @@ import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 env = environ.Env()
 env.read_env('.env')
 SECRET_KEY = env('SECRET_KEY')
+# SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = env("REACT_APP_GOOGLE_CLIENT_ID")
+# SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = env("REACT_APP_SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -47,7 +48,17 @@ INSTALLED_APPS = [
     'file_data',
     'corsheaders',
     'django_filters',
+    'channels',
 ]
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('redis', 6379)],
+        },
+    },
+}
 
 #viewにて、フィルタリングした上でレスポンスするために追加
 REST_FRAMEWORK = {
@@ -62,13 +73,10 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.common.CommonMiddleware',
 ]
 
 CORS_ORIGIN_WHITELIST = (
     'http://localhost:3000',
-    'http://192.168.0.125:3000',
-    'http://125.12.209.175:3000',
     'http://localhost:4444',
 )
 
@@ -103,8 +111,8 @@ TEMPLATES = [
     },
 ]
 
+ASGI_APPLICATION = 'dlion_project.asgi.application'
 WSGI_APPLICATION = 'dlion_project.wsgi.application'
-
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
@@ -134,7 +142,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
@@ -149,7 +156,6 @@ USE_L10N = True
 USE_TZ = True
 
 FILE_UPLOAD_MAX_MEMORY_SIZE = 1024 * 1024 * 1024 * 8196
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/

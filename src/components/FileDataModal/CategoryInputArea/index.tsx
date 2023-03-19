@@ -3,7 +3,7 @@ import { BaseSelect } from "components/BaseSelect";
 import { BaseTextField } from "components/BaseTextField";
 import React from "react";
 import { baseStyle, borderRadius } from "theme";
-import { PostModalLine } from "../PostModalLine";
+import { FileDataModalLine } from "components/FileDataModal/FileDataModalLine";
 import CloseIcon from "@material-ui/icons/Close";
 import { UserContext } from "contexts/UserContext";
 import { getCategories } from "api/api";
@@ -95,7 +95,7 @@ export const CategoryInputArea = ({
           onClick={handleClickAddCategory}
           disabled={!fetchedCategories.length}
         />
-        <PostModalLine />
+        <FileDataModalLine />
         <div className={classes.addNewCategoryArea}>
           <BaseTextField
             label="Add new category"

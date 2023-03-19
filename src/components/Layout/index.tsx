@@ -15,7 +15,8 @@ export const Layout = (props: Props) => {
 
   React.useEffect(() => {
     const pathname = window.location.pathname;
-    if (pathname === "/auth" || pathname.match(/filedata/)) {
+    // if (pathname === "/auth" || pathname.match(/filedata/)) {
+    if (pathname === "/auth") {
       setIsHiddenSubArea(true);
     }
   }, [window.location.pathname]);
@@ -29,9 +30,7 @@ export const Layout = (props: Props) => {
         ) : (
           <>
             <SubArea />
-            <div className={classes.mainArea}>
-              <div className={classes.mainPage}>{children}</div>
-            </div>
+            <div className={classes.mainArea}>{children}</div>
           </>
         )}
       </main>
@@ -43,6 +42,7 @@ const useStyles = makeStyles({
   main: {
     height: `calc(100vh -  ${baseStyle.header.height})`,
     display: "flex",
+    gap: "15px",
     justifyContent: "center",
     alignItems: "center",
     padding: `0 ${baseStyle.pagePaddingHorizontal.main}`,
@@ -60,12 +60,5 @@ const useStyles = makeStyles({
     "&::-webkit-scrollbar": {
       display: "none",
     },
-  },
-  mainPage: {
-    width: "100%",
-    padding: "10px 0px 10px 20px",
-    display: "flex",
-    gap: baseStyle.mainPageFileDataCardGap.main,
-    flexWrap: "wrap",
   },
 });

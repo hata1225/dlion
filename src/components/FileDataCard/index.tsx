@@ -8,9 +8,10 @@ import {
   fontSize,
 } from "theme";
 import ExpandLessIcon from "@material-ui/icons/ExpandLess";
-import { getFileData } from "api/api";
-import { UserContext } from "contexts/UserContext";
 import { CoverImageAreaByVideoData } from "components/CoverImageAreaByVideoData";
+import { BookmarkButton } from "components/BookmarkButton";
+import userIconImageDefault from "userIconImageDefault.webp";
+import { useNavigate } from "react-router-dom";
 
 type CardProps = React.ComponentProps<typeof Card>;
 type Props = CardProps & {
@@ -24,21 +25,13 @@ export const FileDataCard = ({
   style,
   ...props
 }: Props) => {
-  const {
-    id,
-    title,
-    description,
-    created_at,
-    categories,
-    cover_image,
-    short_video_path,
-    video_data_status,
-  } = fileData;
+  const { title, description, categories, user } = fileData;
   const [isScaleUpBottomArea, setIsScaleUpButtonArea] = React.useState(false);
   const [bottomAreaDefaultHeight, setBottomAreaDefaultHeight] =
     React.useState(0);
   const classes = useStyles();
   const bottomAreaRef = React.useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
   React.useEffect(() => {
     if (!isScaleUpBottomArea && bottomAreaRef.current) {
@@ -53,6 +46,10 @@ export const FileDataCard = ({
     setIsScaleUpButtonArea((prev) => !prev);
   };
 
+  const handleClickUserIcon = () => {
+    window.location.href = `/profile/${fileData?.user?.id}`;
+  };
+
   return (
     <Card
       className={`${classes.fileDataCard} ${className}`}
@@ -62,6 +59,19 @@ export const FileDataCard = ({
         ...style,
       }}
     >
+      <div className={classes.userInfoArea}>
+        <div>
+          <img
+            className={classes.userIconImage}
+            src={user?.icon_image ?? userIconImageDefault}
+            alt=""
+            onClick={handleClickUserIcon}
+          />
+        </div>
+        <div>
+          <p>{user?.name}</p>
+        </div>
+      </div>
       <CoverImageAreaByVideoData fileData={fileData} />
       <div
         ref={bottomAreaRef}
@@ -81,32 +91,37 @@ export const FileDataCard = ({
       >
         <div className={classes.bottomAreaContnet}>
           <div className={classes.bottomAreaContnetTop}>
-            <h3
-              className={classes.heading}
-              style={
-                isScaleUpBottomArea
-                  ? {
-                      WebkitLineClamp: 2,
-                      height: "auto",
-                    }
-                  : {}
-              }
-            >
-              {title}
-            </h3>
-            <p
-              className={classes.description}
-              style={
-                isScaleUpBottomArea
-                  ? {
-                      WebkitLineClamp: 7,
-                      height: "auto",
-                    }
-                  : {}
-              }
-            >
-              {description}
-            </p>
+            <div className={classes.bottomAreaContentTopLeft}>
+              <h3
+                className={classes.heading}
+                style={
+                  isScaleUpBottomArea
+                    ? {
+                        WebkitLineClamp: 2,
+                        height: "auto",
+                      }
+                    : {}
+                }
+              >
+                {title}
+              </h3>
+              <p
+                className={classes.description}
+                style={
+                  isScaleUpBottomArea
+                    ? {
+                        WebkitLineClamp: 7,
+                        height: "auto",
+                      }
+                    : {}
+                }
+              >
+                {description}
+              </p>
+            </div>
+            <div className={classes.bottomAreaContentTopRight}>
+              <BookmarkButton />
+            </div>
           </div>
           <p
             className={classes.categoriesArea}
@@ -144,6 +159,19 @@ const useStyles = makeStyles({
     position: "relative",
     height: "100%",
   },
+  userInfoArea: {
+    display: "flex",
+    alignItems: "center",
+    padding: "5px 7px 5px 7px",
+    gap: "5px",
+  },
+  userIconImage: {
+    width: baseStyle.userIconSize.small,
+    height: baseStyle.userIconSize.small,
+    borderRadius: "50%",
+    objectFit: "cover",
+    cursor: "pointer",
+  },
   img: {
     width: "100%",
     aspectRatio: "16 / 9",
@@ -168,10 +196,15 @@ const useStyles = makeStyles({
   },
   bottomAreaContnetTop: {
     display: "flex",
-    flexDirection: "column",
-    gap: "5px",
+    justifyContent: "space-between",
     marginBottom: "5px",
   },
+  bottomAreaContentTopLeft: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "5px",
+  },
+  bottomAreaContentTopRight: {},
   heading: {
     display: "-webkit-box",
     overflow: "hidden",

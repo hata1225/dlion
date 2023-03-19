@@ -1,4 +1,4 @@
-FROM ubuntu:22.04
+FROM ubuntu:22.10
 
 ENV PYTHONBUFFERED 1
 
@@ -11,13 +11,9 @@ RUN apt-get -y update \
 
 COPY ./requirements.txt /requirements.txt
 RUN pip3 install -r /requirements.txt
-RUN pip3 install django-cleanup django-cors-headers django-filter opencv-python \
-                opencv-contrib-python requests beautifulsoup4 selenium \
-                ffmpeg-python django-environ
 
 RUN mkdir /django_api
 
 WORKDIR /django_api
 COPY ./django_api /django_api
-RUN cd /django_api && \
-    DJANGO_SUPERUSER_PASSWORD=${SUPER_USER_PASS} python3 manage.py createsuperuser --no-input --email ${SUPER_USER_EMAIL} ; exit 0
+COPY ./.env /django_api/.env

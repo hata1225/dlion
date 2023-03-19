@@ -1,11 +1,32 @@
+from email.policy import default
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.conf import settings
+from django.db.models.signals import post_save, post_delete
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 import os
 import subprocess
 import cv2
 import math
 import json
+import uuid
+
+def saveCoverDataPath(instance, filename):
+    ext = filename.split('.')[-1]
+    return f'sub/{instance.user.id}/{instance.id}/{instance.id}.{ext}'
+
+def saveMainDataPath(instance, filename):
+    ext = filename.split('.')[-1]
+    return f'main/{instance.user.id}/{instance.id}/{instance.id}.{ext}'
+
+def saveIconImagePath(instance, filename):
+    ext = filename.split('.')[-1]
+    return f'icon/{instance.id}/{instance.id}/{instance.id}.{ext}'
+
+def saveBackgroundImagePath(instance, filename):
+    ext = filename.split('.')[-1]
+    return f'background/{instance.id}/{instance.id}/{instance.id}.{ext}'
 
 class UserManager(BaseUserManager):
 
@@ -30,23 +51,31 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email = models.EmailField(max_length=255, null=False, unique=True)
-    name = models.CharField(max_length=255, null=False)
-    favorites = models.TextField(default=json.dumps([]))
+    name = models.CharField(max_length=50, null=False)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
-
+    is_private = models.BooleanField(default=False)
+    icon_image = models.FileField(upload_to=saveIconImagePath, null=True)
+    background_image = models.FileField(upload_to=saveBackgroundImagePath, null=True)
+    description = models.CharField(max_length=255, null=True)
     objects = UserManager()
-
     USERNAME_FIELD = 'email'
 
-def saveCoverDataPath(instance, filename):
-    ext = filename.split('.')[-1]
-    return f'sub/{instance.user.name}/{instance.id}/{instance.id}.{ext}'
 
-def saveMainDataPath(instance, filename):
-    ext = filename.split('.')[-1]
-    return f'main/{instance.user.name}/{instance.id}/{instance.id}.{ext}'
+class FriendShip(models.Model):
+    """
+    @created_user: apiを叩いたユーザー(ログインユーザー)
+    @following_user: apiのクエリパラメーター(user_id)
+    """
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    created_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='following_user_friendships')
+    following_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_user_friendships')
+    created_at = models.DateTimeField(auto_now_add=True)
+    class Meta:
+        unique_together = ('created_user', 'following_user')
+
 
 class Categories(models.Model):
     user = models.ForeignKey(
@@ -67,6 +96,7 @@ class FileData(models.Model):
     )
 
     #共通
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=70, null=False)
     description = models.TextField(null=True)
     created_at = models.DateField(auto_now_add=True)
@@ -79,7 +109,8 @@ class FileData(models.Model):
     #動画 video 単数
         # lowmp4=>低画質mp4 playlist=>低画質高画質混合m3u8 allcomplete=>エンコード完了 completetotal(0~4)=>エンコード状況
     video_data_status = models.TextField(default=json.dumps({'lsm3u8': 0, 'shortmp4': 0, 'allcomplete': 0, 'completetotal': 0 }))
-    short_video_path = models.TextField(default="")
+    is_video_encoded = models.BooleanField(default=False)
+    short_video_path = models.FileField(null=True)
     short_video_play_time = models.IntegerField(default=0)
 
     #画像 images 複数
@@ -92,23 +123,6 @@ class FileData(models.Model):
         return self.title
 
     def save(self, *args, **kwargs):
-        if self.id is None:
-            # アップロードされたファイルを変数に代入しておく
-            cover_image = self.cover_image
-            main_data = self.main_data
-
-            # 一旦fileフィールドがNullの状態で保存(→インスタンスIDが割り当てられる)
-            self.cover_image = None
-            self.main_data = None
-            super().save(*args, **kwargs)
-
-            # fileフィールドに値をセット
-            self.cover_image = cover_image
-            self.main_data = main_data
-            if "force_insert" in kwargs:
-                kwargs.pop("force_insert")
-
-        # この段階ではインスタンスIDが存在する
         super().save(*args, **kwargs)
 
         # fileDataに追加されたcategoryがCategoriesに存在しない場合、Categoriesに追加
@@ -123,22 +137,28 @@ class FileData(models.Model):
             if not file_data_category in all_categories:
                 Categories.objects.create(category=file_data_category, user=self.user)
 
-        if self.main_data_type == "video":
-            # 保存されたvideoData, cover_imageのパス, main_data名, export_path
-            main_data_path = "media/"+str(self.main_data)
-            cover_image_path = "media/"+str(self.cover_image)
-            main_data_name = str(main_data_path).split("/")[-1]
-            main_data_path_by_export = main_data_path.replace(main_data_name, "")
-            cover_image_name = str(cover_image_path).split("/")[-1]
-            cover_image_path_by_export = cover_image_path.replace(cover_image_name, "")
+        # 保存されたvideoData, cover_imageのパス, main_data名, export_path
+        main_data_path = "media/"+str(self.main_data)
+        cover_image_path = "media/"+str(self.cover_image)
+        main_data_name = str(main_data_path).split("/")[-1]
+        main_data_path_by_export = main_data_path.replace(main_data_name, "")
+        cover_image_name = str(cover_image_path).split("/")[-1]
+        cover_image_path_by_export = cover_image_path.replace(cover_image_name, "")
 
-            # cover_imageをwebpに変換
-            cmd = f'ffmpeg -i {cover_image_path} -vf scale=800:-1 -q:v 65 {cover_image_path_by_export}cover_image.webp'
+        # cover_imageをwebpに変換 横幅1200px
+        if "webp" in self.cover_image:
+            cmd = f'ffmpeg -i {cover_image_path} -vf scale=1200:-1 {cover_image_path_by_export}cover_image.webp'
             code = subprocess.call(cmd.split())
             print('process=' + str(code))
             cover_image_path_by_export = cover_image_path_by_export.replace("media/", "")
             self.cover_image = f'{cover_image_path_by_export}cover_image.webp'
-            super().save(*args, **kwargs)
+
+        super().save()
+
+        video_data_status = json.loads(self.video_data_status)
+
+        # 動画は編集を想定していない
+        if self.main_data_type == "video" and video_data_status["allcomplete"] == 0:
 
             # m3u8の作成([input].mp4 -> ls/ls.m3u8)
             os.makedirs(f'{main_data_path_by_export}ls')
@@ -150,11 +170,10 @@ class FileData(models.Model):
             cmd += f' {main_data_path_by_export}ls/ls_%5d.ts'
             code = subprocess.call(cmd.split())
             print('process=' + str(code))
-            video_data_status = json.loads(self.video_data_status)
             video_data_status['lsm3u8'] = 1
             video_data_status['completetotal'] = 1
             self.video_data_status = json.dumps(video_data_status)
-            super().save(*args, **kwargs)
+            super().save()
 
             # short.mp4, short.webp作成
             t_while = 1.5 # 切り取り秒数
@@ -190,7 +209,7 @@ class FileData(models.Model):
             video_data_status['shortmp4'] = 1
             video_data_status['completetotal'] = 2
             self.video_data_status = json.dumps(video_data_status)
-            super().save(*args, **kwargs)
+            super().save()
 
             short_videos = []
             i = 1
@@ -211,7 +230,6 @@ class FileData(models.Model):
                 path = f'{main_data_path_by_export}short_{i}.mp4'
                 os.remove(path)
                 i += 1
-            self.short_video_path = f'http://localhost:8000/media/main/example1/{self.id}/short.webp'
 
             cap = cv2.VideoCapture(f'{main_data_path_by_export}short.mp4')
             short_video_play_time = cap.get(cv2.CAP_PROP_FRAME_COUNT) / cap.get(cv2.CAP_PROP_FPS)
@@ -223,12 +241,35 @@ class FileData(models.Model):
             self.main_data_size = os.path.getsize(main_data_path)
             main_data_path_by_export = main_data_path_by_export.replace("media/", "")
             self.main_data = main_data_path_by_export + "ls/ls.m3u8"
+            self.short_video_path = f'{main_data_path_by_export}short.webp'
             video_data_status = json.loads(self.video_data_status)
             video_data_status['allcomplete'] = 1
             video_data_status['completetotal'] = 3
 
             self.video_data_status = json.dumps(video_data_status)
-        super().save(*args, **kwargs)
+            self.is_video_encoded = True
+        super().save()
 
     def __str__(self):
         return self.title
+
+
+# websocket用、更新があった際に発火
+def send_update(sender, instance, **kwargs):
+    channel_layer = get_channel_layer()
+
+    async_to_sync(channel_layer.group_send)(
+        str(instance.created_user_id),
+        {
+            'type': 'follow_update',
+        },
+    )
+    async_to_sync(channel_layer.group_send)(
+        str(instance.following_user_id),
+        {
+            'type': 'follow_update',
+        },
+    )
+
+post_save.connect(send_update, sender=FriendShip)
+post_delete.connect(send_update, sender=FriendShip)

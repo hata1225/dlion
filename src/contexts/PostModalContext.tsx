@@ -1,38 +1,50 @@
-import { PostModal } from "components/PostModal";
+import { FileDataModal } from "components/FileDataModal";
 import React from "react";
 import { FileData } from "types/fileData";
 
-interface PostModalContextInterface {
-  isOpenPostModal: boolean;
-  setIsOpenPostModal: React.Dispatch<React.SetStateAction<boolean>>;
-  handleOpenPostModal: (fileDataProps?: FileData) => void;
+interface FileDataModalContextInterface {
+  isOpenFileDataModal: boolean;
+  setIsOpenFileDataModal: React.Dispatch<React.SetStateAction<boolean>>;
+  handleOpenPostModal: () => void;
+  handleOpenEditModal: (fileDataProps: FileData) => void;
 }
 
-export const PostModalContext = React.createContext<PostModalContextInterface>(
-  {} as PostModalContextInterface
-);
+export const PostModalContext =
+  React.createContext<FileDataModalContextInterface>(
+    {} as FileDataModalContextInterface
+  );
 
 export const PostModalProvider = ({
   children,
 }: {
   children: React.ReactNode;
 }) => {
-  const [isOpenPostModal, setIsOpenPostModal] = React.useState(false);
+  const [isOpenFileDataModal, setIsOpenFileDataModal] = React.useState(false);
   const [fileData, setFileData] = React.useState<FileData>();
 
-  const handleOpenPostModal = (fileDataProp?: FileData) => {
-    setIsOpenPostModal(true);
+  const handleOpenPostModal = () => {
+    setIsOpenFileDataModal(true);
+  };
+
+  const handleOpenEditModal = (fileDataProp: FileData) => {
+    setIsOpenFileDataModal(true);
     setFileData(fileDataProp);
   };
 
   return (
     <PostModalContext.Provider
-      value={{ isOpenPostModal, setIsOpenPostModal, handleOpenPostModal }}
+      value={{
+        isOpenFileDataModal,
+        setIsOpenFileDataModal,
+        handleOpenPostModal,
+        handleOpenEditModal,
+      }}
     >
-      <PostModal
-        isOpenPostModal={isOpenPostModal}
-        setIsOpenPostModal={setIsOpenPostModal}
+      <FileDataModal
+        isOpenFileDataModal={isOpenFileDataModal}
+        setIsOpenFileDataModal={setIsOpenFileDataModal}
         fileData={fileData}
+        setFileData={setFileData}
       />
       {children}
     </PostModalContext.Provider>

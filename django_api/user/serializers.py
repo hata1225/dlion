@@ -1,13 +1,16 @@
 from django.contrib.auth import get_user_model, authenticate
 
 from rest_framework import serializers
+from core import models
 
 
 class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = get_user_model()
-        fields = ('email', 'password', 'name', 'favorites')
+        fields = ('id', 'email', 'password', 'name', 'is_private', 'icon_image', 'background_image', 'description')
+        # fields = ('id', 'email', 'password', 'name', 'is_private', 'icon_image', 'background_image', 'description')
+
         extra_kwargs = {'password': {'write_only': True, 'min_length': 8}}
 
     def create(self, validated_data):
@@ -24,6 +27,12 @@ class UserSerializer(serializers.ModelSerializer):
             user.save()
 
         return user
+
+class FriendShipSerializer(serializers.Serializer):
+    def create(self, validated_data):
+        created_user = self.context['request'].user
+        following_user = models.User.objects.get(id=self.context['request'].GET.get('user_id'))
+        return models.FriendShip.objects.create(created_user=created_user, following_user=following_user)
 
 class AuthTokenSerializer(serializers.Serializer):
     email = serializers.CharField()

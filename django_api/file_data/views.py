@@ -1,9 +1,9 @@
 from rest_framework import viewsets, pagination, response
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
+from django.db.models import Q
 
-from core.models import FileData
-from core.models import Categories
+from core.models import FileData, Categories
 
 from file_data import serializers
 import shutil
@@ -33,9 +33,9 @@ class FileDataViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         id = self.request.path.split("/")[3]
-        user_name = self.request.user.name
-        mainDataPath = f'media/main/{user_name}/{id}'
-        subDataPath = f'media/sub/{user_name}/{id}'
+        user_id = self.request.user.id
+        mainDataPath = f'media/main/{user_id}/{id}'
+        subDataPath = f'media/sub/{user_id}/{id}'
         try:
             shutil.rmtree(mainDataPath)
             shutil.rmtree(subDataPath)
@@ -47,7 +47,10 @@ class FileDataViewSet(viewsets.ModelViewSet):
         serializer.save(user=self.request.user)
 
     def get_queryset(self):
-        return FileData.objects.filter(user=self.request.user)
+        user_id = self.request.GET.get("user_id")
+        if user_id:
+            return FileData.objects.filter(user__id=user_id)
+        return FileData.objects.filter(Q(user__is_private=False)|Q(user=self.request.user))
 
 class CategoriesViewSet(viewsets.ModelViewSet):
     authentication_classes = (TokenAuthentication,)

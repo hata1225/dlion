@@ -19,26 +19,41 @@ export const baseStyle = {
   subArea: {
     width: "250px",
   },
+  button: {
+    width: {
+      main: "120px",
+    },
+  },
   maxWidthLayout: {
     pc: 1300,
     tb: 980,
     sp: 600,
   },
-  postModalWidth: {
+  fileDataModalWidth: {
     pc: "500px",
   },
-  postModalHeight: {
+  fileDataModalHeight: {
     pc: "650px",
   },
-  postAreaHeader: {
+  profilePageInnerWidth: {
+    main: "600px",
+  },
+  modalContentAreaHeader: {
     pc: "33px",
   },
-  mainPageFileDataCardGap: {
+  fileAreaFileDataCardGap: {
     main: "10px",
   },
   bottomAreaButtonAreaSize: {
     height: "25px",
     width: "50px",
+  },
+  userIconSize: {
+    main: "72px",
+    small: "32px",
+  },
+  gap: {
+    small: "5px",
   },
   color: {
     purple: {
@@ -48,15 +63,29 @@ export const baseStyle = {
     },
     white: {
       light: "#ffffff",
+      main: "#dcdcdc",
+      dark: "#b9b9b9",
     },
     gray: {
       dark: "#686868",
       main: "#888888",
       light: "#a8a8a8",
     },
+    black: {
+      dark: "#111111",
+      main: "#222222",
+    },
     red: {
       main: "rgba(207, 34, 46, 1)",
       mainButtonHover: "rgba(207, 34, 46, 0.85)",
+    },
+    yellow: {
+      dark: "#b28704",
+      main: "rgba(255, 193, 7, 1)",
+      light: "#ffcd38",
+      buttonHover: {
+        main: "rgba(255, 193, 7, 0.15)",
+      },
     },
   },
 };
@@ -86,7 +115,14 @@ export const fontSize = {
   },
   small: {
     large: "1.2rem",
+    medium: "1rem",
+    small: "0.8rem",
   },
+};
+
+export const fontWeight = {
+  normal: 400,
+  bold: 700,
 };
 
 export const fileDataTitleMaxLength = 70;
