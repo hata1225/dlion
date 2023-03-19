@@ -2,6 +2,9 @@ from email.policy import default
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.conf import settings
+from django.db.models.signals import post_save, post_delete
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 import os
 import subprocess
 import cv2
@@ -249,3 +252,24 @@ class FileData(models.Model):
 
     def __str__(self):
         return self.title
+
+
+# websocket用、更新があった際に発火
+def send_update(sender, instance, **kwargs):
+    channel_layer = get_channel_layer()
+
+    async_to_sync(channel_layer.group_send)(
+        str(instance.created_user_id),
+        {
+            'type': 'follow_update',
+        },
+    )
+    async_to_sync(channel_layer.group_send)(
+        str(instance.following_user_id),
+        {
+            'type': 'follow_update',
+        },
+    )
+
+post_save.connect(send_update, sender=FriendShip)
+post_delete.connect(send_update, sender=FriendShip)

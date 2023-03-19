@@ -16,4 +16,5 @@ channels-redis
 redis==2.10.6
 aiohttp
 daphne
+asgiref
 djangochannelsrestframework

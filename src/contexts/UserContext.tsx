@@ -1,13 +1,12 @@
 import {
   createUser,
-  getFollowerListByCurrentUser,
-  getFollowingListByCurrentUser,
   getToken,
   getUserInfo,
   updateUser,
   followUser as followUserByAPI,
   unfollowUser as unfollowUserByAPI,
 } from "api/api";
+import { useWSFollowInfo } from "dataService/userData";
 import { createNotification } from "functions/notification";
 import React from "react";
 import { UserInterfaceAndUserFollowInterface } from "types/User";
@@ -43,7 +42,9 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     following: [],
     followers: [],
   });
+  const { followingList, followerList } = useWSFollowInfo(user.id);
 
+  // 初期化
   React.useEffect(() => {
     const f = async () => {
       let token = localStorage.getItem("token");
@@ -57,14 +58,10 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       }
       if (token) {
         const userInfo = await getUserInfo(token);
-        const following = await getFollowingListByCurrentUser(token);
-        const followers = await getFollowerListByCurrentUser(token);
         setUser((prev) => ({
           ...prev,
           ...userInfo,
           token,
-          following,
-          followers,
         }));
       }
       if (!token && user?.email && user?.password) {
@@ -73,6 +70,15 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     };
     f();
   }, []);
+
+  // websocket用
+  React.useEffect(() => {
+    setUser((prev) => ({
+      ...prev,
+      following: followingList ?? [],
+      followers: followerList ?? [],
+    }));
+  }, [followingList, followerList]);
 
   const signin = async (email: string, password: string) => {
     try {
