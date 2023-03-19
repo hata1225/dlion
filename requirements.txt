@@ -1,4 +1,4 @@
-Django==3.2.15
+Django==3.2.18
 djangorestframework==3.11.2
 django-cleanup
 django-cors-headers
@@ -13,7 +13,7 @@ django-environ
 python-decouple
 channels
 channels-redis
-redis==2.10.6
+redis==3
 aiohttp
 daphne
 asgiref

@@ -1,3 +1,3 @@
-FROM node:18.12.1-slim
+FROM node:18.15.0-slim
 WORKDIR /src
 COPY ./.env /
