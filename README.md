@@ -1,7 +1,11 @@
+<br>
+<br>
+
 # DLion - ファイル管理 SNS
 
 管理したいファイルをアップロードすると、タイムラインに流れる web アプリを作製中。。。
 
+<br>
 <br>
 
 ## 目次
@@ -15,6 +19,7 @@
 - [🛢 データベースのリセット方法](https://github.com/hata1225/dlion/edit/main/README.md#-%E3%83%87%E3%83%BC%E3%82%BF%E3%83%99%E3%83%BC%E3%82%B9%E3%81%AE%E3%83%AA%E3%82%BB%E3%83%83%E3%83%88%E6%96%B9%E6%B3%95)
 - [🍭 その他](https://github.com/hata1225/dlion/edit/main/README.md#-%E3%81%9D%E3%81%AE%E4%BB%96)
 
+<br>
 <br>
 
 ## ⚙️ Requirement
@@ -55,6 +60,7 @@
 > - バック(管理画面) : [http://localhost:8000/admin](http://localhost:8000/admin)
 
 <br>
+<br>
 
 ## 👀 画面設計（構想）
 
@@ -64,6 +70,7 @@
 
 </details>
 
+<br>
 <br>
 
 ## 🌳 ブランチ管理について
@@ -86,6 +93,7 @@
 
   例: feature/maindata_view_card
 
+<br>
 <br>
 
 ## ⤴️ 立ち上げ方
@@ -193,6 +201,7 @@
 </details>
 
 <br>
+<br>
 
 ## 🛢 データベースのリセット方法
 
@@ -220,6 +229,7 @@
 
 </details>
 
+<br>
 <br>
 
 ## 🍭 その他
@@ -252,3 +262,27 @@
 - UI 実装時によく使っているライブラリ
 
   - [material ui v4](https://v4.mui.com/)
+
+<br>
+<br>
+
+## 💻 自宅サーバー構築tips
+### ハードについて
+- RaspberryPi4B 4GB
+- SSD 120GB
+- HDD 4TB
+### 行ったこと
+- **SSDにOSを焼き付けた**
+  - 参考: [Raspberry Pi ImagerでSSDをフォーマット](http://www.momobro.com/rasbro/tips-rp-raspberry-pi-image-format/)
+- **OSの更新**
+  - 参考: [raspberrypiのOSを更新する方法](https://qiita.com/akiraichi5430/items/6b9855f59fb3a3f9de35)
+- **port番号の固定**
+  - 参考: [初心者向！Raspberry Pi 最低限のセキュリティ設定](https://qiita.com/mochifuture/items/00ca8cdf74c170e3e6c6)
+- **SSH接続**
+  - 参考: [Raspberry Pi3のLAN外からのSSH接続設定方法](https://qiita.com/3no3_tw/items/4b5975a9f3087edf4e20)
+- **sshのconfig設定で、ssh接続を楽に行う**
+  - 参考: [~/.ssh/configを使ってSSH接続を楽にする](https://tech-blog.rakus.co.jp/entry/20210512/ssh)
+- **dockerコマンド**
+  - 参考: [Raspberry PiにDockerをインストール](https://qiita.com/homelan/items/0bb265cf92310d29cb82)
+- **docker-composeコマンド**
+  - 参考: [Raspberry Pi 4 に Docker と Docker Compose をインストールする](https://dev.classmethod.jp/articles/install-docker-for-raspberry-pi-4/)
