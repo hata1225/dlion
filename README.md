@@ -286,8 +286,12 @@
   - 参考: [Raspberry PiにDockerをインストール](https://qiita.com/homelan/items/0bb265cf92310d29cb82)
 - **docker-composeコマンド**
   - 参考: [Raspberry Pi 4 に Docker と Docker Compose をインストールする](https://dev.classmethod.jp/articles/install-docker-for-raspberry-pi-4/)
-- **oh my zsh**
+- **oh my zsh(シェルのカスタマイズ)**
   - 参考: [自分の Ubuntu の zsh を oh-my-zsh に設定する。](https://toxweblog.toxbe.com/2017/10/01/ubuntu-oh-my-zsh/)
   - 参考: [Themes(oh my zshのいろんなテーマがある)](https://github.com/ohmyzsh/ohmyzsh/wiki/Themes)
 - **ラズパイ to github の接続**
   - 参考: [【超簡単】git github 接続方法](https://qiita.com/Sub_Tanabe/items/4e03dcf42e3b0d19bb66)
+- **node install**
+  - 参考: [Ubuntu 20.04にNode.jsをインストールする方法](https://www.digitalocean.com/community/tutorials/how-to-install-node-js-on-ubuntu-20-04-ja)
+- **node管理"n"install**
+  - 参考: [Ubuntu で Node の最新版/推奨版を使う (n コマンド編)](https://qiita.com/cointoss1973/items/c000c4f84ae4b0c166b5)
