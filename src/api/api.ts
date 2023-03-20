@@ -1,4 +1,4 @@
-import axios, { AxiosRequestConfig } from "axios";
+import axios, { AxiosRequestConfig, AxiosProgressEvent } from "axios";
 import { FileData, FileDataByEdit } from "types/fileData";
 
 const ENVS = {
@@ -47,12 +47,12 @@ export const postAxios = async (
           Authorization: `Token ${token}`,
         },
         onUploadProgress: async (ProgressEvent: {
-          total: number;
-          loaded: number;
+          total?: number;
+          loaded?: number;
         }) => {
-          if (setUploadProgressValue) {
-            let total = ProgressEvent.total;
-            let loaded = ProgressEvent.loaded;
+          let total = ProgressEvent?.total;
+          let loaded = ProgressEvent?.loaded;
+          if (setUploadProgressValue && total && loaded) {
             let percentCompleted = (loaded / total) * 100;
             setUploadProgressValue(percentCompleted);
             if (endOfUploadFunc && percentCompleted === 100) {
