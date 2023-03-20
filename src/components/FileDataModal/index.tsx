@@ -52,13 +52,17 @@ export const FileDataModal = (props: Props) => {
   const { updateFileData } = React.useContext(FileDataContext);
   const classes = useStyles();
 
-  const mainDataTypeAndStatus: { status: FileDataStatus; matchText: RegExp }[] =
-    [
+  const mainDataTypeAndStatus: {
+    status: FileDataStatus;
+    matchText: RegExp;
+  }[] = React.useMemo(() => {
+    return [
       { status: "video", matchText: /video/ },
       { status: "image", matchText: /image/ },
       { status: "audio", matchText: /audio/ },
       { status: "pdf", matchText: /pdf/ },
     ];
+  }, []);
 
   React.useEffect(() => {
     if (fileData) {
@@ -88,7 +92,7 @@ export const FileDataModal = (props: Props) => {
         }
       });
     }
-  }, [mainData]);
+  }, [mainData, mainDataTypeAndStatus]);
 
   const handleClose = () => {
     setIsOpenFileDataModal(false);

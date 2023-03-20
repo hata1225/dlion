@@ -70,7 +70,7 @@ export const CoverImageAreaByVideoData = ({
     } else if (videoDataStatus) {
       setIsAllCompleteByEncodeVideo(videoDataStatus["allcomplete"] === 1);
     }
-  }, [videoDataStatus]);
+  }, [videoDataStatus, fileData?.main_data_type]);
 
   const handleClickImage = () => {
     if (!isVideoTypeByFileData && fileData) {

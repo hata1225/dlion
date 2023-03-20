@@ -32,14 +32,17 @@
 >
 > - docker: 20.10.13
 > - docker-compose: 1.92.2
-> - node: 18.15.0
+> - node: 19.8.1
+> - python: 3.11.2
+> - Django: 4.1.7
+> - DRF: 3.14.0
 >
 > ---
 >
 > ### 使用している Docker イメージについて
 >
 > - ubuntu: 22.10
-> - node: 18.15.0-slim
+> - node: 19.8.1-slim
 > - selenium (docker hub から最新の image を引っ張ってる)
 > - redis: redis:latest
 >

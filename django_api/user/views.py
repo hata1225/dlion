@@ -1,4 +1,4 @@
-from rest_framework import generics, viewsets
+from rest_framework import generics
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.settings import api_settings
 from rest_framework.authentication import TokenAuthentication

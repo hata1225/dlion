@@ -3,7 +3,9 @@ import { makeStyles } from "@material-ui/core";
 export const ChatPage = () => {
   const classes = useStyles();
 
-  return <div></div>;
+  return <div className={classes.chatPage}></div>;
 };
 
-const useStyles = makeStyles({});
+const useStyles = makeStyles({
+  chatPage: {},
+});

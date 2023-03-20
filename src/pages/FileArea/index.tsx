@@ -7,30 +7,25 @@ import { baseStyle } from "theme";
 import { FileData } from "types/fileData";
 
 type Props = {
-  reanderedFunc?: () => void;
   isMine?: boolean;
   className?: string;
   userId?: string;
 };
 
-export const FileArea = ({
-  reanderedFunc,
-  isMine,
-  className,
-  userId,
-}: Props) => {
+/**
+ *
+ * @isMine
+ * @className
+ * @userId
+ * @returns
+ */
+export const FileArea = ({ isMine, className, userId }: Props) => {
   const { allFileData, mineFileData, fileDataByUserId } =
     React.useContext(FileDataContext);
   const [fileDataCardWidth, setFileDataCardWidth] = React.useState("100%");
   const [fileData, setFileData] = React.useState<FileData[]>([]);
   const [width] = useWindowSize();
   const classes = useStyles();
-
-  React.useEffect(() => {
-    if (reanderedFunc) {
-      reanderedFunc();
-    }
-  }, []);
 
   React.useEffect(() => {
     let cardRow = 1;
@@ -58,7 +53,7 @@ export const FileArea = ({
       setFileData(newFileData);
     };
     f();
-  }, [userId, mineFileData, allFileData]);
+  }, [userId, mineFileData, allFileData, fileDataByUserId, isMine]);
 
   const fileDataCardExceptByGapFunc = (cardRow: number) => {
     const num = `${baseStyle.fileAreaFileDataCardGap.main} * ${
