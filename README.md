@@ -33,6 +33,9 @@
 > - docker: 20.10.13
 > - docker-compose: 1.92.2
 > - node: 18.15.0
+> - python: 3.11.2
+> - Django: 4.1.7
+> - DRF: 3.14.0
 >
 > ---
 >
