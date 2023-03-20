@@ -286,3 +286,8 @@
   - 参考: [Raspberry PiにDockerをインストール](https://qiita.com/homelan/items/0bb265cf92310d29cb82)
 - **docker-composeコマンド**
   - 参考: [Raspberry Pi 4 に Docker と Docker Compose をインストールする](https://dev.classmethod.jp/articles/install-docker-for-raspberry-pi-4/)
+- **oh my zsh**
+  - 参考: [自分の Ubuntu の zsh を oh-my-zsh に設定する。](https://toxweblog.toxbe.com/2017/10/01/ubuntu-oh-my-zsh/)
+  - 参考: [Themes(oh my zshのいろんなテーマがある)](https://github.com/ohmyzsh/ohmyzsh/wiki/Themes)
+- **ラズパイ to github の接続**
+  - 参考: [【超簡単】git github 接続方法](https://qiita.com/Sub_Tanabe/items/4e03dcf42e3b0d19bb66)
