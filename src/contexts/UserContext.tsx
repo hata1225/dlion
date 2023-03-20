@@ -69,7 +69,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       }
     };
     f();
-  }, []);
+  }, [user?.email, user?.password]);
 
   // websocket用
   React.useEffect(() => {

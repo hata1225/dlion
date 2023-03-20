@@ -1,4 +1,4 @@
-import axios, { AxiosRequestConfig, AxiosProgressEvent } from "axios";
+import axios, { AxiosRequestConfig } from "axios";
 import { FileData, FileDataByEdit } from "types/fileData";
 
 const ENVS = {

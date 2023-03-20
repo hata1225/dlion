@@ -11,7 +11,6 @@ import ExpandLessIcon from "@material-ui/icons/ExpandLess";
 import { CoverImageAreaByVideoData } from "components/CoverImageAreaByVideoData";
 import { BookmarkButton } from "components/BookmarkButton";
 import userIconImageDefault from "userIconImageDefault.webp";
-import { useNavigate } from "react-router-dom";
 
 type CardProps = React.ComponentProps<typeof Card>;
 type Props = CardProps & {
@@ -31,7 +30,6 @@ export const FileDataCard = ({
     React.useState(0);
   const classes = useStyles();
   const bottomAreaRef = React.useRef<HTMLDivElement>(null);
-  const navigate = useNavigate();
 
   React.useEffect(() => {
     if (!isScaleUpBottomArea && bottomAreaRef.current) {
@@ -40,7 +38,11 @@ export const FileDataCard = ({
         setBottomAreaDefaultHeight(bottomAreaHeightByRef);
       }
     }
-  }, [bottomAreaRef.current?.clientHeight]);
+  }, [
+    bottomAreaRef.current?.clientHeight,
+    bottomAreaDefaultHeight,
+    isScaleUpBottomArea,
+  ]);
 
   const handleClickButton = () => {
     setIsScaleUpButtonArea((prev) => !prev);

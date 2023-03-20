@@ -25,13 +25,9 @@ export const FollowButton = ({ userId }: Props) => {
 
   React.useEffect(() => {
     let newIsFollowing: boolean = false;
-    followingList?.find((user) => {
-      if (user.id === userId) {
-        newIsFollowing = true;
-      }
-    });
+    newIsFollowing = followingList.some((user) => user.id === userId);
     setIsFollowing(newIsFollowing);
-  }, [followingList]);
+  }, [followingList, userId]);
 
   React.useEffect(() => {
     setCurrentUserId(user.id);

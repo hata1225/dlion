@@ -19,7 +19,7 @@ export const Layout = (props: Props) => {
     if (pathname === "/auth") {
       setIsHiddenSubArea(true);
     }
-  }, [window.location.pathname]);
+  }, []);
 
   return (
     <>
