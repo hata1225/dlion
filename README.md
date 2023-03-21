@@ -267,11 +267,15 @@
 <br>
 
 ## 💻 自宅サーバー構築tips
+
 ### ハードについて
 - RaspberryPi4B 4GB
 - SSD 120GB
 - HDD 4TB
+
 ### 行ったこと
+- **SSD, HDDフォーマット**
+  - 参考: [ラズパイに外付けHDD(SSD)を接続する方法を徹底解説 – フォーマット、パーティション作成、マウント方法など](https://jorublog.site/raspi-hdd-connect/)
 - **SSDにOSを焼き付けた**
   - 参考: [Raspberry Pi ImagerでSSDをフォーマット](http://www.momobro.com/rasbro/tips-rp-raspberry-pi-image-format/)
 - **OSの更新**
@@ -295,3 +299,5 @@
   - 参考: [Ubuntu 20.04にNode.jsをインストールする方法](https://www.digitalocean.com/community/tutorials/how-to-install-node-js-on-ubuntu-20-04-ja)
 - **node管理"n"install**
   - 参考: [Ubuntu で Node の最新版/推奨版を使う (n コマンド編)](https://qiita.com/cointoss1973/items/c000c4f84ae4b0c166b5)
+- **HDDにパーティション作成、ラズパイへのマウント**
+  - 参考: [ラズパイに外付けHDD(SSD)を接続する方法を徹底解説 – フォーマット、パーティション作成、マウント方法など](https://jorublog.site/raspi-hdd-connect)
