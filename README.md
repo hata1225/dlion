@@ -81,18 +81,6 @@
 > >
 > > > feature/[機能名]
 
-**現在は、develop/v1.0.0 に直接コミットしています。**
-
-- develop/[バージョン]
-
-  例: develop/v1.0.0
-
-- feature/[機能名]
-
-  スネークケースで記述
-
-  例: feature/maindata_view_card
-
 <br>
 <br>
 
