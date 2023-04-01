@@ -12,9 +12,11 @@ ffmpeg-python
 django-environ
 python-decouple
 channels
-channels-redis
-redis==3
+channels-redis==3.4.1
+redis==3.5.3
 aiohttp
 daphne
 asgiref
 djangochannelsrestframework
+celery
+django-celery-results

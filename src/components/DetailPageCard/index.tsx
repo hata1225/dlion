@@ -28,7 +28,7 @@ export const DetailPageCard = ({ fileData }: Props) => {
           <CoverImageAreaByVideoData
             className={classes.coverImageAreaByVideoData}
             classNameByImage={classes.image}
-            fileData={fileData}
+            propFileData={fileData}
             isNotTransitionPage
           />
         </div>

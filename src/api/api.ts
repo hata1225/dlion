@@ -2,7 +2,7 @@ import axios, { AxiosRequestConfig } from "axios";
 import { FileData, FileDataByEdit } from "types/fileData";
 
 const ENVS = {
-  develop: "localhost",
+  develop: `${process.env.REACT_APP_IP_ADDRESS}`,
 };
 
 export const ENV = `http://${ENVS.develop}`; // 環境ごとに変更
@@ -29,7 +29,7 @@ export const postAxios = async (
   data: object,
   token?: string,
   setUploadProgressValue?: React.Dispatch<React.SetStateAction<number>> | null,
-  endOfUploadFunc?: undefined
+  endOfUploadFunc?: any
 ) => {
   axios.defaults.withCredentials = false;
   let postProps: [
@@ -47,12 +47,12 @@ export const postAxios = async (
           Authorization: `Token ${token}`,
         },
         onUploadProgress: async (ProgressEvent: {
-          total: number;
-          loaded: number;
+          total?: number;
+          loaded?: number;
         }) => {
-          if (setUploadProgressValue) {
-            let total = ProgressEvent.total;
-            let loaded = ProgressEvent.loaded;
+          let total = ProgressEvent?.total;
+          let loaded = ProgressEvent?.loaded;
+          if (setUploadProgressValue && total && loaded) {
             let percentCompleted = (loaded / total) * 100;
             setUploadProgressValue(percentCompleted);
             if (endOfUploadFunc && percentCompleted === 100) {
@@ -267,7 +267,6 @@ export const getAllFileData = async (token: string) => {
     const fileData: FileData[] = result.data.results;
     fileData.forEach((item: any) => {
       item.categories = JSON.parse(item.categories);
-      item.video_data_status = JSON.parse(item.video_data_status);
     });
     return result?.data?.results;
   } catch (error) {
@@ -286,7 +285,6 @@ export const getFileDataByUserId = async (token: string, user_id: string) => {
     const fileData: FileData[] = result.data.results;
     fileData.forEach((item: any) => {
       item.categories = JSON.parse(item.categories);
-      item.video_data_status = JSON.parse(item.video_data_status);
     });
     return result?.data?.results;
   } catch (error) {
@@ -300,7 +298,6 @@ export const getFileData = async (token: string, id: string) => {
   try {
     const result = await getAxios(path, token);
     const fileData: FileData = result.data;
-    fileData.video_data_status = JSON.parse(result.data.video_data_status);
     fileData.categories = JSON.parse(result.data.categories);
     return fileData;
   } catch (error) {
@@ -347,7 +344,7 @@ export const deleteFileData = async (token: string, id: string) => {
 export const postFileData = async (
   data: object,
   token: string,
-  setUploadProgressValue?: React.Dispatch<React.SetStateAction<number>> | null,
+  setUploadProgressValue?: React.Dispatch<React.SetStateAction<number>>,
   endOfUploadFunc?: any
 ) => {
   const path = "/api/file_data/";
