@@ -52,17 +52,16 @@ export const FileDataModal = (props: Props) => {
   const { updateFileData } = React.useContext(FileDataContext);
   const classes = useStyles();
 
-  const mainDataTypeAndStatus: {
-    status: FileDataStatus;
-    matchText: RegExp;
-  }[] = React.useMemo(() => {
-    return [
-      { status: "video", matchText: /video/ },
-      { status: "image", matchText: /image/ },
-      { status: "audio", matchText: /audio/ },
-      { status: "pdf", matchText: /pdf/ },
-    ];
-  }, []);
+  const mainDataTypeAndStatus: { status: FileDataStatus; matchText: RegExp }[] =
+    React.useMemo(
+      () => [
+        { status: "video", matchText: /video/ },
+        { status: "image", matchText: /image/ },
+        { status: "audio", matchText: /audio/ },
+        { status: "pdf", matchText: /pdf/ },
+      ],
+      []
+    );
 
   React.useEffect(() => {
     if (fileData) {
@@ -120,8 +119,6 @@ export const FileDataModal = (props: Props) => {
   };
 
   const handlePost = async () => {
-    let newData;
-
     if (coverImage && mainData && user?.token) {
       let data = {
         title,
@@ -131,46 +128,30 @@ export const FileDataModal = (props: Props) => {
         main_data_size: String(mainData?.size ?? 0),
         main_data_type: mainDataStatus,
         main_data: mainData,
+        video_encode_status: "not_encoded",
       };
-      if (mainDataStatus === "video") {
-        newData = {
-          ...{
-            video_data_status: JSON.stringify({
-              lsm3u8: 0,
-              shortmp4: 0,
-              allcomplete: 0,
-              completetotal: 0,
-            }),
-          },
-          ...data,
-        };
-      } else {
-        newData = {
-          ...data,
-        };
-      }
       try {
-        if (newData) {
-          await postFileData(
-            newData,
-            user.token,
-            setUploadProgressValue,
-            async () => {
-              await updateFileData();
-              setTitle("");
-              setDescription("");
-              setSelectedCategories([]);
-              setCoverImage(undefined);
-              setCoverImageObjectUrl("");
-              setMainData(undefined);
-              setMainDataObjectUrl("");
-              setMainDataStatus("none");
-              setIsDisabledPostEditButton(true);
-              setUploadProgressValue(0);
-              createNotification("success", "投稿できました");
-            }
-          );
-        }
+        console.log("---投稿前---");
+        await postFileData(
+          data,
+          user.token,
+          setUploadProgressValue,
+          async () => {
+            console.log("---post済み---");
+            await updateFileData();
+            setTitle("");
+            setDescription("");
+            setSelectedCategories([]);
+            setCoverImage(undefined);
+            setCoverImageObjectUrl("");
+            setMainData(undefined);
+            setMainDataObjectUrl("");
+            setMainDataStatus("none");
+            setIsDisabledPostEditButton(true);
+            setUploadProgressValue(0);
+            createNotification("success", "投稿できました");
+          }
+        );
       } catch (error: any) {
         createNotification("danger", error?.message, "投稿に失敗しました");
       }

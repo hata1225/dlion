@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'django_filters',
     'channels',
+    'django_celery_results'
 ]
 
 CHANNEL_LAYERS = {
@@ -59,6 +60,12 @@ CHANNEL_LAYERS = {
         },
     },
 }
+
+CELERY_BROKER_URL = 'redis://redis:6379'
+CELERY_RESULT_BACKEND = 'redis://redis:6379'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
 
 #viewにて、フィルタリングした上でレスポンスするために追加
 REST_FRAMEWORK = {
