@@ -38,7 +38,11 @@ export const FileDataCard = ({
         setBottomAreaDefaultHeight(bottomAreaHeightByRef);
       }
     }
-  }, [bottomAreaRef.current?.clientHeight]);
+  }, [
+    bottomAreaRef.current?.clientHeight,
+    bottomAreaDefaultHeight,
+    isScaleUpBottomArea,
+  ]);
 
   const handleClickButton = () => {
     setIsScaleUpButtonArea((prev) => !prev);

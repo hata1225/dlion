@@ -1,7 +1,11 @@
+<br>
+<br>
+
 # DLion - ファイル管理 SNS
 
 管理したいファイルをアップロードすると、タイムラインに流れる web アプリを作製中。。。
 
+<br>
 <br>
 
 ## 目次
@@ -15,6 +19,7 @@
 - [🛢 データベースのリセット方法](https://github.com/hata1225/dlion/edit/main/README.md#-%E3%83%87%E3%83%BC%E3%82%BF%E3%83%99%E3%83%BC%E3%82%B9%E3%81%AE%E3%83%AA%E3%82%BB%E3%83%83%E3%83%88%E6%96%B9%E6%B3%95)
 - [🍭 その他](https://github.com/hata1225/dlion/edit/main/README.md#-%E3%81%9D%E3%81%AE%E4%BB%96)
 
+<br>
 <br>
 
 ## ⚙️ Requirement
@@ -32,14 +37,17 @@
 >
 > - docker: 20.10.13
 > - docker-compose: 1.92.2
-> - node: 18.15.0
+> - node: 19.8.1
+> - python: 3.11.2
+> - Django: 4.1.7
+> - DRF: 3.14.0
 >
 > ---
 >
 > ### 使用している Docker イメージについて
 >
 > - ubuntu: 22.10
-> - node: 18.15.0-slim
+> - node: 19.8.1-slim
 > - selenium (docker hub から最新の image を引っ張ってる)
 > - redis: redis:latest
 >
@@ -52,6 +60,7 @@
 > - バック(管理画面) : [http://localhost:8000/admin](http://localhost:8000/admin)
 
 <br>
+<br>
 
 ## 👀 画面設計（構想）
 
@@ -62,6 +71,7 @@
 </details>
 
 <br>
+<br>
 
 ## 🌳 ブランチ管理について
 
@@ -71,18 +81,7 @@
 > >
 > > > feature/[機能名]
 
-**現在は、develop/v1.0.0 に直接コミットしています。**
-
-- develop/[バージョン]
-
-  例: develop/v1.0.0
-
-- feature/[機能名]
-
-  スネークケースで記述
-
-  例: feature/maindata_view_card
-
+<br>
 <br>
 
 ## ⤴️ 立ち上げ方
@@ -190,6 +189,7 @@
 </details>
 
 <br>
+<br>
 
 ## 🛢 データベースのリセット方法
 
@@ -217,6 +217,7 @@
 
 </details>
 
+<br>
 <br>
 
 ## 🍭 その他
@@ -249,3 +250,42 @@
 - UI 実装時によく使っているライブラリ
 
   - [material ui v4](https://v4.mui.com/)
+
+<br>
+<br>
+
+## 💻 自宅サーバー構築tips
+
+### ハードについて
+- RaspberryPi4B 4GB
+- SSD 120GB
+- HDD 4TB
+
+### 行ったこと
+- **SSD, HDDフォーマット**
+  - 参考: [ラズパイに外付けHDD(SSD)を接続する方法を徹底解説 – フォーマット、パーティション作成、マウント方法など](https://jorublog.site/raspi-hdd-connect/)
+- **SSDにOSを焼き付けた**
+  - 参考: [Raspberry Pi ImagerでSSDをフォーマット](http://www.momobro.com/rasbro/tips-rp-raspberry-pi-image-format/)
+- **OSの更新**
+  - 参考: [raspberrypiのOSを更新する方法](https://qiita.com/akiraichi5430/items/6b9855f59fb3a3f9de35)
+- **port番号の固定**
+  - 参考: [初心者向！Raspberry Pi 最低限のセキュリティ設定](https://qiita.com/mochifuture/items/00ca8cdf74c170e3e6c6)
+- **SSH接続**
+  - 参考: [Raspberry Pi3のLAN外からのSSH接続設定方法](https://qiita.com/3no3_tw/items/4b5975a9f3087edf4e20)
+- **sshのconfig設定で、ssh接続を楽に行う**
+  - 参考: [~/.ssh/configを使ってSSH接続を楽にする](https://tech-blog.rakus.co.jp/entry/20210512/ssh)
+- **dockerコマンド**
+  - 参考: [Raspberry PiにDockerをインストール](https://qiita.com/homelan/items/0bb265cf92310d29cb82)
+- **docker-composeコマンド**
+  - 参考: [Raspberry Pi 4 に Docker と Docker Compose をインストールする](https://dev.classmethod.jp/articles/install-docker-for-raspberry-pi-4/)
+- **oh my zsh(シェルのカスタマイズ)**
+  - 参考: [自分の Ubuntu の zsh を oh-my-zsh に設定する。](https://toxweblog.toxbe.com/2017/10/01/ubuntu-oh-my-zsh/)
+  - 参考: [Themes(oh my zshのいろんなテーマがある)](https://github.com/ohmyzsh/ohmyzsh/wiki/Themes)
+- **ラズパイ to github の接続**
+  - 参考: [【超簡単】git github 接続方法](https://qiita.com/Sub_Tanabe/items/4e03dcf42e3b0d19bb66)
+- **node install**
+  - 参考: [Ubuntu 20.04にNode.jsをインストールする方法](https://www.digitalocean.com/community/tutorials/how-to-install-node-js-on-ubuntu-20-04-ja)
+- **node管理"n"install**
+  - 参考: [Ubuntu で Node の最新版/推奨版を使う (n コマンド編)](https://qiita.com/cointoss1973/items/c000c4f84ae4b0c166b5)
+- **HDDにパーティション作成、ラズパイへのマウント**
+  - 参考: [ラズパイに外付けHDD(SSD)を接続する方法を徹底解説 – フォーマット、パーティション作成、マウント方法など](https://jorublog.site/raspi-hdd-connect)

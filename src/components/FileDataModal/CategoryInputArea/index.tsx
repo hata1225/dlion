@@ -51,7 +51,7 @@ export const CategoryInputArea = ({
         setSelectedCategories(newSelectedCategories);
       }
     }
-  }, [selectedCategories]);
+  }, [selectedCategories, setSelectedCategories]);
 
   const handleClickAddCategory = (e: any) => {
     let value = e.target?.value;

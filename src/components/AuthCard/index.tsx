@@ -7,18 +7,18 @@ import { baseStyle } from "theme";
 import { ImageArea } from "./ImageArea";
 import userIconImageDefault from "userIconImageDefault.webp";
 
-interface Props {
-  statusProp?: "signin" | "signup" | "edit";
-}
+type StatusType = "signin" | "signup" | "edit";
 
-const defaultStatus = "signin";
+interface Props {
+  statusProp?: StatusType;
+}
 
 /**
  * statusPropのデフォルト値は、"signin"
  * @param param0
  * @returns
  */
-export const AuthCard = ({ statusProp = defaultStatus }: Props) => {
+export const AuthCard = ({ statusProp = "signin" }: Props) => {
   const classes = useStyles();
   const [email, setEmail] = React.useState("");
   const [name, setName] = React.useState("");
@@ -31,9 +31,115 @@ export const AuthCard = ({ statusProp = defaultStatus }: Props) => {
   const [userIconImageUrl, setUserIconImageUrl] = React.useState<string>();
   const [password, setPassword] = React.useState("");
   const [reinputPassword, setReinputPassword] = React.useState("");
-  const [status, setStatus] = React.useState(defaultStatus);
+  const [status, setStatus] = React.useState(statusProp);
   const [authCardContent, setAuthCardContent] = React.useState<any>();
   const { signup, signin, user, editUser } = React.useContext(UserContext);
+
+  const handleClickSignup = React.useMemo(
+    () => async () => {
+      console.log("handleClickSignup pass: ", password, " ", reinputPassword);
+      if (password !== reinputPassword) {
+        createNotification("danger", "パスワードが一致しません");
+        return;
+      }
+      if (password.length < 8) {
+        createNotification("danger", "パスワードは8文字以上入力してください");
+        return;
+      }
+      await signup(email, name, password);
+      window.location.href = "/";
+    },
+    [email, name, password, reinputPassword, signup]
+  );
+
+  const handleClickSignin = React.useMemo(
+    () => async () => {
+      const userInfo = await signin(email, password);
+      if (userInfo) {
+        window.location.href = "/";
+      }
+    },
+    [email, password, signin]
+  );
+
+  const handleClickEdit = React.useMemo(
+    () => async () => {
+      try {
+        if (editUser) {
+          const userInfo = await editUser(
+            email,
+            name,
+            description,
+            isPrivate,
+            userIconImage,
+            userBackgroundImage
+          );
+          if (userInfo) {
+            createNotification("success", "アカウントを編集しました");
+          }
+        }
+      } catch (error) {
+        console.log("@handleClickEdit: ", error);
+        createNotification("danger", "アカウントの編集に失敗しました");
+      }
+    },
+    [
+      description,
+      editUser,
+      email,
+      isPrivate,
+      name,
+      userBackgroundImage,
+      userIconImage,
+    ]
+  );
+
+  const handleClickChangeStatus = (status: StatusType) => {
+    setStatus(status);
+  };
+
+  const authCardContents = React.useMemo(() => {
+    return [
+      {
+        status: "signin",
+        title: "ログイン",
+        emailForm: true,
+        passwordForm: true,
+        runButtonText: "ログインをする",
+        googleAuthButton: true,
+        runButtonFunc: async () => await handleClickSignin(),
+        statusChangeButton: true,
+        statusChangeButtonText: "アカウントを作成する→",
+        statusChangeFunc: () => handleClickChangeStatus("signup"),
+      },
+      {
+        status: "signup",
+        title: "アカウントを作成",
+        emailForm: true,
+        nameForm: true,
+        passwordForm: true,
+        reinputPasswordForm: true,
+        runButtonText: "アカウントを作成",
+        runButtonFunc: async () => await handleClickSignup(),
+        statusChangeButton: true,
+        statusChangeButtonText: "作成済みのアカウントを使う→",
+        statusChangeFunc: () => handleClickChangeStatus("signin"),
+      },
+      {
+        status: "edit",
+        title: "アカウントを編集",
+        imageArea: true,
+        descriptionForm: true,
+        emailForm: true,
+        nameForm: true,
+        isPrivateSwitch: true,
+        runButtonText: "更新する",
+        runButtonFunc: async () => await handleClickEdit(),
+        statusChangeButtonText: "",
+        statusChangeFunc: () => handleClickChangeStatus("edit"),
+      },
+    ];
+  }, [handleClickEdit, handleClickSignin, handleClickSignup]);
 
   React.useEffect(() => {
     authCardContents.forEach((content, i) => {
@@ -42,6 +148,7 @@ export const AuthCard = ({ statusProp = defaultStatus }: Props) => {
         setAuthCardContent(newAuthCardContent);
       }
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     status,
     email,
@@ -54,10 +161,6 @@ export const AuthCard = ({ statusProp = defaultStatus }: Props) => {
     userIconImage,
   ]);
 
-  React.useEffect(() => {
-    setStatus(statusProp);
-  }, [statusProp]);
-
   // statusがeditの場合、値をセットする
   React.useEffect(() => {
     if (status === "edit" && user?.email && user?.name) {
@@ -69,93 +172,6 @@ export const AuthCard = ({ statusProp = defaultStatus }: Props) => {
       setUserIconImageUrl(user?.icon_image ?? userIconImageDefault);
     }
   }, [status, user]);
-
-  const authCardContents = [
-    {
-      status: "signin",
-      title: "ログイン",
-      emailForm: true,
-      passwordForm: true,
-      runButtonText: "ログインをする",
-      googleAuthButton: true,
-      runButtonFunc: async () => await handleClickSignin(),
-      statusChangeButton: true,
-      statusChangeButtonText: "アカウントを作成する→",
-      statusChangeFunc: () => handleClickChangeStatus("signup"),
-    },
-    {
-      status: "signup",
-      title: "アカウントを作成",
-      emailForm: true,
-      nameForm: true,
-      passwordForm: true,
-      reinputPasswordForm: true,
-      runButtonText: "アカウントを作成",
-      runButtonFunc: async () => await handleClickSignup(),
-      statusChangeButton: true,
-      statusChangeButtonText: "作成済みのアカウントを使う→",
-      statusChangeFunc: () => handleClickChangeStatus("signin"),
-    },
-    {
-      status: "edit",
-      title: "アカウントを編集",
-      imageArea: true,
-      descriptionForm: true,
-      emailForm: true,
-      nameForm: true,
-      isPrivateSwitch: true,
-      runButtonText: "更新する",
-      runButtonFunc: async () => await handleClickEdit(),
-      statusChangeButtonText: "",
-      statusChangeFunc: () => handleClickChangeStatus(""),
-    },
-  ];
-
-  const handleClickSignup = async () => {
-    console.log("handleClickSignup pass: ", password, " ", reinputPassword);
-    if (password !== reinputPassword) {
-      createNotification("danger", "パスワードが一致しません");
-      return;
-    }
-    if (password.length < 8) {
-      createNotification("danger", "パスワードは8文字以上入力してください");
-      return;
-    }
-    await signup(email, name, password);
-    window.location.href = "/";
-  };
-
-  const handleClickSignin = async () => {
-    const userInfo = await signin(email, password);
-    if (userInfo) {
-      window.location.href = "/";
-    }
-  };
-
-  const handleClickEdit = async () => {
-    try {
-      if (editUser) {
-        const userInfo = await editUser(
-          email,
-          name,
-          description,
-          isPrivate,
-          userIconImage,
-          userBackgroundImage
-        );
-        if (userInfo) {
-          createNotification("success", "アカウントを編集しました");
-        }
-      }
-    } catch (error) {
-      console.log("@handleClickEdit: ", error);
-      createNotification("danger", "アカウントの編集に失敗しました");
-    }
-  };
-
-  const handleClickChangeStatus = (status: string) => {
-    setStatus(status);
-  };
 
   return (
     <Card className={classes.card}>
