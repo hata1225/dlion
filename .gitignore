@@ -27,3 +27,5 @@ yarn-error.log*
 /django_api/db.sqlite3
 /django_api/*/migrations
 
+*.pyc
+
