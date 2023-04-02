@@ -1,9 +1,33 @@
-from io import StringIO
-from unicodedata import category
+from email.policy import default
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.conf import settings
+from django.db.models.signals import post_save, post_delete
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+# from core.tasks import video_encode_task
+import os
+import subprocess
+import cv2
+import math
 import json
+import uuid
+
+def saveCoverDataPath(instance, filename):
+    ext = filename.split('.')[-1]
+    return f'sub/{instance.user.id}/{instance.id}/{instance.id}.{ext}'
+
+def saveMainDataPath(instance, filename):
+    ext = filename.split('.')[-1]
+    return f'main/{instance.user.id}/{instance.id}/{instance.id}.{ext}'
+
+def saveIconImagePath(instance, filename):
+    ext = filename.split('.')[-1]
+    return f'icon/{instance.id}/{instance.id}/{instance.id}.{ext}'
+
+def saveBackgroundImagePath(instance, filename):
+    ext = filename.split('.')[-1]
+    return f'background/{instance.id}/{instance.id}/{instance.id}.{ext}'
 
 class UserManager(BaseUserManager):
 
@@ -28,28 +52,30 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email = models.EmailField(max_length=255, null=False, unique=True)
-    name = models.CharField(max_length=255, null=False)
-    favorites = models.TextField(default=json.dumps([]))
+    name = models.CharField(max_length=50, null=False)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
-
+    is_private = models.BooleanField(default=False)
+    icon_image = models.FileField(upload_to=saveIconImagePath, null=True)
+    background_image = models.FileField(upload_to=saveBackgroundImagePath, null=True)
+    description = models.CharField(max_length=255, null=True)
     objects = UserManager()
-
     USERNAME_FIELD = 'email'
 
-def saveCoverDataPath(instance, filename):
-    ext = filename.split('.')[-1]
-    return f'sub/{instance.user.name}/{instance.id}/{instance.id}.{ext}'
 
-def saveMainDataPath(instance, filename):
-    ext = filename.split('.')[-1]
-    return f'main/{instance.user.name}/{instance.id}/{instance.id}.{ext}'
-
-
-class VideoDataStatus(models.Model):
-    video_id = models.IntegerField(null=False)
-    video_data_status = models.TextField(default=json.dumps({'hm3u8': 0, 'lowmp4': 0, 'lm3u8': 0, 'playlist': 0, 'allcomplete': 0, 'completetotal': 0 }))
+class FriendShip(models.Model):
+    """
+    @created_user: apiを叩いたユーザー(ログインユーザー)
+    @following_user: apiのクエリパラメーター(user_id)
+    """
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    created_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='following_user_friendships')
+    following_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_user_friendships')
+    created_at = models.DateTimeField(auto_now_add=True)
+    class Meta:
+        unique_together = ('created_user', 'following_user')
 
 
 class Categories(models.Model):
@@ -71,54 +97,59 @@ class FileData(models.Model):
     )
 
     #共通
-    title = models.CharField(max_length=255, null=False)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    title = models.CharField(max_length=70, null=False)
     description = models.TextField(null=True)
     created_at = models.DateField(auto_now_add=True)
     categories = models.TextField(null=False, default=json.dumps([]))
     cover_image = models.FileField(upload_to=saveCoverDataPath, null=True)
     main_data_size = models.CharField(max_length=1000, default=0)
     main_data_type = models.TextField(default="none") # none | video | image | pdf | audio
-
-    #動画 video 単数
-    video_data = models.FileField(upload_to=saveMainDataPath, null=True)
-        # lowmp4=>低画質mp4 playlist=>低画質高画質混合m3u8 allcomplete=>エンコード完了 completetotal(0~4)=>エンコード状況
-    video_data_status = models.TextField(default=json.dumps({'hm3u8': 0, 'lowmp4': 0, 'lm3u8': 0, 'playlist': 0, 'allcomplete': 0, 'completetotal': 0 }))
-    short_video_path = models.TextField(default="")
-
-    #画像 images 複数
-
-    #pdf pdf 単数
+    main_data = models.FileField(upload_to=saveMainDataPath, null=True)
+    video_encode_status = models.CharField(max_length=50, null=False, default="not_encoded") # not_encoded | m3u8 | short | encoded
+    short_video_path = models.FileField(null=True)
+    short_video_play_time = models.IntegerField(default=0)
 
     def __str__(self):
         return self.title
 
     def save(self, *args, **kwargs):
-        if self.id is None:
-            # アップロードされたファイルを変数に代入しておく
-            cover_image = self.cover_image
-            video_data = self.video_data
-
-            # 一旦fileフィールドがNullの状態で保存(→インスタンスIDが割り当てられる)
-            self.cover_image = None
-            self.video_data = None
-            super().save(*args, **kwargs)
-
-            # fileフィールドに値をセット
-            self.cover_image = cover_image
-            self.video_data = video_data
-            if "force_insert" in kwargs:
-                kwargs.pop("force_insert")
-
-        # この段階ではインスタンスIDが存在する
+        from core.tasks import video_encode_task
+        is_new = self._state.adding # 追加されたばかりのオブジェクトかどうかを確認するフラグ
         super().save(*args, **kwargs)
+        if is_new:
+            video_encode_task.delay(self.id)
 
-        categories_objects = Categories.objects.all()
-        file_data_categories = json.loads(self.categories)
-        all_categories = []
+    def __str__(self):
+        return self.title
 
-        for category_object in categories_objects:
-            all_categories.append(category_object.category)
 
-        for file_data_category in file_data_categories:
-            if not file_data_category in all_categories:
-                Categories.objects.create(category=file_data_category, user=self.user)
+# websocket用、更新があった際に発火
+def send_update_follow(sender, instance, **kwargs):
+    channel_layer = get_channel_layer()
+
+    async_to_sync(channel_layer.group_send)(
+        str(instance.created_user_id),
+        {
+            'type': 'follow_update',
+        },
+    )
+    async_to_sync(channel_layer.group_send)(
+        str(instance.following_user_id),
+        {
+            'type': 'follow_update',
+        },
+    )
+def send_update_file_data(sender, instance, **kwargs):
+    channel_layer = get_channel_layer()
+    async_to_sync(channel_layer.group_send)(
+        str(instance.id),
+        {
+            'type': 'file_data_update',
+        },
+    )
+
+post_save.connect(send_update_follow, sender=FriendShip)
+post_delete.connect(send_update_follow, sender=FriendShip)
+post_save.connect(send_update_file_data, sender=FileData)
+post_delete.connect(send_update_file_data, sender=FileData)

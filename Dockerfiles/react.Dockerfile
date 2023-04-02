@@ -1,2 +1,3 @@
-FROM node:18.5.0-alpine
+FROM node:19.8.1-slim
 WORKDIR /src
+COPY ./.env /

@@ -1,0 +1,25 @@
+.react-pdf__Page__canvas {
+  max-width: 100% !important;
+  max-height: 100% !important;
+  width: auto !important;
+  height: auto !important;
+}
+
+.react-pdf__Document {
+  height: 100%;
+}
+
+.react-pdf__Page {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.react-pdf__Page__annotations {
+  max-width: 0;
+}
+
+.react-pdf__Page__textContent {
+  display: none;
+}

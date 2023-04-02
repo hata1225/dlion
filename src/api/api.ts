@@ -1,7 +1,8 @@
 import axios, { AxiosRequestConfig } from "axios";
+import { FileData, FileDataByEdit } from "types/fileData";
 
 const ENVS = {
-  develop: "localhost",
+  develop: `${process.env.REACT_APP_IP_ADDRESS}`,
 };
 
 export const ENV = `http://${ENVS.develop}`; // 環境ごとに変更
@@ -16,17 +17,19 @@ const createFormData = (data: any) => {
   let formData = new FormData();
   const objectKeys = Object.keys(data);
   objectKeys.forEach((objectKey) => {
-    formData.append(`${objectKey}`, data[objectKey]);
+    if (data[objectKey] === false || data[objectKey]) {
+      formData.append(`${objectKey}`, data[objectKey]);
+    }
   });
   return formData;
 };
 
-export const post = async (
+export const postAxios = async (
   path: string,
   data: object,
   token?: string,
   setUploadProgressValue?: React.Dispatch<React.SetStateAction<number>> | null,
-  endOfUploadFunc?: undefined
+  endOfUploadFunc?: any
 ) => {
   axios.defaults.withCredentials = false;
   let postProps: [
@@ -37,19 +40,19 @@ export const post = async (
   const formData = createFormData(data);
   if (token) {
     postProps = [
-      `/api${path}`,
+      `${path}`,
       formData,
       {
         headers: {
           Authorization: `Token ${token}`,
         },
         onUploadProgress: async (ProgressEvent: {
-          total: number;
-          loaded: number;
+          total?: number;
+          loaded?: number;
         }) => {
-          if (setUploadProgressValue) {
-            let total = ProgressEvent.total;
-            let loaded = ProgressEvent.loaded;
+          let total = ProgressEvent?.total;
+          let loaded = ProgressEvent?.loaded;
+          if (setUploadProgressValue && total && loaded) {
             let percentCompleted = (loaded / total) * 100;
             setUploadProgressValue(percentCompleted);
             if (endOfUploadFunc && percentCompleted === 100) {
@@ -60,7 +63,7 @@ export const post = async (
       },
     ];
   } else {
-    postProps = [`api${path}`, formData, undefined];
+    postProps = [`${path}`, formData, undefined];
   }
   try {
     console.log("postProps: ", postProps);
@@ -71,13 +74,13 @@ export const post = async (
   }
 };
 
-export const patch = async (path: string, data: object, token: string) => {
+export const patchAxios = async (path: string, data: object, token: string) => {
   axios.defaults.withCredentials = false;
   let patchProps: [string, any, AxiosRequestConfig<any> | undefined];
   let formData = createFormData(data);
   if (token) {
     patchProps = [
-      `/api${path}`,
+      `${path}`,
       formData,
       {
         headers: {
@@ -86,7 +89,7 @@ export const patch = async (path: string, data: object, token: string) => {
       },
     ];
   } else {
-    patchProps = [`/api${path}`, formData, undefined];
+    patchProps = [`${path}`, formData, undefined];
   }
 
   try {
@@ -98,12 +101,13 @@ export const patch = async (path: string, data: object, token: string) => {
   }
 };
 
-export const get = async (path: string, token: string) => {
+export const getAxios = async (path: string, token: string) => {
   axios.defaults.withCredentials = false;
   let getProps: [string, AxiosRequestConfig<any> | undefined];
+  const isPathMatchByHttp = path.match(/http:/);
   if (token) {
     getProps = [
-      `/api${path}`,
+      `${path}`,
       {
         headers: {
           Authorization: `Token ${token}`,
@@ -111,7 +115,10 @@ export const get = async (path: string, token: string) => {
       },
     ];
   } else {
-    getProps = [`/api${path}`, undefined];
+    getProps = [`${path}`, undefined];
+  }
+  if (isPathMatchByHttp) {
+    getProps[0] = path;
   }
   try {
     return await axios.get(...getProps);
@@ -121,11 +128,58 @@ export const get = async (path: string, token: string) => {
   }
 };
 
+export const getAxiosByMainDataBlob = async (path: string, token: string) => {
+  axios.defaults.withCredentials = false;
+  let getProps: [string, AxiosRequestConfig<any> | undefined];
+  if (token) {
+    getProps = [
+      `${path}`,
+      {
+        responseType: "blob",
+        headers: {
+          Authorization: `Token ${token}`,
+        },
+      },
+    ];
+  } else {
+    getProps = [`${path}`, { responseType: "blob" }];
+  }
+  try {
+    return await axios.get(...getProps);
+  } catch (error) {
+    console.log("[GET] Error: ", error);
+    throw error;
+  }
+};
+
+export const deleteAxios = async (path: string, token: string) => {
+  axios.defaults.withCredentials = false;
+  let deleteProps: [string, AxiosRequestConfig<any> | undefined];
+  if (token) {
+    deleteProps = [
+      `${path}`,
+      {
+        headers: {
+          Authorization: `Token ${token}`,
+        },
+      },
+    ];
+  } else {
+    deleteProps = [`${path}`, undefined];
+  }
+  try {
+    return await axios.delete(...deleteProps);
+  } catch (error) {
+    console.log("[DELETE] Error: ", error);
+    throw error;
+  }
+};
+
 export const getToken = async (email: string, password: string) => {
-  const path = "/user/token/";
+  const path = "/api/user/token/";
   const data = { email, password };
   try {
-    const result = await post(path, data);
+    const result = await postAxios(path, data);
     return result?.data?.token;
   } catch (error) {
     console.log("@getToken Error: ", error);
@@ -133,17 +187,18 @@ export const getToken = async (email: string, password: string) => {
   }
 };
 
-export const getUserInfo = async (token: string) => {
-  const path = "/user/update/";
+export const getUserInfo = async (token: string, id?: string) => {
+  let path = "";
+  if (id) {
+    path = `/api/user/get/${id}/`;
+  } else {
+    path = "/api/user/update/";
+  }
   try {
-    const result = await get(path, token);
+    const result = await getAxios(path, token);
     return result?.data;
   } catch (error) {
     console.log("@getUserInfo: ", error);
-    if (window.location.pathname !== "/auth") {
-      localStorage.clear();
-      window.location.href = "/auth";
-    }
     throw error;
   }
 };
@@ -153,14 +208,14 @@ export const createUser = async (
   password: string,
   name: string
 ) => {
-  const path = "/user/create/";
+  const path = "/api/user/create/";
   const data = {
     email,
     password,
     name,
   };
   try {
-    await post(path, data);
+    await postAxios(path, data);
   } catch (error) {
     console.log("@createUser Error: ", error);
     throw error;
@@ -170,13 +225,24 @@ export const createUser = async (
 export const updateUser = async (
   email: string,
   name: string,
+  description: string | undefined,
+  isPrivate: boolean,
+  iconImage: File | undefined,
+  backgroundImage: File | undefined,
   token: string
 ) => {
-  const path = "/user/update/";
-  const data = { email, name };
+  const path = "/api/user/update/";
+  const data = {
+    email,
+    name,
+    description: description ?? "",
+    is_private: isPrivate,
+    icon_image: iconImage ?? null,
+    background_image: backgroundImage ?? null,
+  };
   try {
-    const result = await patch(path, data, token);
-    return result;
+    const result = await patchAxios(path, data, token);
+    return result?.data;
   } catch (error) {
     console.log("@updateUser: ", error);
     throw error;
@@ -184,9 +250,9 @@ export const updateUser = async (
 };
 
 export const getCategories = async (token: string) => {
-  const path = "/categories/";
+  const path = "/api/categories/";
   try {
-    const result = await get(path, token);
+    const result = await getAxios(path, token);
     return result?.data;
   } catch (error) {
     console.log("@getCategories: ", error);
@@ -194,26 +260,96 @@ export const getCategories = async (token: string) => {
   }
 };
 
-export const getFileData = async (token: string) => {
-  const path = "/file_data/";
+export const getAllFileData = async (token: string) => {
+  const path = "/api/file_data/";
   try {
-    const result = await get(path, token);
+    const result = await getAxios(path, token);
+    const fileData: FileData[] = result.data.results;
+    fileData.forEach((item: any) => {
+      item.categories = JSON.parse(item.categories);
+    });
     return result?.data?.results;
+  } catch (error) {
+    console.log("@getAllFileData: ", error);
+    throw error;
+  }
+};
+
+export const getFileDataByUserId = async (token: string, user_id: string) => {
+  let path = "/api/file_data/";
+  if (user_id) {
+    path = `/api/file_data/?user_id=${user_id}`;
+  }
+  try {
+    const result = await getAxios(path, token);
+    const fileData: FileData[] = result.data.results;
+    fileData.forEach((item: any) => {
+      item.categories = JSON.parse(item.categories);
+    });
+    return result?.data?.results;
+  } catch (error) {
+    console.log("@getMineFileData: ", error);
+    throw error;
+  }
+};
+
+export const getFileData = async (token: string, id: string) => {
+  const path = `/api/file_data/${id}/`;
+  try {
+    const result = await getAxios(path, token);
+    const fileData: FileData = result.data;
+    fileData.categories = JSON.parse(result.data.categories);
+    return fileData;
   } catch (error) {
     console.log("@getFileData: ", error);
     throw error;
   }
 };
 
+export const patchFileData = async (data: FileDataByEdit, token: string) => {
+  const path = `/api/file_data/${data.id}/`;
+  const newData = {
+    title: data.title,
+    description: data.description,
+    categories: JSON.stringify(data.categories),
+  };
+  try {
+    const result = await patchAxios(path, newData, token);
+    return result;
+  } catch (error) {
+    console.log("@patchFileData: ", error);
+    throw error;
+  }
+};
+
+export const deleteFileData = async (token: string, id: string) => {
+  const path = `/api/file_data/${id}/`;
+  try {
+    const result = await deleteAxios(path, token);
+    return result;
+  } catch (error) {
+    console.log("@deleteFileData: ", error);
+    throw error;
+  }
+};
+
+/**
+ * fileDataをpostする際に使うapi
+ * @param data
+ * @param token
+ * @param setUploadProgressValue
+ * @param endOfUploadFunc
+ * @returns
+ */
 export const postFileData = async (
   data: object,
   token: string,
-  setUploadProgressValue?: React.Dispatch<React.SetStateAction<number>> | null,
+  setUploadProgressValue?: React.Dispatch<React.SetStateAction<number>>,
   endOfUploadFunc?: any
 ) => {
-  const path = "/file_data/";
+  const path = "/api/file_data/";
   try {
-    const result = await post(
+    const result = await postAxios(
       path,
       data,
       token,
@@ -223,6 +359,120 @@ export const postFileData = async (
     return result;
   } catch (error) {
     console.log("@postFileData: ", error);
+    throw error;
+  }
+};
+
+export const getMainDataByBlob = async (fileData: FileData, token: string) => {
+  const path = fileData?.main_data ?? "";
+  try {
+    const result = await getAxiosByMainDataBlob(path, token);
+    return result.data;
+  } catch (error) {
+    console.log("@getMainData: ", error);
+    throw error;
+  }
+};
+
+/**
+ * フォロー機能
+ * @param token
+ * @param userId
+ * @returns
+ */
+export const followUser = async (token: string, userId: string) => {
+  const path = `/api/user/follow/?user_id=${userId}`;
+  const data = {
+    user_id: userId,
+  };
+  try {
+    const result = await postAxios(path, data, token);
+    return result.data;
+  } catch (error) {
+    console.log(`@followUser: `, error);
+    throw error;
+  }
+};
+
+/**
+ * フォローを外す機能
+ * @param token
+ * @param userId
+ * @returns
+ */
+export const unfollowUser = async (token: string, userId: string) => {
+  const path = `/api/user/unfollow/?user_id=${userId}`;
+  try {
+    const result = await deleteAxios(path, token);
+    return result.data;
+  } catch (error) {
+    console.log(`@unfollowUser: `, error);
+    throw error;
+  }
+};
+
+/**
+ * currentUserがフォローしているユーザー一覧
+ * @param token
+ */
+export const getFollowingListByCurrentUser = async (token: string) => {
+  const path = `/api/user/followinglist/`;
+  try {
+    const result = await getAxios(path, token);
+    return result.data;
+  } catch (error) {
+    console.log("@getFollowingListByCurrentUser: ", error);
+    throw error;
+  }
+};
+
+/**
+ * currentUserをフォローしているユーザー一覧
+ * @param token
+ */
+export const getFollowerListByCurrentUser = async (token: string) => {
+  const path = `/api/user/followerlist/`;
+  try {
+    const result = await getAxios(path, token);
+    return result.data;
+  } catch (error) {
+    console.log("@getFollowerListByCurrentUser: ", error);
+    throw error;
+  }
+};
+
+/**
+ * currentUserがフォローしているユーザー一覧
+ * @param token
+ */
+export const getFollowingListByUserId = async (
+  token: string,
+  userId: string
+) => {
+  const path = `/api/user/followinglist/?user_id=${userId}`;
+  try {
+    const result = await getAxios(path, token);
+    return result.data;
+  } catch (error) {
+    console.log("@getFollowingListByUserId: ", error);
+    throw error;
+  }
+};
+
+/**
+ * currentUserをフォローしているユーザー一覧
+ * @param token
+ */
+export const getFollowerListByUserId = async (
+  token: string,
+  userId: string
+) => {
+  const path = `/api/user/followerlist/?user_id=${userId}`;
+  try {
+    const result = await getAxios(path, token);
+    return result.data;
+  } catch (error) {
+    console.log("@getFollowerListByUserId: ", error);
     throw error;
   }
 };

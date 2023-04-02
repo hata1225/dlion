@@ -3,23 +3,36 @@ import { Header } from "components/Header";
 import { SubArea } from "components/SubArea";
 import React from "react";
 import { baseStyle } from "theme";
-import { UserContext } from "../../contexts/UserContext";
 
 interface Props {
   children?: React.ReactNode;
-  isAuthPage?: boolean;
 }
 
 export const Layout = (props: Props) => {
-  const { children, isAuthPage } = props;
+  const { children } = props;
+  const [isHiddenSubArea, setIsHiddenSubArea] = React.useState(false);
   const classes = useStyles();
+
+  React.useEffect(() => {
+    const pathname = window.location.pathname;
+    // if (pathname === "/auth" || pathname.match(/filedata/)) {
+    if (pathname === "/auth") {
+      setIsHiddenSubArea(true);
+    }
+  }, []);
 
   return (
     <>
       <Header />
       <main className={classes.main}>
-        {window.location.pathname === "/auth" ? <></> : <SubArea />}
-        <div className={classes.mainArea}>{children}</div>
+        {isHiddenSubArea ? (
+          <div className={classes.mainArea}>{children}</div>
+        ) : (
+          <>
+            <SubArea />
+            <div className={classes.mainArea}>{children}</div>
+          </>
+        )}
       </main>
     </>
   );
@@ -29,8 +42,10 @@ const useStyles = makeStyles({
   main: {
     height: `calc(100vh -  ${baseStyle.header.height})`,
     display: "flex",
+    gap: "15px",
     justifyContent: "center",
     alignItems: "center",
+    padding: `0 ${baseStyle.pagePaddingHorizontal.main}`,
   },
   subArea: {
     height: "100%",
@@ -38,6 +53,12 @@ const useStyles = makeStyles({
   },
   mainArea: {
     height: "100%",
-    width: `calc(${baseStyle.maxWidthLayout.pc} - ${baseStyle.subArea.width})`,
+    width: `calc(${baseStyle.maxWidthLayout.pc}px - ${baseStyle.subArea.width})`,
+    overflow: "scroll",
+    msOverflowStyle: "none",
+    scrollbarWidth: "none",
+    "&::-webkit-scrollbar": {
+      display: "none",
+    },
   },
 });

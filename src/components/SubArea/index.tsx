@@ -1,6 +1,9 @@
 import { makeStyles } from "@material-ui/core";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
+import PersonIcon from "@material-ui/icons/Person";
+import MailOutlineIcon from "@material-ui/icons/MailOutline";
+import HomeIcon from "@material-ui/icons/Home";
 import { ButtonWithIcon } from "components/ButtonWithIcon";
 import { fontSize, baseStyle, shadow } from "theme";
 import React from "react";
@@ -16,13 +19,34 @@ type SubAreaContents = {
 export const SubArea = () => {
   const classes = useStyles();
   const { handleOpenPostModal } = React.useContext(PostModalContext);
-  const { signout } = React.useContext(UserContext);
+  const { signout, user } = React.useContext(UserContext);
+
+  const handleClickHomeIcon = () => {
+    window.location.href = "/";
+  };
 
   const handleClickSignout = () => {
     signout();
   };
 
+  const handleClickUserEditButton = () => {
+    window.location.href = "/edituser";
+  };
+
+  const handleClickUserProfileButton = () => {
+    window.location.href = `/profile/${user?.id}`;
+  };
+
+  const handleClickChatIcon = () => {
+    window.location.href = "/chat";
+  };
+
   const subAreaContents: SubAreaContents = [
+    {
+      func: handleClickHomeIcon,
+      description: "ホーム",
+      icon: <HomeIcon style={{ fontSize: fontSize.medium.medium }} />,
+    },
     {
       func: handleClickSignout,
       description: "ログアウト",
@@ -30,8 +54,23 @@ export const SubArea = () => {
     },
     {
       func: handleOpenPostModal,
-      description: "投稿する",
+      description: "データ投稿",
       icon: <CloudUploadIcon style={{ fontSize: fontSize.medium.medium }} />,
+    },
+    {
+      func: handleClickUserProfileButton,
+      description: "プロフィール",
+      icon: <PersonIcon style={{ fontSize: fontSize.medium.medium }} />,
+    },
+    {
+      func: handleClickUserEditButton,
+      description: "アカウント設定",
+      icon: <PersonIcon style={{ fontSize: fontSize.medium.medium }} />,
+    },
+    {
+      func: handleClickChatIcon,
+      description: "チャット",
+      icon: <MailOutlineIcon style={{ fontSize: fontSize.medium.medium }} />,
     },
   ];
 

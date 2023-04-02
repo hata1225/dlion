@@ -1,15 +1,15 @@
 from rest_framework import viewsets, pagination, response
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
+from django.db.models import Q
 
-from core.models import FileData
-from core.models import Categories
+from core.models import FileData, Categories
 
 from file_data import serializers
-
+import shutil
 
 class FileDataPagination(pagination.PageNumberPagination):
-    page_size = 10
+    page_size = 20
 
     def get_paginated_response(self, data):
         return response.Response({
@@ -31,11 +31,26 @@ class FileDataViewSet(viewsets.ModelViewSet):
     queryset = FileData.objects.order_by('-created_at')
     pagination_class = FileDataPagination
 
+    def destroy(self, request, *args, **kwargs):
+        id = self.request.path.split("/")[3]
+        user_id = self.request.user.id
+        mainDataPath = f'media/main/{user_id}/{id}'
+        subDataPath = f'media/sub/{user_id}/{id}'
+        try:
+            shutil.rmtree(mainDataPath)
+            shutil.rmtree(subDataPath)
+        except:
+            print("delete error")
+        return super().destroy(request, *args, **kwargs)
+
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
     def get_queryset(self):
-        return FileData.objects.filter(user=self.request.user)
+        user_id = self.request.GET.get("user_id")
+        if user_id:
+            return FileData.objects.filter(user__id=user_id)
+        return FileData.objects.filter(Q(user__is_private=False)|Q(user=self.request.user))
 
 class CategoriesViewSet(viewsets.ModelViewSet):
     authentication_classes = (TokenAuthentication,)
@@ -48,12 +63,3 @@ class CategoriesViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Categories.objects.filter(user=self.request.user)
-
-class VideoDataStatusViewSet(viewsets.ModelViewSet):
-    authentication_classes = (TokenAuthentication,)
-    permission_classes = (IsAuthenticated,)
-    serializer_class = serializers.VideoDataStatusSerializer
-    queryset = Categories.objects.order_by('-created_at')
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
