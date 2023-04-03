@@ -4,7 +4,6 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from core import models
 from asgiref.sync import sync_to_async
 from user import serializers
-from core.usecase.mediafile_changepath import update_changepath
 
 class FollowInfoConsumer(AsyncWebsocketConsumer):
     async def connect(self):

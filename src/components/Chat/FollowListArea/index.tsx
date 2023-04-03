@@ -15,28 +15,33 @@ export const FollowListArea = () => {
       <div className={classes.chatPageHeading}>
         <h2>チャット</h2>
       </div>
-      {followingList?.map((followUser, i) => (
-        <a key={i} className={classes.followListAreaElement} color="primary">
-          <img
-            className={classes.iconImage}
-            src={followUser?.icon_image ?? userIconImageDefault}
-            alt=""
-            loading="lazy"
-          />
-          <div className={classes.textArea}>
-            <h3>{followUser.name}</h3>
-            <p className={classes.message}>
-              サンプルメッセージサンプルメッセージサンプルメッセージサンプルメッセージサンプルメッセージサンプルメッセージサンプルメッセージサンプルメッセージサンプルメッセージサンプルメッセージサンプルメッセージサンプルメッセージ
-            </p>
-          </div>
-        </a>
-      ))}
+      {followingList.length ? (
+        followingList?.map((followUser, i) => (
+          <a key={i} className={classes.followListAreaElement} color="primary">
+            <img
+              className={classes.iconImage}
+              src={followUser?.icon_image ?? userIconImageDefault}
+              alt=""
+              loading="lazy"
+            />
+            <div className={classes.textArea}>
+              <h3>{followUser.name}</h3>
+              <p className={classes.message}>
+                サンプルメッセージサンプルメッセージサンプルメッセージサンプルメッセージサンプルメッセージサンプルメッセージサンプルメッセージサンプルメッセージサンプルメッセージサンプルメッセージサンプルメッセージサンプルメッセージ
+              </p>
+            </div>
+          </a>
+        ))
+      ) : (
+        <p>フォローの数が0です。</p>
+      )}
     </div>
   );
 };
 
 const useStyles = makeStyles({
   followListArea: {
+    width: "100%",
     minWidth: baseStyle.card.minWidth,
     maxWidth: baseStyle.card.maxWidth,
     display: "flex",
