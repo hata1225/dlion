@@ -33,7 +33,6 @@ class FileDataConsumer(AsyncWebsocketConsumer):
                 data = await resp.json()
                 return data
 
-@update_changepath
 async def file_data_by_id(file_data_id):
     file_data = await sync_to_async(models.FileData.objects.get)(id=file_data_id)
     serializer_file_data = await sync_to_async(serializers.FileDataSerializer)(file_data)

@@ -36,7 +36,6 @@ class FollowInfoConsumer(AsyncWebsocketConsumer):
                 data = await resp.json()
                 return data
 
-@update_changepath
 async def follow_info_by_user_id(user_id):
     friendships_following = await sync_to_async(models.FriendShip.objects.filter)(created_user__id=user_id)
     friendships_follower = await sync_to_async(models.FriendShip.objects.filter)(following_user__id=user_id)
