@@ -15,6 +15,8 @@ export const baseStyle = {
   card: {
     width: "370px",
     padding: "20px",
+    minWidth: "370px",
+    maxWidth: "500px",
   },
   subArea: {
     width: "250px",
@@ -28,6 +30,9 @@ export const baseStyle = {
     pc: 1300,
     tb: 980,
     sp: 600,
+  },
+  pageLayoutInnerTop: {
+    main: "30px",
   },
   fileDataModalWidth: {
     pc: "500px",
