@@ -138,12 +138,14 @@
 
         SECRET_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-6.  **superuser 情報を.env ファイルに追記**
+6.  **superuser 情報などを.env ファイルに追記**
 
     localhost:8000/admin にログインするとき & watchdog でディレクトリを監視、エンコード等で使います
 
         SUPER_USER_EMAIL=example@example.com
         SUPER_USER_PASS=password
+        SUPER_USER_NAME=example
+        REACT_APP_IP_ADDRESS=localhost
 
 7.  **yarn install をする**
 
