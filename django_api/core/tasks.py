@@ -1,7 +1,6 @@
 from celery import shared_task
 from .models import send_update_file_data
 from concurrent.futures import ThreadPoolExecutor
-
 import subprocess
 import math
 import json
@@ -113,7 +112,7 @@ def video_encode_task(filedata_id):
         cmd = f'ffmpeg -f concat -safe 0 -i {main_data_path_by_export}short_videos.txt -c copy {main_data_path_by_export}short.mp4'
         code  = subprocess.call(cmd.split())
         print('process=' + str(code))
-        cmd = f'ffmpeg -i {main_data_path_by_export}short.mp4  -vb 100k  -vf scale=-1:180  -r 20 -pix_fmt pal8 {main_data_path_by_export}short.webp'
+        cmd = f'ffmpeg -i {main_data_path_by_export}short.mp4 -vb 60k -vf scale=-1:180 -r 18 -pix_fmt pal8 {main_data_path_by_export}short.webp'
         code = subprocess.call(cmd.split())
         print('process=' + str(code))
         i = 1

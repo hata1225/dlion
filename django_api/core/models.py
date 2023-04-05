@@ -1,15 +1,9 @@
-from email.policy import default
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.conf import settings
 from django.db.models.signals import post_save, post_delete
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
-# from core.tasks import video_encode_task
-import os
-import subprocess
-import cv2
-import math
 import json
 import uuid
 
