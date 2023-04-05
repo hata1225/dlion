@@ -36,7 +36,7 @@ services:
              export DJANGO_SUPERUSER_EMAIL=${SUPER_USER_EMAIL} &&
              export DJANGO_SUPERUSER_PASSWORD=${SUPER_USER_PASS} &&
              python3 manage.py createsuperuser --no-input &&
-             daphne -b 0.0.0.0 -p 8000 dlion_project.asgi:application"
+             daphne -b 0.0.0.0 -p 8000 --websocket_timeout 3600 dlion_project.asgi:application"
     depends_on:
       - "redis"
     tty: true
