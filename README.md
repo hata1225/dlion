@@ -161,22 +161,7 @@
 
         docker-compose build
 
-9.  **docker-compose up**
-
-    docker-compose up
-
-    しばらくした後、ターミナルの一番下の行にこんなのが出力されたら**多分成功**です。\
-    `react-app_1 | No issues found.`
-
-10. **localhost:3000 へ移動する**
-
-    **http://localhost:3000**
-
-11. **停止**
-
-    ショートカット: cmd + c
-
-12. **マイグレーションファイルを作製**
+9.  **マイグレーションファイルを作製**
 
         docker-compose run --rm django_app sh -c "python3 manage.py makemigrations core"
 
@@ -184,9 +169,25 @@
 
     sh -c: シェルコマンド （bash -c: バッシュコマンド）
 
-. **マイグレーションファイルをもとに、データベースへ反映**
+10. **マイグレーションファイルをもとに、データベースへ反映**
 
         docker-compose run --rm django_app sh -c "python3 manage.py migrate core"
+
+11. **docker-compose up**
+
+    docker-compose up
+
+    しばらくした後、ターミナルの一番下の行にこんなのが出力されたら**多分成功**です。
+
+    react-app_1 | No issues found.
+
+12. **localhost:3000 へ移動する**
+
+    **http://localhost:3000**
+
+13. **停止**
+
+    ショートカット: ctrl + c
 
 </details>
 
@@ -256,38 +257,40 @@
 <br>
 <br>
 
-## 💻 自宅サーバー構築tips
+## 💻 自宅サーバー構築 tips
 
 ### ハードについて
+
 - RaspberryPi4B 4GB
 - SSD 120GB
 - HDD 4TB
 
 ### 行ったこと
-- **SSD, HDDフォーマット**
-  - 参考: [ラズパイに外付けHDD(SSD)を接続する方法を徹底解説 – フォーマット、パーティション作成、マウント方法など](https://jorublog.site/raspi-hdd-connect/)
-- **SSDにOSを焼き付けた**
-  - 参考: [Raspberry Pi ImagerでSSDをフォーマット](http://www.momobro.com/rasbro/tips-rp-raspberry-pi-image-format/)
-- **OSの更新**
-  - 参考: [raspberrypiのOSを更新する方法](https://qiita.com/akiraichi5430/items/6b9855f59fb3a3f9de35)
-- **port番号の固定**
+
+- **SSD, HDD フォーマット**
+  - 参考: [ラズパイに外付け HDD(SSD)を接続する方法を徹底解説 – フォーマット、パーティション作成、マウント方法など](https://jorublog.site/raspi-hdd-connect/)
+- **SSD に OS を焼き付けた**
+  - 参考: [Raspberry Pi Imager で SSD をフォーマット](http://www.momobro.com/rasbro/tips-rp-raspberry-pi-image-format/)
+- **OS の更新**
+  - 参考: [raspberrypi の OS を更新する方法](https://qiita.com/akiraichi5430/items/6b9855f59fb3a3f9de35)
+- **port 番号の固定**
   - 参考: [初心者向！Raspberry Pi 最低限のセキュリティ設定](https://qiita.com/mochifuture/items/00ca8cdf74c170e3e6c6)
-- **SSH接続**
-  - 参考: [Raspberry Pi3のLAN外からのSSH接続設定方法](https://qiita.com/3no3_tw/items/4b5975a9f3087edf4e20)
-- **sshのconfig設定で、ssh接続を楽に行う**
-  - 参考: [~/.ssh/configを使ってSSH接続を楽にする](https://tech-blog.rakus.co.jp/entry/20210512/ssh)
-- **dockerコマンド**
-  - 参考: [Raspberry PiにDockerをインストール](https://qiita.com/homelan/items/0bb265cf92310d29cb82)
-- **docker-composeコマンド**
+- **SSH 接続**
+  - 参考: [Raspberry Pi3 の LAN 外からの SSH 接続設定方法](https://qiita.com/3no3_tw/items/4b5975a9f3087edf4e20)
+- **ssh の config 設定で、ssh 接続を楽に行う**
+  - 参考: [~/.ssh/config を使って SSH 接続を楽にする](https://tech-blog.rakus.co.jp/entry/20210512/ssh)
+- **docker コマンド**
+  - 参考: [Raspberry Pi に Docker をインストール](https://qiita.com/homelan/items/0bb265cf92310d29cb82)
+- **docker-compose コマンド**
   - 参考: [Raspberry Pi 4 に Docker と Docker Compose をインストールする](https://dev.classmethod.jp/articles/install-docker-for-raspberry-pi-4/)
 - **oh my zsh(シェルのカスタマイズ)**
   - 参考: [自分の Ubuntu の zsh を oh-my-zsh に設定する。](https://toxweblog.toxbe.com/2017/10/01/ubuntu-oh-my-zsh/)
-  - 参考: [Themes(oh my zshのいろんなテーマがある)](https://github.com/ohmyzsh/ohmyzsh/wiki/Themes)
+  - 参考: [Themes(oh my zsh のいろんなテーマがある)](https://github.com/ohmyzsh/ohmyzsh/wiki/Themes)
 - **ラズパイ to github の接続**
   - 参考: [【超簡単】git github 接続方法](https://qiita.com/Sub_Tanabe/items/4e03dcf42e3b0d19bb66)
 - **node install**
-  - 参考: [Ubuntu 20.04にNode.jsをインストールする方法](https://www.digitalocean.com/community/tutorials/how-to-install-node-js-on-ubuntu-20-04-ja)
-- **node管理"n"install**
+  - 参考: [Ubuntu 20.04 に Node.js をインストールする方法](https://www.digitalocean.com/community/tutorials/how-to-install-node-js-on-ubuntu-20-04-ja)
+- **node 管理"n"install**
   - 参考: [Ubuntu で Node の最新版/推奨版を使う (n コマンド編)](https://qiita.com/cointoss1973/items/c000c4f84ae4b0c166b5)
-- **HDDにパーティション作成、ラズパイへのマウント**
-  - 参考: [ラズパイに外付けHDD(SSD)を接続する方法を徹底解説 – フォーマット、パーティション作成、マウント方法など](https://jorublog.site/raspi-hdd-connect)
+- **HDD にパーティション作成、ラズパイへのマウント**
+  - 参考: [ラズパイに外付け HDD(SSD)を接続する方法を徹底解説 – フォーマット、パーティション作成、マウント方法など](https://jorublog.site/raspi-hdd-connect)

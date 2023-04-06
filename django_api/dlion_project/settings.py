@@ -11,7 +11,6 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 import environ
 from pathlib import Path
-from django.core.management.utils import get_random_secret_key
 import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -43,6 +42,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'django_cleanup',
+    'chat',
     'core',
     'user',
     'file_data',
@@ -162,7 +162,8 @@ USE_L10N = True
 
 USE_TZ = True
 
-FILE_UPLOAD_MAX_MEMORY_SIZE = 1024 * 1024 * 1024 * 8196
+FILE_UPLOAD_MAX_MEMORY_SIZE = 5242880 # 5GB
+DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880 # 5GB
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/

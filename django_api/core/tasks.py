@@ -1,6 +1,6 @@
 from celery import shared_task
 from .models import send_update_file_data
-from channels.layers import get_channel_layer
+from concurrent.futures import ThreadPoolExecutor
 import subprocess
 import math
 import json
@@ -57,54 +57,62 @@ def video_encode_task(filedata_id):
         code = subprocess.call(cmd.split())
         print('process=' + str(code))
         instance.video_encode_status = "m3u8"
-        channel_layer = get_channel_layer()
         file_data_save(instance)
 
         # short.mp4, short.webp作成
         t_while = 1.5 # 切り取り秒数
         export_video_ren = 5 # shortvideo作成数
         cap = cv2.VideoCapture(main_data_path)
-        play_time = cap.get(cv2.CAP_PROP_FRAME_COUNT) / cap.get(cv2.CAP_PROP_FPS)
+        play_time = cap.get(cv2.CAP_PROP_FRAME_COUNT) / cap.get(cv2.CAP_PROP_FPS) # 動画の時間(s)
 
+        # ss_t: 切り取り開始秒数
         create_videos = [
             {"video_id": 1, "ss_t": 5},
             {"video_id": 2, "ss_t": math.floor(play_time / 4)},
             {"video_id": 3, "ss_t": math.floor(play_time / 2)},
             {"video_id": 4, "ss_t": math.floor((play_time / 4) * 3)},
-            {"video_id": 5, "ss_t": math.floor(play_time - 30)},
+            {"video_id": 5, "ss_t": math.floor(play_time - 15)},
         ]
 
-        if play_time < 150:
-            create_videos.pop()
-            export_video_ren = 4
-        elif play_time < 120:
-            t_while = 10
-            create_videos = [{"video_id": 1, "ss_t": 5}]
+        # 切り取り開始時間(ss_t)と、切り取りの時間(t_while)の調整
+        if play_time < 30:
             export_video_ren = 1
-        elif play_time < 15:
-            t_while = play_time - 0.5
             create_videos = [{"video_id": 1, "ss_t": 0}]
+            t_while = 8
+            if play_time < 10:
+                t_while = play_time - 0.5
+        if 30 <= play_time and play_time < 120: # 30秒以上120秒未満の場合は、動画時間の半分から切り取る
             export_video_ren = 1
-        for item in create_videos:
+            create_videos = create_videos[2]
+            t_while = 8
+
+        # 並列処理でshort.mp4を作成する関数
+        def process_short_video(item):
             cmd = f'ffmpeg -ss {item["ss_t"]} -i {main_data_path} -t {t_while} -c copy {main_data_path_by_export}short_{item["video_id"]}.mp4'
             code = subprocess.call(cmd.split())
             print('process=' + str(code))
-        f = open(f'{main_data_path_by_export}short_videos.txt', 'w')
+
+        # ThreadPoolExecutorを使って並列処理でshort.mp4を作成
+        with ThreadPoolExecutor() as executor:
+            executor.map(process_short_video, create_videos)
+
         instance.video_encode_status = "short"
         file_data_save(instance)
 
+        # 切り取り&分割された動画を連結させ1つのmp4を作成 -> 作成されたmp4をwebpに変換
         short_videos = []
         i = 1
         while i <= export_video_ren:
             short_videos.append(f"file 'short_{i}.mp4'")
             i += 1
         write_text = "\n".join(short_videos)
+        f = open(f'{main_data_path_by_export}short_videos.txt', 'w')
         f.write(write_text)
         f.close()
         cmd = f'ffmpeg -f concat -safe 0 -i {main_data_path_by_export}short_videos.txt -c copy {main_data_path_by_export}short.mp4'
         code  = subprocess.call(cmd.split())
         print('process=' + str(code))
-        cmd = f'ffmpeg -i {main_data_path_by_export}short.mp4  -vb 100k  -vf scale=-1:180  -r 18 -pix_fmt pal8 {main_data_path_by_export}short.webp'
+        cmd = f'ffmpeg -i {main_data_path_by_export}short.mp4 -vb 80k -vf scale=-1:270 -r 20 -pix_fmt pal8 {main_data_path_by_export}short.webp'
         code = subprocess.call(cmd.split())
         print('process=' + str(code))
         i = 1

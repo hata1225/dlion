@@ -138,20 +138,20 @@ export const FileDataModal = (props: Props) => {
           setUploadProgressValue,
           async () => {
             console.log("---post済み---");
-            await updateFileData();
-            setTitle("");
-            setDescription("");
-            setSelectedCategories([]);
-            setCoverImage(undefined);
-            setCoverImageObjectUrl("");
-            setMainData(undefined);
-            setMainDataObjectUrl("");
-            setMainDataStatus("none");
-            setIsDisabledPostEditButton(true);
-            setUploadProgressValue(0);
-            createNotification("success", "投稿できました");
           }
         );
+        setTitle("");
+        setDescription("");
+        setSelectedCategories([]);
+        setCoverImage(undefined);
+        setCoverImageObjectUrl("");
+        setMainData(undefined);
+        setMainDataObjectUrl("");
+        setMainDataStatus("none");
+        setIsDisabledPostEditButton(true);
+        setUploadProgressValue(0);
+        createNotification("success", "投稿できました");
+        await updateFileData();
       } catch (error: any) {
         createNotification("danger", error?.message, "投稿に失敗しました");
       }

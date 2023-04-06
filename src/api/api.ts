@@ -9,7 +9,7 @@ export const ENV = `http://${ENVS.develop}`; // 環境ごとに変更
 
 axios.defaults.baseURL = `${ENV}:8000`;
 axios.defaults.headers.common["Accept"] = "application/json";
-axios.defaults.headers.post["Content-Type"] = "application/json;charset=utf-8";
+axios.defaults.headers.post["Content-Type"] = "multipart/form-data";
 axios.defaults.headers.common["Access-Control-Allow-Origin"] = `${ENV}:3000`;
 axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
 
@@ -32,11 +32,7 @@ export const postAxios = async (
   endOfUploadFunc?: any
 ) => {
   axios.defaults.withCredentials = false;
-  let postProps: [
-    string,
-    object | undefined,
-    AxiosRequestConfig<object> | undefined
-  ];
+  let postProps: [string, FormData, AxiosRequestConfig<object> | undefined];
   const formData = createFormData(data);
   if (token) {
     postProps = [
@@ -76,7 +72,7 @@ export const postAxios = async (
 
 export const patchAxios = async (path: string, data: object, token: string) => {
   axios.defaults.withCredentials = false;
-  let patchProps: [string, any, AxiosRequestConfig<any> | undefined];
+  let patchProps: [string, FormData, AxiosRequestConfig<any> | undefined];
   let formData = createFormData(data);
   if (token) {
     patchProps = [
