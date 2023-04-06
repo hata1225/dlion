@@ -36,7 +36,7 @@ services:
              export DJANGO_SUPERUSER_EMAIL=${SUPER_USER_EMAIL} &&
              export DJANGO_SUPERUSER_PASSWORD=${SUPER_USER_PASS} &&
              python3 manage.py createsuperuser --no-input &&
-             daphne -b 0.0.0.0 -p 8000 dlion_project.asgi:application"
+             daphne -b 0.0.0.0 -p 8000 --websocket_timeout 3600 dlion_project.asgi:application"
     depends_on:
       - "redis"
     tty: true
@@ -57,3 +57,16 @@ services:
     container_name: redis
     ports:
       - "6379:6379"
+  celery_worker:
+    build:
+      context: .
+      dockerfile: ./Dockerfiles/django.Dockerfile
+    env_file:
+      - ./.env
+    container_name: celery_worker
+    volumes:
+      - ./django_api:/django_api
+    command: celery -A dlion_project worker --loglevel=info
+    depends_on:
+      - "redis"
+      - "django_app"

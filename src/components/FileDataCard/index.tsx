@@ -74,7 +74,7 @@ export const FileDataCard = ({
           <p>{user?.name}</p>
         </div>
       </div>
-      <CoverImageAreaByVideoData fileData={fileData} />
+      <CoverImageAreaByVideoData propFileData={fileData} />
       <div
         ref={bottomAreaRef}
         className={classes.bottomArea}

@@ -11,7 +11,6 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 import environ
 from pathlib import Path
-from django.core.management.utils import get_random_secret_key
 import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -43,12 +42,14 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'django_cleanup',
+    'chat',
     'core',
     'user',
     'file_data',
     'corsheaders',
     'django_filters',
     'channels',
+    'django_celery_results'
 ]
 
 CHANNEL_LAYERS = {
@@ -59,6 +60,12 @@ CHANNEL_LAYERS = {
         },
     },
 }
+
+CELERY_BROKER_URL = 'redis://redis:6379'
+CELERY_RESULT_BACKEND = 'redis://redis:6379'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
 
 #viewにて、フィルタリングした上でレスポンスするために追加
 REST_FRAMEWORK = {
@@ -155,7 +162,8 @@ USE_L10N = True
 
 USE_TZ = True
 
-FILE_UPLOAD_MAX_MEMORY_SIZE = 1024 * 1024 * 1024 * 8196
+FILE_UPLOAD_MAX_MEMORY_SIZE = 5242880 # 5GB
+DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880 # 5GB
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
@@ -170,4 +178,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'core.User'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-MEDIA_URL = '/media/'
+MEDIA_URL = 'http://localhost:8000/media/'

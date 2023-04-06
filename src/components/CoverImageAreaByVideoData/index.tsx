@@ -1,87 +1,84 @@
 import { makeStyles, CircularProgress } from "@material-ui/core";
-import { getFileData } from "api/api";
-import { UserContext } from "contexts/UserContext";
+import { useWSFileData } from "dataService/fileData";
 import React from "react";
 import { baseStyle, fontSize } from "theme";
-import { FileData } from "types/fileData";
+import { FileData, VideoEncodeStatus } from "types/fileData";
 
 type Props = {
   className?: string;
   classNameByImage?: string;
-  fileData?: FileData;
+  propFileData?: FileData;
   isNotTransitionPage?: boolean;
 };
 
 export const CoverImageAreaByVideoData = ({
   className,
   classNameByImage,
-  fileData,
+  propFileData,
   isNotTransitionPage,
 }: Props) => {
   const classes = useStyles();
   const [isShortVideo, setIsShortVideo] = React.useState(false);
-  const [videoDataStatus, setVideoDataStatus] = React.useState<any>();
-  const [coverImage, setCoverImage] = React.useState(fileData?.cover_image);
-  const [isVideoTypeByFileData, setIsVideoTypeByFileData] = React.useState(
-    fileData?.main_data_type === "video"
-  );
-  const [shortVideo, setShortVideo] = React.useState(
-    fileData?.short_video_path
-  );
-  const [isAllCompleteByEncodeVideo, setIsAllCompleteByEncodeVideo] =
-    React.useState<any>();
-  const { user } = React.useContext(UserContext);
+  const [coverImage, setCoverImage] = React.useState("");
+  const [shortVideo, setShortVideo] = React.useState("");
+  const [videoEncodeStatus, setVideoEncodeStatus] =
+    React.useState<VideoEncodeStatus>();
+  const [isVideoType, setIsVideoType] = React.useState(false); // 動画タイプならtrue
+  const [isVideoEncoded, setIsVideoEncoded] = React.useState(true);
+  const [videoEncodeProgress, setVideoEncodeProgress] = React.useState(0);
+  const { fileData } = useWSFileData(propFileData?.id);
 
+  // エンコード状況,カバー画像,ショートビデオの取得
   React.useEffect(() => {
-    setIsVideoTypeByFileData(fileData?.main_data_type === "video");
-  }, [fileData]);
+    if (propFileData) {
+      const {
+        video_encode_status,
+        cover_image,
+        short_video_path,
+        main_data_type,
+      } = propFileData;
+      setVideoEncodeStatus(video_encode_status);
+      setCoverImage(cover_image ?? "");
+      setShortVideo(short_video_path);
+      setIsVideoType(main_data_type === "video");
+      setIsVideoEncoded(video_encode_status === "encoded");
+    }
+  }, [propFileData]);
 
   React.useEffect(() => {
     if (fileData) {
-      const { video_data_status } = fileData;
-      setVideoDataStatus(video_data_status);
-      setCoverImage(fileData.cover_image);
-      setShortVideo(fileData.short_video_path);
-      (async () => {
-        // fileDataがvideoタイプかつ、エンコードが終わっていない場合は、fileDataを再取得
-        const isFetchedEncodeStatusByVideoData =
-          video_data_status["allcomplete"] === 0 &&
-          fileData.main_data_type === "video";
-        if (isFetchedEncodeStatusByVideoData) {
-          const getFileDataInterval = setInterval(async () => {
-            if (user?.token) {
-              const newFileData = await getFileData(user.token, fileData.id);
-              const newVideoDataStatus = newFileData.video_data_status;
-              setVideoDataStatus(newVideoDataStatus);
-              setCoverImage(newFileData.cover_image);
-              if (newVideoDataStatus["allcomplete"] === 1) {
-                setShortVideo(newFileData.short_video_path);
-                clearInterval(getFileDataInterval);
-              }
-            }
-          }, 2000);
-        }
-      })();
+      const { video_encode_status, cover_image, short_video_path } = fileData;
+      setVideoEncodeStatus(video_encode_status);
+      setCoverImage(cover_image ?? "");
+      if (video_encode_status === "encoded") {
+        setIsVideoEncoded(true);
+        setShortVideo(short_video_path);
+      }
     }
-  }, [fileData, user?.token]);
+  }, [fileData]);
 
   React.useEffect(() => {
-    if (fileData?.main_data_type !== "video") {
-    } else if (videoDataStatus) {
-      setIsAllCompleteByEncodeVideo(videoDataStatus["allcomplete"] === 1);
+    if (videoEncodeStatus === "not_encoded") {
+      setVideoEncodeProgress(0);
+    } else if (videoEncodeStatus === "m3u8") {
+      setVideoEncodeProgress(1);
+    } else if (videoEncodeStatus === "short") {
+      setVideoEncodeProgress(2);
+    } else if (videoEncodeStatus === "encoded") {
+      setVideoEncodeProgress(3);
     }
-  }, [videoDataStatus, fileData?.main_data_type]);
+  }, [videoEncodeStatus]);
 
   const handleClickImage = () => {
-    if (!isVideoTypeByFileData && fileData) {
-      window.location.href = `/filedata/${fileData.id}`;
-    } else if (isAllCompleteByEncodeVideo && fileData && !isNotTransitionPage) {
-      window.location.href = `/filedata/${fileData.id}`;
+    if (!isVideoType && propFileData) {
+      window.location.href = `/filedata/${propFileData.id}`;
+    } else if (isVideoEncoded && propFileData && !isNotTransitionPage) {
+      window.location.href = `/filedata/${propFileData.id}`;
     }
   };
 
   const onMouseEnterImage = () => {
-    if (isVideoTypeByFileData) {
+    if (isVideoType) {
       setIsShortVideo(true);
     }
   };
@@ -98,7 +95,7 @@ export const CoverImageAreaByVideoData = ({
     >
       {fileData ? (
         <>
-          {!isVideoTypeByFileData || isAllCompleteByEncodeVideo ? (
+          {!isVideoType || isVideoEncoded ? (
             <img
               className={`${classes.image} ${classNameByImage}`}
               src={isShortVideo ? shortVideo : coverImage}
@@ -119,7 +116,7 @@ export const CoverImageAreaByVideoData = ({
                 <CircularProgress className={classes.circularProgress} />
                 <p className={classes.circularProgressText}>
                   動画変換中(
-                  {videoDataStatus ? videoDataStatus["completetotal"] : 0}
+                  {videoEncodeProgress}
                   /2)
                 </p>
               </div>

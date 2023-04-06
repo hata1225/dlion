@@ -1,4 +1,3 @@
-from dataclasses import fields
 from rest_framework import serializers
 
 from core.models import FileData
@@ -12,7 +11,7 @@ class FileDataSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = FileData
-        fields = ('id', 'user', 'title', 'description', 'created_at', 'categories', 'cover_image', 'main_data_size', 'main_data_type', 'main_data', 'video_data_status', 'is_video_encoded', 'short_video_path', 'short_video_play_time')
+        fields = ('id', 'user', 'title', 'description', 'created_at', 'categories', 'cover_image', 'main_data_size', 'main_data_type', 'main_data', 'video_encode_status', 'short_video_path', 'short_video_play_time')
         read_only_fields = ('id', 'user',)
 
 
