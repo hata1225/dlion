@@ -51,10 +51,15 @@ class GetChatRoomAPIView(APIView):
     def get(self, request):
         try:
             chat_room_id = request.GET.get('chat_room_id')
-            if chat_room_id:
+
+            # formdataにchat_room_idが含まれているか
+            if not chat_room_id:
                 return Response(status=status.HTTP_400_BAD_REQUEST)
+
+            # 指定されたchat_room_idが存在するか
             if ChatRoom.objects.filter(id=chat_room_id).exists():
-                return Response(status=status.HTTP_400_BAD_REQUEST)
+                return Response(status=status.HTTP_404_NOT_FOUND)
+
             chat_room = ChatRoom.objects.get(id=chat_room_id)
             chats = Chat.objects.filter(chat_room__id=chat_room_id)
             chat_room_serializer = ChatRoomSerializer(chat_room)
