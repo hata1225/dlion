@@ -1,16 +1,18 @@
 import { makeStyles } from "@material-ui/core";
-import { FollowListArea } from "components/Chat/FollowListArea";
+import { ChatRoomListArea } from "components/Chat/ChatRoomListArea";
 import { ChatArea } from "components/Chat/ChatArea";
 import { baseStyle } from "theme";
 import { useParams } from "react-router-dom";
+import React from "react";
 
 export const ChatPage = () => {
   const { id } = useParams(); // ChatRoomのid
   const classes = useStyles();
+  const [chatRoomList, setChatRoomList] = React.useState();
 
   return (
     <div className={classes.chatPage}>
-      {id ? <ChatArea chatRoomId={id} /> : <FollowListArea />}
+      {id ? <ChatArea chatRoomId={id} /> : <ChatRoomListArea />}
     </div>
   );
 };

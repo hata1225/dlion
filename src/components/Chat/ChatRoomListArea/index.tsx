@@ -6,17 +6,15 @@ import { baseStyle } from "theme";
 import userIconImageDefault from "userIconImageDefault.webp";
 import { UserInterface } from "types/User";
 
-export const FollowListArea = () => {
+export const ChatRoomListArea = () => {
   const classes = useStyles();
   const { user } = React.useContext(UserContext);
   const { followingList } = useWSFollowInfo(user.id);
 
-  const handleClickFollowListAreaElement = async (
-    followUser: UserInterface
-  ) => {};
+  const handleClickFollowListContnet = async (followUser: UserInterface) => {};
 
   return (
-    <div className={classes.followListArea}>
+    <div className={classes.chatRoomListArea}>
       <div className={classes.chatPageHeading}>
         <h2>チャット</h2>
       </div>
@@ -26,9 +24,7 @@ export const FollowListArea = () => {
             key={i}
             className={classes.followListContent}
             color="primary"
-            onClick={async () =>
-              await handleClickFollowListAreaElement(followUser)
-            }
+            onClick={async () => await handleClickFollowListContnet(followUser)}
             href="/"
           >
             <img
@@ -53,7 +49,7 @@ export const FollowListArea = () => {
 };
 
 const useStyles = makeStyles({
-  followListArea: {
+  chatRoomListArea: {
     width: "100%",
     minWidth: baseStyle.card.minWidth,
     maxWidth: baseStyle.card.maxWidth,

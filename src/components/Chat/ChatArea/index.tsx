@@ -3,7 +3,6 @@ import { makeStyles } from "@material-ui/core";
 import { useWSFollowInfo } from "dataService/userData";
 import { UserContext } from "contexts/UserContext";
 import { baseStyle } from "theme";
-import userIconImageDefault from "userIconImageDefault.webp";
 import { UserInterface } from "types/User";
 
 interface Props {
