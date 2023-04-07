@@ -24,7 +24,7 @@ export const FollowListArea = () => {
         followingList?.map((followUser, i) => (
           <a
             key={i}
-            className={classes.followListAreaElement}
+            className={classes.followListContent}
             color="primary"
             onClick={async () =>
               await handleClickFollowListAreaElement(followUser)
@@ -64,7 +64,7 @@ const useStyles = makeStyles({
   chatPageHeading: {
     width: "100%",
   },
-  followListAreaElement: {
+  followListContent: {
     height: "55px",
     width: "100%",
     display: "flex",
