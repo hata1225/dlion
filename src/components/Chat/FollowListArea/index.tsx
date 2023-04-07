@@ -17,7 +17,7 @@ export const FollowListArea = () => {
       </div>
       {followingList.length ? (
         followingList?.map((followUser, i) => (
-          <a key={i} className={classes.followListAreaElement} color="primary">
+          <a key={i} className={classes.followListContent} color="primary">
             <img
               className={classes.iconImage}
               src={followUser?.icon_image ?? userIconImageDefault}
@@ -51,7 +51,7 @@ const useStyles = makeStyles({
   chatPageHeading: {
     width: "100%",
   },
-  followListAreaElement: {
+  followListContent: {
     height: "55px",
     width: "100%",
     display: "flex",
