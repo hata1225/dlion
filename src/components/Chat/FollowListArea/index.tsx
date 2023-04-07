@@ -4,11 +4,16 @@ import { useWSFollowInfo } from "dataService/userData";
 import { UserContext } from "contexts/UserContext";
 import { baseStyle } from "theme";
 import userIconImageDefault from "userIconImageDefault.webp";
+import { UserInterface } from "types/User";
 
 export const FollowListArea = () => {
   const classes = useStyles();
   const { user } = React.useContext(UserContext);
   const { followingList } = useWSFollowInfo(user.id);
+
+  const handleClickFollowListAreaElement = async (
+    followUser: UserInterface
+  ) => {};
 
   return (
     <div className={classes.followListArea}>
@@ -17,7 +22,15 @@ export const FollowListArea = () => {
       </div>
       {followingList.length ? (
         followingList?.map((followUser, i) => (
-          <a key={i} className={classes.followListAreaElement} color="primary">
+          <a
+            key={i}
+            className={classes.followListAreaElement}
+            color="primary"
+            onClick={async () =>
+              await handleClickFollowListAreaElement(followUser)
+            }
+            href="/"
+          >
             <img
               className={classes.iconImage}
               src={followUser?.icon_image ?? userIconImageDefault}

@@ -13,7 +13,7 @@ axios.defaults.headers.post["Content-Type"] = "multipart/form-data";
 axios.defaults.headers.common["Access-Control-Allow-Origin"] = `${ENV}:3000`;
 axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
 
-const createFormData = (data: any) => {
+export const createFormData = (data: any) => {
   let formData = new FormData();
   const objectKeys = Object.keys(data);
   objectKeys.forEach((objectKey) => {
