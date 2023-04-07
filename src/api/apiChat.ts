@@ -15,6 +15,11 @@ export const getChatRoomsByCurrentUser = async (token: string) => {
   }
 };
 
+/**
+ * ChatRoomの取得と、紐付いたChatの取得
+ * @param token
+ * @param chatRoomId
+ */
 export const getChatRoom = async (token: string, chatRoomId: string) => {
   const path = `/api/chat/chat_room/?chat_room_id=${chatRoomId}`;
   try {
@@ -26,6 +31,11 @@ export const getChatRoom = async (token: string, chatRoomId: string) => {
   }
 };
 
+/**
+ * ChatRoomの作成
+ * @param token
+ * @param userIds
+ */
 export const createChatRoom = async (token: string, userIds: string[]) => {
   const path = `/api/chat/create_chat_room/`;
   const data = {
@@ -39,6 +49,12 @@ export const createChatRoom = async (token: string, userIds: string[]) => {
   }
 };
 
+/**
+ * Chatの作成(メッセージ送信時)
+ * @param token
+ * @param chatRoomId
+ * @param message
+ */
 export const createChat = async (
   token: string,
   chatRoomId: string,
