@@ -7,9 +7,9 @@ from chat.models import ChatRoom, Chat
 from chat.serializers import ChatSerializer, ChatRoomSerializer
 
 
-class GetChatRoomsByUserAPIView(APIView):
+class GetChatRoomsByCurrentUserAPIView(APIView):
     """
-    対象のuserが含まれるChatRoomと、それに紐づく最新のChatを取得
+    現在のuserが含まれるChatRoomと、それに紐づく最新のChat1件を取得
 
     ---
     """
