@@ -4,7 +4,9 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from chat.models import ChatRoom, Chat
+from core.models import User
 from chat.serializers import ChatSerializer, ChatRoomSerializer
+import re
 
 
 class GetChatRoomsByCurrentUserAPIView(APIView):
@@ -84,21 +86,28 @@ class CreateChatRoomAPIView(APIView):
 
     def post(self, request):
         try:
-            serializer = ChatRoomSerializer(data=request.data)
             user = request.user
-            user_ids = serializer.validated_data["user_ids"]
-            if not user.id in user_ids:
-                user_ids.append(user.id)
+
+            user_ids = []
+            for key, value in request.data.items():
+                match = re.match(r'user_ids\[(\d+)\]', key)
+                if match:
+                    index = int(match.group(1))
+                    user_ids.insert(index, value)
+
+            if not str(user.id) in user_ids:
+                user_ids.append(str(user.id))
 
             # 重複チェック(chatroom作成時に重複したパターンのuser_idsがないかチェック)
             is_exist_user_ids = ChatRoom.objects.filter(users__id__in=user_ids).count() > 0
 
             # シリアライザ成功(userのidが存在しているetc...) and 重複チェック
-            if serializer.is_valid() and not is_exist_user_ids:
-                chat_room = serializer.save()
-                return Response(ChatRoomSerializer(chat_room).data, status=status.HTTP_201_CREATED)
-            else:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            if not is_exist_user_ids:
+                users = User.objects.filter(id__in=user_ids)
+                chatroom = ChatRoom.objects.create()
+                chatroom.users.set(users)
+                chatroom.save()
+            return Response(status=status.HTTP_201_CREATED)
         except:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 

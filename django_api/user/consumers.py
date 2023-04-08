@@ -29,12 +29,6 @@ class FollowInfoConsumer(AsyncWebsocketConsumer):
     async def send_follow_data(self, event):
         await self.send(text_data=json.dumps(event))
 
-    async def fetch_api_data(self, api_url):
-        async with aiohttp.ClientSession() as session:
-            async with session.get(api_url) as resp:
-                data = await resp.json()
-                return data
-
 async def follow_info_by_user_id(user_id):
     friendships_following = await sync_to_async(models.FriendShip.objects.filter)(created_user__id=user_id)
     friendships_follower = await sync_to_async(models.FriendShip.objects.filter)(following_user__id=user_id)

@@ -10,7 +10,7 @@ import uuid
 class ChatRoom(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     users = models.ManyToManyField(User)
-    created_at = models.DateField(auto_created=True)
+    created_at = models.DateField(auto_now_add=True)
 
 
 class Chat(models.Model):

@@ -1,10 +1,10 @@
 import json
-import aiohttp
 from channels.generic.websocket import AsyncWebsocketConsumer
 from chat.models import Chat, ChatRoom
 from core.models import User
 from asgiref.sync import sync_to_async
 from chat.serializers import ChatRoomSerializer, ChatSerializer
+
 
 class ChatRoomsConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -27,26 +27,46 @@ class ChatRoomsConsumer(AsyncWebsocketConsumer):
         chat_rooms = await chat_rooms_by_user_id(self.user_id)
         await self.send(text_data=json.dumps({"type": "chat_rooms_update", "data": chat_rooms}))
 
-    async def fetch_api_data(self, api_url):
-        async with aiohttp.ClientSession() as session:
-            async with session.get(api_url) as resp:
-                data = await resp.json()
-                return data
-
 async def chat_rooms_by_user_id(user_id):
     user = await sync_to_async(User.objects.get)(id=user_id)
     chat_rooms = await sync_to_async(ChatRoom.objects.filter)(users=user)
-    response_data = []
-
-    for chat_room in chat_rooms:
-        chat_room_serializer = ChatRoomSerializer(chat_room)
-        latest_chat = await sync_to_async(Chat.objects.filter)(chat_room=chat_room)
-        latest_chat = await sync_to_async(latest_chat.order_by)('-created_at')
-        latest_chat = await sync_to_async(latest_chat.first)()
-        chat_serializer = ChatSerializer(latest_chat)
-
-        chat_room_data = chat_room_serializer.data
-        chat_room_data['latest_chat'] = chat_serializer.data
-        response_data.append(chat_room_data)
-
+    response_data = await sync_to_async(create_chat_rooms_data)(chat_rooms)
     return response_data
+
+def create_chat_rooms_data(chat_rooms):
+    response_data = []
+    for chat_room in chat_rooms:
+        chat_room_data = ChatRoomSerializer(chat_room).data
+        latest_chat = Chat.objects.filter(chat_room=chat_room).order_by('-created_at').first()
+        chat_room_data['latest_chat'] = ChatSerializer(latest_chat).data
+        response_data.append(chat_room_data)
+    return response_data
+
+
+class ChatRoomConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        self.chat_room_id = self.scope["url_route"]["kwargs"]["chat_room_id"]
+        await self.channel_layer.group_add(self.chat_room_id, self.channel_name)
+        await self.accept()
+
+    async def disconnect(self, close_code):
+        await self.channel_layer.group_discard(self.chat_room_id, self.channel_name)
+
+    async def receive(self, text_data):
+        text_data_json = json.loads(text_data)
+        action = text_data_json.get("action")
+
+        if action == "fetch_chat_room":
+            chat_room = await sync_to_async(chat_room_by_id)(self.chat_room_id)
+            await self.send(text_data=json.dumps({"type": "chat_room", "data": chat_room}))
+
+    async def chat_room_update(self, event):
+        chat_room = await sync_to_async(chat_room_by_id)(self.chat_room_id)
+        await self.send(text_data=json.dumps({"type": "chat_room_update", "data": chat_room}))
+
+def chat_room_by_id(chat_room_id):
+    chat_room = ChatRoom.objects.get(id=chat_room_id)
+    chats = Chat.objects.filter(chat_room=chat_room).order_by('-created_at')
+    chat_room_data = ChatRoomSerializer(chat_room).data
+    chats_data = ChatSerializer(chats, many=True).data
+    return {"chat_room": chat_room_data, "chats": chats_data}
