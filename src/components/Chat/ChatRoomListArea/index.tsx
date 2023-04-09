@@ -4,20 +4,29 @@ import { useWSFollowInfo } from "dataService/userData";
 import { UserContext } from "contexts/UserContext";
 import { baseStyle } from "theme";
 import userIconImageDefault from "userIconImageDefault.webp";
+import { UserInterface } from "types/User";
 
-export const FollowListArea = () => {
+export const ChatRoomListArea = () => {
   const classes = useStyles();
   const { user } = React.useContext(UserContext);
   const { followingList } = useWSFollowInfo(user.id);
 
+  const handleClickFollowListContnet = async (followUser: UserInterface) => {};
+
   return (
-    <div className={classes.followListArea}>
+    <div className={classes.chatRoomListArea}>
       <div className={classes.chatPageHeading}>
         <h2>チャット</h2>
       </div>
       {followingList.length ? (
         followingList?.map((followUser, i) => (
-          <a key={i} className={classes.followListAreaElement} color="primary">
+          <a
+            key={i}
+            className={classes.followListContent}
+            color="primary"
+            onClick={async () => await handleClickFollowListContnet(followUser)}
+            href="/"
+          >
             <img
               className={classes.iconImage}
               src={followUser?.icon_image ?? userIconImageDefault}
@@ -40,7 +49,7 @@ export const FollowListArea = () => {
 };
 
 const useStyles = makeStyles({
-  followListArea: {
+  chatRoomListArea: {
     width: "100%",
     minWidth: baseStyle.card.minWidth,
     maxWidth: baseStyle.card.maxWidth,
@@ -51,7 +60,7 @@ const useStyles = makeStyles({
   chatPageHeading: {
     width: "100%",
   },
-  followListAreaElement: {
+  followListContent: {
     height: "55px",
     width: "100%",
     display: "flex",

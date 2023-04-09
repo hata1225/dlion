@@ -44,6 +44,7 @@ const ReactRouter = () => {
         <Route path="/filedata/:id" element={<FileDataDetailPage />} />
         <Route path="/edituser" element={<EditUserPage />} />
         <Route path="/chat" element={<ChatPage />} />
+        <Route path="/chat/:id" element={<ChatPage />} />
         <Route path="/profile/:id" element={<ProfilePage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>

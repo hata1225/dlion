@@ -26,12 +26,6 @@ class FileDataConsumer(AsyncWebsocketConsumer):
         file_data = await file_data_by_id(self.file_data_id)
         await self.send(text_data=json.dumps({"type": "file_data_update", "data": file_data}))
 
-    async def fetch_api_data(self, api_url):
-        async with aiohttp.ClientSession() as session:
-            async with session.get(api_url) as resp:
-                data = await resp.json()
-                return data
-
 async def file_data_by_id(file_data_id):
     file_data = await sync_to_async(models.FileData.objects.get)(id=file_data_id)
     serializer_file_data = await sync_to_async(serializers.FileDataSerializer)(file_data)
