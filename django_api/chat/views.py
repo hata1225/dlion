@@ -117,7 +117,7 @@ class CreateChatAPIView(APIView):
     Chatの作成(メッセージ送信時)
 
     ---
-    ### formdata
+    ### formdatap
     - chat_room_id: (string)ChatRoomのID
     - message: (string)メッセージ本文
     """
@@ -125,18 +125,19 @@ class CreateChatAPIView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request):
+        # return Response(status=status.HTTP_200_OK)
         try:
             user = request.user
-            serializer = ChatSerializer(data=request.data)
-            chat_room_id = serializer.validated_data["chat_room_id"]
-            message = serializer.validated_data["message"]
-            chat_room_by_id = ChatRoom.objects.filter(id=chat_room_id).first()
-            if not chat_room_by_id: # チャットルームが存在しているかチェック
+
+            chat_room_id = request.data['chat_room_id']
+            message = request.data.get('message')
+            chat_room = ChatRoom.objects.filter(id=chat_room_id).first()
+            if not chat_room: # チャットルームが存在しているか
                 return Response(status=status.HTTP_404_NOT_FOUND)
-            is_exist_chat_room_by_user = user in chat_room_by_id.users.all()
-            if not is_exist_chat_room_by_user:
+            if not user in chat_room.users.all(): # チャットルームにuserが含まれているか
                 return Response(status=status.HTTP_400_BAD_REQUEST)
-            serializer.save(chat_room=chat_room_by_id, message=message, created_user=request.user)
+            if message:
+                Chat.objects.create(chat_room=chat_room, message=message, created_user=request.user)
             return Response(status=status.HTTP_201_CREATED)
         except:
             return Response(status=status.HTTP_400_BAD_REQUEST)

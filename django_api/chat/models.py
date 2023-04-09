@@ -30,5 +30,16 @@ def send_update_chat_rooms(sender, instance, **kwargs):
         },
     )
 
+def send_update_chat_room(sender, instance, **kwargs):
+    channel_layer = get_channel_layer()
+    async_to_sync(channel_layer.group_send)(
+        str(instance.chat_room.id),
+        {
+            'type': 'chat_room_update',
+        },
+    )
+
 post_save.connect(send_update_chat_rooms, sender=ChatRoom)
 post_delete.connect(send_update_chat_rooms, sender=ChatRoom)
+post_save.connect(send_update_chat_room, sender=Chat)
+post_delete.connect(send_update_chat_room, sender=Chat)
