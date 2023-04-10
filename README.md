@@ -66,7 +66,7 @@
 
 <details>
 
-![画面設計](https://lh3.googleusercontent.com/nRzfPmMVbbyvrw7XO_T2Hqz-Uk9Kj2yGbcYo4pGIRLjMKewo2auP54qUlDVImhk4hfYDJsgM6Reo0Ksk63pq=w2156-h1414-rw)
+![画面設計](./dlion%E7%94%BB%E9%9D%A2%E9%81%B7%E7%A7%BB.png)
 
 </details>
 
