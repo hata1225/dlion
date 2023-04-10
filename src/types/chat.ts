@@ -10,7 +10,7 @@ export type Chat = {
 
 export type ChatRoom = {
   id: string;
-  latestChat: Chat; // Chatに置き換える
+  latest_chat: Chat; // Chatに置き換える
   users: UserInterface[];
   created_at: string;
 };

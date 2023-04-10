@@ -1,24 +1,33 @@
 import axios, { AxiosRequestConfig } from "axios";
 import { FileData, FileDataByEdit } from "types/fileData";
 
-const ENVS = {
+export const ENVS = {
   develop: `${process.env.REACT_APP_IP_ADDRESS}`,
+  develop2: "192.168.11.7",
 };
 
-export const ENV = `http://${ENVS.develop}`; // 環境ごとに変更
+export const ENV = `${ENVS.develop2}`; // 環境ごとに変更
 
-axios.defaults.baseURL = `${ENV}:8000`;
+axios.defaults.baseURL = `http://${ENV}:8000`;
 axios.defaults.headers.common["Accept"] = "application/json";
 axios.defaults.headers.post["Content-Type"] = "multipart/form-data";
-axios.defaults.headers.common["Access-Control-Allow-Origin"] = `${ENV}:3000`;
+axios.defaults.headers.common[
+  "Access-Control-Allow-Origin"
+] = `http://${ENV}:3000`;
 axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
 
 export const createFormData = (data: any) => {
   let formData = new FormData();
   const objectKeys = Object.keys(data);
   objectKeys.forEach((objectKey) => {
-    if (data[objectKey] === false || data[objectKey]) {
-      formData.append(`${objectKey}`, data[objectKey]);
+    const value = data[objectKey];
+    if (Array.isArray(value)) {
+      value.forEach((v, i) => {
+        formData.append(`${objectKey}[${i}]`, v); // arrayデータを分割して入れ直す
+      });
+    } else if (value === false || value) {
+      // valueがfalse or valueがtruthy
+      formData.append(`${objectKey}`, value);
     }
   });
   return formData;

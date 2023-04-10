@@ -8,7 +8,6 @@ import React from "react";
 export const ChatPage = () => {
   const { id } = useParams(); // ChatRoomのid
   const classes = useStyles();
-  const [chatRoomList, setChatRoomList] = React.useState();
 
   return (
     <div className={classes.chatPage}>

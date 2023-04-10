@@ -60,7 +60,7 @@ export const createChat = async (
   chatRoomId: string,
   message: string
 ) => {
-  const path = `/api/chat/create_chat`;
+  const path = `/api/chat/create_chat/`;
   const data = {
     chat_room_id: chatRoomId,
     message: message,
