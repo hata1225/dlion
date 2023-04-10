@@ -10,7 +10,6 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 import environ
-from pathlib import Path
 import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -22,8 +21,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 env = environ.Env()
 env.read_env('.env')
 SECRET_KEY = env('SECRET_KEY')
-# SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = env("REACT_APP_GOOGLE_CLIENT_ID")
-# SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = env("REACT_APP_SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -82,10 +79,11 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
 ]
 
-CORS_ORIGIN_WHITELIST = (
-    'http://localhost:3000',
-    'http://localhost:4444',
-)
+CORS_ORIGIN_ALLOW_ALL = True
+# CORS_ORIGIN_WHITELIST = (
+#     'http://localhost:3000',
+#     'http://localhost:4444',
+# )
 
 CORS_ALLOW_HEADERS = (
   'accept',
@@ -178,4 +176,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'core.User'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-MEDIA_URL = 'http://localhost:8000/media/'
+MEDIA_URL = "http://" + env("REACT_APP_IP_ADDRESS") + ":8000/media/"
