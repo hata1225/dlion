@@ -25,6 +25,7 @@ urlpatterns = [
     path('api/chat/', include('chat.urls')),
     path('api/', include('file_data.urls')),
     re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
+    path('auth/',include('drf_social_oauth2.urls',namespace='drf'))
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

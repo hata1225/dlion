@@ -19,6 +19,7 @@
     "eslint-config-prettier": "^8.8.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-google-login": "^5.2.2",
     "react-hls-player": "^3.0.7",
     "react-lottie": "^1.2.3",
     "react-notifications-component": "^4.0.1",

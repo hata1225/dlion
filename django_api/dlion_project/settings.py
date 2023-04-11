@@ -37,6 +37,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'oauth2_provider',
+    'social_django',
+    'drf_social_oauth2',
     'rest_framework.authtoken',
     'django_cleanup',
     'chat',
@@ -66,8 +69,31 @@ CELERY_RESULT_SERIALIZER = 'json'
 
 #viewにて、フィルタリングした上でレスポンスするために追加
 REST_FRAMEWORK = {
-    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend'
+        'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
+        'drf_social_oauth2.authentication.SocialAuthentication',
+    ],
 }
+
+AUTHENTICATION_BACKENDS = (
+    # Google OAuth2
+    'social_core.backends.google.GoogleOAuth2',
+    # drf-social-oauth2
+    'drf_social_oauth2.backends.DjangoOAuth2',
+    # Django
+    'django.contrib.auth.backends.ModelBackend',
+)
+
+# Google configuration
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = env("SOCIAL_AUTH_GOOGLE_OAUTH2_KEY")
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = env("SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET")
+
+# Define SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE to get extra permissions from Google.
+SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
+   'https://www.googleapis.com/auth/userinfo.email',
+   'https://www.googleapis.com/auth/userinfo.profile',
+]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -111,6 +137,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'social_django.context_processors.backends',
+                'social_django.context_processors.login_redirect',
             ],
         },
     },
