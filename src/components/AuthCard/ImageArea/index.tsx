@@ -128,7 +128,7 @@ export const ImageArea = ({
 const useStyles = makeStyles({
   imageArea: {
     position: "relative",
-    marginBottom: `calc(${baseStyle.userIconSize.main} / 3)`,
+    marginBottom: `calc(${baseStyle.userIconSize.large} / 3)`,
   },
   changeView: {
     height: "100%",
@@ -157,11 +157,11 @@ const useStyles = makeStyles({
     borderRadius: borderRadius.main,
   },
   userIconImageArea: {
-    width: baseStyle.userIconSize.main,
-    height: baseStyle.userIconSize.main,
+    width: baseStyle.userIconSize.large,
+    height: baseStyle.userIconSize.large,
     borderRadius: "50%",
     backgroundColor: baseStyle.color.gray.main,
-    bottom: `calc(-${baseStyle.userIconSize.main} / 3)`,
+    bottom: `calc(-${baseStyle.userIconSize.large} / 3)`,
     position: "absolute",
     marginLeft: "10px",
     cursor: "pointer",

@@ -1,3 +1,4 @@
+import { ENV } from "api/api";
 import React from "react";
 import { UserInterface } from "types/User";
 
@@ -6,7 +7,7 @@ export const useWSFollowInfo = (userId: string) => {
   const [followerList, setFollowerList] = React.useState<UserInterface[]>([]);
   React.useEffect(() => {
     if (userId) {
-      const ws = new WebSocket(`ws://localhost:8000/ws/follow/${userId}/`);
+      const ws = new WebSocket(`ws://${ENV}:8000/ws/follow/${userId}/`);
 
       ws.onopen = () => {
         console.log("WebSocket connected");

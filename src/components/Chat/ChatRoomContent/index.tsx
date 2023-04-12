@@ -1,0 +1,65 @@
+import { makeStyles } from "@material-ui/core";
+import { baseStyle } from "theme";
+import { ChatRoom } from "types/chat";
+import { useExceptUsersByCurrentUser } from "functions/exceptUsers";
+
+interface Props {
+  chatRoom: ChatRoom;
+}
+
+export const ChatRoomContent = ({ chatRoom }: Props) => {
+  const classes = useStyles();
+  const users = useExceptUsersByCurrentUser(chatRoom.users);
+
+  return (
+    <a className={classes.chatRoomContent} href={`/chat/${chatRoom.id}`}>
+      <img
+        className={classes.chatRoomIcon}
+        src={users[0]?.icon_image}
+        alt={`${users[0]?.name} icon`}
+      />
+      <div className={classes.textArea}>
+        <h3 className={classes.chatRoomName}>{users[0]?.name}</h3>
+        <p className={classes.message}>
+          {chatRoom?.latest_chat?.message ?? ""}
+        </p>
+      </div>
+    </a>
+  );
+};
+
+const useStyles = makeStyles({
+  chatRoomContent: {
+    width: "100%",
+    padding: "5px",
+    display: "flex",
+    gap: "5px",
+    cursor: "pointer",
+    "&:hover": {
+      backgroundColor: "rgb(0 0 0 / .05)",
+    },
+  },
+  chatRoomIcon: {
+    width: baseStyle.userIconSize.main,
+    aspectRatio: "1 / 1",
+    borderRadius: "50%",
+    objectFit: "cover",
+  },
+  textArea: {
+    width: "100%",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "space-between",
+    padding: "3px 0",
+  },
+  chatRoomName: {
+    width: "100%",
+  },
+  message: {
+    width: "100%",
+    display: "-webkit-box",
+    overflow: "hidden",
+    WebkitLineClamp: 1,
+    WebkitBoxOrient: "vertical",
+  },
+});

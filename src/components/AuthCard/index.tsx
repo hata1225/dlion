@@ -6,6 +6,7 @@ import React from "react";
 import { baseStyle } from "theme";
 import { ImageArea } from "./ImageArea";
 import userIconImageDefault from "userIconImageDefault.webp";
+import { GoogleAuthButton } from "components/GoogleAuthButton";
 
 type StatusType = "signin" | "signup" | "edit";
 
@@ -120,6 +121,8 @@ export const AuthCard = ({ statusProp = "signin" }: Props) => {
         passwordForm: true,
         reinputPasswordForm: true,
         runButtonText: "アカウントを作成",
+        googleAuthButton: true,
+        googleAuthButtonText: "Googleでアカウント作成",
         runButtonFunc: async () => await handleClickSignup(),
         statusChangeButton: true,
         statusChangeButtonText: "作成済みのアカウントを使う→",
@@ -252,6 +255,11 @@ export const AuthCard = ({ statusProp = "signin" }: Props) => {
           />
         )}
       </div>
+      {authCardContent?.googleAuthButton && (
+        <div className={classes.googleLoginArea}>
+          <GoogleAuthButton text={authCardContent?.googleAuthButtonText} />
+        </div>
+      )}
       <div className={classes.bottomArea}>
         <Button
           onClick={async () => await authCardContent.runButtonFunc()}

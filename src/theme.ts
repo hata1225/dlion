@@ -53,8 +53,12 @@ export const baseStyle = {
     height: "25px",
     width: "50px",
   },
+  iconButtonSize: {
+    main: "35px",
+  },
   userIconSize: {
-    main: "72px",
+    large: "72px",
+    main: "45px",
     small: "32px",
   },
   gap: {
@@ -64,6 +68,7 @@ export const baseStyle = {
     purple: {
       dark: "#2c387e",
       main: "#3f51b5",
+      mainButtonHover: "rgb(63 81 181 / .85)",
       light: "#6573c3",
     },
     white: {

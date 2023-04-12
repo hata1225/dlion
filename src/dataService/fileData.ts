@@ -1,3 +1,4 @@
+import { ENV } from "api/api";
 import React from "react";
 import { FileData } from "types/fileData";
 
@@ -5,9 +6,7 @@ export const useWSFileData = (fileDataId?: string) => {
   const [fileData, setFileData] = React.useState<FileData>();
   React.useEffect(() => {
     if (fileDataId) {
-      const ws = new WebSocket(
-        `ws://localhost:8000/ws/filedata/${fileDataId}/`
-      );
+      const ws = new WebSocket(`ws://${ENV}:8000/ws/filedata/${fileDataId}/`);
 
       ws.onopen = () => {
         console.log("WebSocket connected");
