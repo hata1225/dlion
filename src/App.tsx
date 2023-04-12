@@ -19,9 +19,6 @@ import { ProfilePage } from "pages/ProfilePage";
 import { FilePage } from "pages/FilePage";
 
 export default function App() {
-  React.useEffect(() => {
-    console.log(process.env.REACT_APP_GOOGLE_CLIENT_ID);
-  }, [process.env.REACT_APP_GOOGLE_CLIENT_ID]);
   return (
     <GoogleOAuthProvider clientId={`${process.env.REACT_APP_GOOGLE_CLIENT_ID}`}>
       <UserProvider>

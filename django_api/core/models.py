@@ -40,7 +40,7 @@ class UserManager(BaseUserManager):
         user.is_superuser = True
         user.save(using=self._db)
         return user
-    
+
     def create_user_from_google(self, email, social_id, **extra_fields):
         if not email:
             raise ValueError('The Email field must be set')

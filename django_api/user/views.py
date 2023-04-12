@@ -33,7 +33,7 @@ class ManageUserView(generics.RetrieveUpdateAPIView):
 
     def get_object(self):
         return self.request.user
-    
+
 
 class GoogleAuthView(APIView):
     def post(self, request):
@@ -53,7 +53,7 @@ class GoogleAuthView(APIView):
         authenticated_user = backend.do_auth(access_token)
         if not authenticated_user:
             return Response({'error': 'Google authentication failed.'}, status=status.HTTP_400_BAD_REQUEST)
-        
+
         user_data = {
             'id': authenticated_user.social_auth.get(provider='google-oauth2').uid,
             'email': authenticated_user.email,
