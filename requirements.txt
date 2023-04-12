@@ -19,3 +19,4 @@ daphne==3.0.2
 asgiref==3.6.0
 celery
 django-celery-results
+social-auth-app-django

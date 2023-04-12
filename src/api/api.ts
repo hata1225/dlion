@@ -480,3 +480,27 @@ export const getFollowerListByUserId = async (
     throw error;
   }
 };
+
+/**
+ * google認証のための関数
+ * @param access_token
+ * @returns
+ */
+export const googleOauth = async (access_token: string) => {
+  const path = "/auth/google-auth/";
+  const data = {
+    access_token,
+    backend: "google-oauth2",
+    grant_type: "convert_token",
+    client_id: process.env.REACT_APP_DRF_GOOGLE_OAUTH_CLIENT_ID,
+    client_secret: process.env.REACT_APP_DRF_GOOGLE_OAUTH_CLIENT_SECRET,
+  };
+  console.log("@googleOauth sendData: ", data);
+  try {
+    const result = await postAxios(path, data);
+    return result.data;
+  } catch (error) {
+    console.log("@googleOauth: ", error);
+    throw error;
+  }
+};
