@@ -99,15 +99,15 @@ class CreateChatRoomAPIView(APIView):
                 user_ids.append(str(user.id))
 
             # 重複チェック(chatroom作成時に重複したパターンのuser_idsがないかチェック)
-            is_exist_user_ids = ChatRoom.objects.filter(users__id__in=user_ids).count() > 0
+            chatroom = ChatRoom.objects.filter(users__id__in=user_ids).first()
 
-            # シリアライザ成功(userのidが存在しているetc...) and 重複チェック
-            if not is_exist_user_ids:
+            # 重複チェックしてなかったら新しく作成
+            if not chatroom:
                 users = User.objects.filter(id__in=user_ids)
                 chatroom = ChatRoom.objects.create()
                 chatroom.users.set(users)
                 chatroom.save()
-            return Response(status=status.HTTP_201_CREATED)
+            return Response(ChatRoomSerializer(chatroom).data,status=status.HTTP_201_CREATED)
         except:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 

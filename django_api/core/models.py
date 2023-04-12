@@ -77,7 +77,7 @@ class Categories(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE
     )
-    created_at = models.DateField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
     category = models.TextField()
 
     def save(self, *args, **kwargs):
@@ -94,7 +94,7 @@ class FileData(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=70, null=False)
     description = models.TextField(null=True)
-    created_at = models.DateField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
     categories = models.TextField(null=False, default=json.dumps([]))
     cover_image = models.FileField(upload_to=saveCoverDataPath, null=True)
     main_data_size = models.CharField(max_length=1000, default=0)
