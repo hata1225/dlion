@@ -10,7 +10,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from social_core.exceptions import MissingBackend
 from social_core.backends.oauth import BaseOAuth2
-from social_django.strategy import DjangoStrategy
+from social_django.utils import load_strategy
 from rest_framework.authtoken.models import Token
 
 from user import serializers
@@ -42,7 +42,7 @@ class GoogleAuthView(APIView):
             return Response({'error': 'Access token is required.'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            backend = DjangoStrategy().get_backend('google-oauth2')
+            backend = load_strategy().get_backend('google-oauth2')
         except MissingBackend:
             return Response({'error': 'Google backend not found.'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -50,12 +50,18 @@ class GoogleAuthView(APIView):
             return Response({'error': 'Google authentication failed.'}, status=status.HTTP_400_BAD_REQUEST)
 
         # Google OAuth2からユーザー情報を取得
-        user_data = backend.do_auth(access_token)
-        if not user_data:
+        authenticated_user = backend.do_auth(access_token)
+        if not authenticated_user:
             return Response({'error': 'Google authentication failed.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        user_data = {
+            'id': authenticated_user.social_auth.get(provider='google-oauth2').uid,
+            'email': authenticated_user.email,
+            'name': authenticated_user.name,
+        }
 
         # Google OAuth2から取得した情報を使ってユーザーを作成または取得
-        user, created = models.User.objects.get_or_create(
+        user = models.User.objects.get_or_create(
             email=user_data.get('email'),
             defaults={
                 'social_id': user_data.get('id'),
@@ -64,7 +70,7 @@ class GoogleAuthView(APIView):
                 'is_staff': False,
                 'is_private': False,
             }
-        )
+        )[0]
 
         if not user.is_active:
             return Response({'error': 'User is not active.'}, status=status.HTTP_400_BAD_REQUEST)

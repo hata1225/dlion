@@ -46,7 +46,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'django_filters',
     'channels',
-    'django_celery_results'
+    'django_celery_results',
+    'social_django',
 ]
 
 CHANNEL_LAYERS = {
