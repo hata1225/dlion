@@ -3,10 +3,9 @@ import { FileData, FileDataByEdit } from "types/fileData";
 
 export const ENVS = {
   develop: `${process.env.REACT_APP_IP_ADDRESS}`,
-  develop2: "192.168.11.7",
 };
 
-export const ENV = `${ENVS.develop2}`; // 環境ごとに変更
+export const ENV = `${ENVS.develop}`; // 環境ごとに変更
 
 axios.defaults.baseURL = `http://${ENV}:8000`;
 axios.defaults.headers.common["Accept"] = "application/json";
