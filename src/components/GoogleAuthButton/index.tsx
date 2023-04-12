@@ -2,6 +2,8 @@ import { Button, makeStyles } from "@material-ui/core";
 import { useGoogleLogin } from "@react-oauth/google";
 import { googleOauth } from "api/api";
 import { ReactComponent as GoogleIcon } from "./google.svg";
+import React from "react";
+import { UserContext } from "contexts/UserContext";
 
 interface Props {
   text?: string;
@@ -9,10 +11,11 @@ interface Props {
 
 export const GoogleAuthButton = ({ text = "googleでログイン" }: Props) => {
   const classes = useStyles();
+  const { signinByGoogleOauth } = React.useContext(UserContext);
   const login = useGoogleLogin({
     onSuccess: async (tokenResponse: any) => {
-      const authresponse = await googleOauth(tokenResponse.access_token);
-      console.log("authres: ", authresponse);
+      await signinByGoogleOauth(tokenResponse.access_token);
+      window.location.href = "/";
     },
   });
 
