@@ -19,5 +19,4 @@ daphne==3.0.2
 asgiref==3.6.0
 celery
 django-celery-results
-drf_social_oauth2==1.2.1
-python-decouple==3.6
+social-auth-app-django

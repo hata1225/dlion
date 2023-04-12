@@ -18,6 +18,7 @@ from django.urls import path, include, re_path
 from django.views.static import serve
 from django.conf import settings
 from django.conf.urls.static import static
+from user.views import GoogleAuthView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -25,7 +26,7 @@ urlpatterns = [
     path('api/chat/', include('chat.urls')),
     path('api/', include('file_data.urls')),
     re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
-    path('auth/',include('drf_social_oauth2.urls',namespace='drf'))
+    path('auth/google-auth/', GoogleAuthView.as_view(), name='google-auth'),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
