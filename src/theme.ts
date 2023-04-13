@@ -23,7 +23,9 @@ export const baseStyle = {
   },
   button: {
     width: {
+      large: "150px",
       main: "120px",
+      small: "55px",
     },
   },
   maxWidthLayout: {

@@ -17,6 +17,7 @@ import { EditUserPage } from "pages/EditUserPage";
 import { ChatPage } from "pages/ChatPage";
 import { ProfilePage } from "pages/ProfilePage";
 import { FilePage } from "pages/FilePage";
+import { VideoCallModalModalProvider } from "contexts/VideoCallModalContext";
 
 export default function App() {
   return (
@@ -24,10 +25,12 @@ export default function App() {
       <UserProvider>
         <FileDataProvider>
           <PostModalProvider>
-            <ReactNotifications />
-            <Layout>
-              <ReactRouter />
-            </Layout>
+            <VideoCallModalModalProvider>
+              <ReactNotifications />
+              <Layout>
+                <ReactRouter />
+              </Layout>
+            </VideoCallModalModalProvider>
           </PostModalProvider>
         </FileDataProvider>
       </UserProvider>
