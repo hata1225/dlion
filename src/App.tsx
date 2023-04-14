@@ -2,6 +2,7 @@ import React from "react";
 import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { UserProvider } from "contexts/UserContext";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 import "react-notifications-component/dist/theme.css";
 import "animate.css/animate.min.css";
 
@@ -16,19 +17,24 @@ import { EditUserPage } from "pages/EditUserPage";
 import { ChatPage } from "pages/ChatPage";
 import { ProfilePage } from "pages/ProfilePage";
 import { FilePage } from "pages/FilePage";
+import { VideoCallModalModalProvider } from "contexts/VideoCallModalContext";
 
 export default function App() {
   return (
-    <UserProvider>
-      <FileDataProvider>
-        <PostModalProvider>
-          <ReactNotifications />
-          <Layout>
-            <ReactRouter />
-          </Layout>
-        </PostModalProvider>
-      </FileDataProvider>
-    </UserProvider>
+    <GoogleOAuthProvider clientId={`${process.env.REACT_APP_GOOGLE_CLIENT_ID}`}>
+      <UserProvider>
+        <FileDataProvider>
+          <PostModalProvider>
+            <VideoCallModalModalProvider>
+              <ReactNotifications />
+              <Layout>
+                <ReactRouter />
+              </Layout>
+            </VideoCallModalModalProvider>
+          </PostModalProvider>
+        </FileDataProvider>
+      </UserProvider>
+    </GoogleOAuthProvider>
   );
 }
 

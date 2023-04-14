@@ -12,6 +12,8 @@ import PersonIcon from "@material-ui/icons/Person";
 import { fontSize } from "theme";
 import { FollowButton } from "components/FollowButton";
 import { useWSFollowInfo } from "dataService/userData";
+import { VideoCallOpenModalButton } from "components/VideoCall/VideoCallOpenModalButton";
+import { ChatButton } from "components/Chat/ChatButton";
 
 export const ProfilePage = () => {
   const classes = useStyles();
@@ -59,7 +61,7 @@ export const ProfilePage = () => {
           />
         </div>
         <div className={classes.userInfoArea}>
-          <div className={classes.userInfoAreaTop}>
+          <div className={classes.userInfoLeftArea}>
             <div className={classes.iconImageWrap}>
               <img
                 className={classes.iconImage}
@@ -67,6 +69,9 @@ export const ProfilePage = () => {
                 alt=""
               />
             </div>
+            <h3>{userInfo?.name}</h3>
+          </div>
+          <div className={classes.userInfoRightArea}>
             <div className={classes.friendshipArea}>
               <div className={classes.friendshipContent}>
                 <h5>フォロー</h5>
@@ -77,25 +82,23 @@ export const ProfilePage = () => {
                 <p>{followerList?.length ?? "0"}</p>
               </div>
             </div>
-          </div>
-          <div className={classes.userInfoTextArea}>
-            <div className={classes.UserInfoTextAreaTop}>
-              <h3>{userInfo?.name}</h3>
-              {isOwnUserId ? (
-                <ButtonWithIcon
-                  className={classes.editButton}
-                  onClick={handleClickEditButton}
-                  description="編集する"
-                  icon={
-                    <PersonIcon style={{ fontSize: fontSize.medium.medium }} />
-                  }
-                  variant="outlined"
-                />
-              ) : (
-                <FollowButton userId={profilePageUserId} />
-              )}
+            <div className={classes.communicationArea}>
+              <ChatButton />
+              <VideoCallOpenModalButton />
             </div>
-            <p>{userInfo?.description}</p>
+            {isOwnUserId ? (
+              <ButtonWithIcon
+                className={classes.editButton}
+                onClick={handleClickEditButton}
+                description="編集する"
+                icon={
+                  <PersonIcon style={{ fontSize: fontSize.medium.medium }} />
+                }
+                variant="outlined"
+              />
+            ) : (
+              <FollowButton userId={profilePageUserId} />
+            )}
           </div>
         </div>
       </div>
@@ -160,24 +163,20 @@ const useStyles = makeStyles({
     marginTop: "20px",
     padding: "0 5px",
     display: "flex",
-    flexDirection: "column",
-    alignItems: "start",
-  },
-  userInfoAreaTop: {
-    width: "100%",
-    display: "flex",
     justifyContent: "space-between",
   },
-  userInfoTextArea: {
-    width: "100%",
+  userInfoLeftArea: {
     display: "flex",
-    gap: "5px",
+    flexDirection: "column",
+    gap: baseStyle.gap.small,
+  },
+  userInfoRightArea: {
+    display: "flex",
     flexDirection: "column",
     justifyContent: "space-between",
   },
-  UserInfoTextAreaTop: {
+  communicationArea: {
     display: "flex",
-    alignItems: "center",
     justifyContent: "space-between",
   },
   editButton: {

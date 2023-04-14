@@ -28,12 +28,10 @@ class UserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
         if not email:
             raise ValueError('User must have an email address')
-
         email = self.normalize_email(email)
         user = self.model(email=email, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
-
         return user
 
     def create_superuser(self, email, password):
@@ -41,12 +39,21 @@ class UserManager(BaseUserManager):
         user.is_staff = True
         user.is_superuser = True
         user.save(using=self._db)
+        return user
 
+    def create_user_from_google(self, email, social_id, **extra_fields):
+        if not email:
+            raise ValueError('The Email field must be set')
+        email = self.normalize_email(email)
+        user = self.model(email=email, social_id=social_id, **extra_fields)
+        user.set_unusable_password()
+        user.save(using=self._db)
         return user
 
 
 class User(AbstractBaseUser, PermissionsMixin):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    social_id = models.CharField(max_length=255, unique=True, null=True)
     email = models.EmailField(max_length=255, null=False, unique=True)
     name = models.CharField(max_length=50, null=False)
     is_active = models.BooleanField(default=True)
@@ -77,7 +84,7 @@ class Categories(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE
     )
-    created_at = models.DateField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
     category = models.TextField()
 
     def save(self, *args, **kwargs):
@@ -94,7 +101,7 @@ class FileData(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=70, null=False)
     description = models.TextField(null=True)
-    created_at = models.DateField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
     categories = models.TextField(null=False, default=json.dumps([]))
     cover_image = models.FileField(upload_to=saveCoverDataPath, null=True)
     main_data_size = models.CharField(max_length=1000, default=0)
