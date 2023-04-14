@@ -4,15 +4,23 @@ import CallIcon from "@material-ui/icons/Call";
 import { baseStyle, fontSize } from "theme";
 import { VideoCallModalContext } from "contexts/VideoCallModalContext";
 
-export const VideoCallOpenModalButton = () => {
+interface Props {
+  userIdsByVideoCall: string[];
+}
+
+export const VideoCallOpenModalButton = ({ userIdsByVideoCall }: Props) => {
   const classes = useStyles();
   const { handleOpenVideoCallModal } = React.useContext(VideoCallModalContext);
+
+  React.useEffect(() => {
+    console.log("users: ", userIdsByVideoCall);
+  }, [userIdsByVideoCall]);
 
   return (
     <Button
       className={classes.buttonWithIcon}
       variant="outlined"
-      onClick={handleOpenVideoCallModal}
+      onClick={() => handleOpenVideoCallModal(userIdsByVideoCall)}
     >
       <CallIcon style={{ fontSize: fontSize.medium.medium }} />
     </Button>

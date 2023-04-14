@@ -14,6 +14,7 @@ import { FollowButton } from "components/FollowButton";
 import { useWSFollowInfo } from "dataService/userData";
 import { VideoCallOpenModalButton } from "components/VideoCall/VideoCallOpenModalButton";
 import { ChatButton } from "components/Chat/ChatButton";
+import { Layout } from "components/Layout";
 
 export const ProfilePage = () => {
   const classes = useStyles();
@@ -51,59 +52,67 @@ export const ProfilePage = () => {
   };
 
   return (
-    <div className={classes.profilePage}>
-      <div className={classes.profileArea}>
-        <div className={classes.backgroundImageWrap}>
-          <img
-            className={classes.backgroundImage}
-            src={userInfo?.background_image}
-            alt=""
-          />
-        </div>
-        <div className={classes.userInfoArea}>
-          <div className={classes.userInfoLeftArea}>
-            <div className={classes.iconImageWrap}>
-              <img
-                className={classes.iconImage}
-                src={userInfo?.icon_image ?? userIconImageDefault}
-                alt=""
-              />
-            </div>
-            <h3>{userInfo?.name}</h3>
+    <Layout>
+      <div className={classes.profilePage}>
+        <div className={classes.profileArea}>
+          <div className={classes.backgroundImageWrap}>
+            <img
+              className={classes.backgroundImage}
+              src={userInfo?.background_image}
+              alt=""
+            />
           </div>
-          <div className={classes.userInfoRightArea}>
-            <div className={classes.friendshipArea}>
-              <div className={classes.friendshipContent}>
-                <h5>フォロー</h5>
-                <p>{followingList?.length ?? "0"}</p>
+          <div className={classes.userInfoArea}>
+            <div className={classes.userInfoLeftArea}>
+              <div className={classes.iconImageWrap}>
+                <img
+                  className={classes.iconImage}
+                  src={userInfo?.icon_image ?? userIconImageDefault}
+                  alt=""
+                />
               </div>
-              <div className={classes.friendshipContent}>
-                <h5>フォロワー</h5>
-                <p>{followerList?.length ?? "0"}</p>
+              <h3>{userInfo?.name}</h3>
+            </div>
+            <div className={classes.userInfoRightArea}>
+              <div className={classes.friendshipArea}>
+                <div className={classes.friendshipContent}>
+                  <h5>フォロー</h5>
+                  <p>{followingList?.length ?? "0"}</p>
+                </div>
+                <div className={classes.friendshipContent}>
+                  <h5>フォロワー</h5>
+                  <p>{followerList?.length ?? "0"}</p>
+                </div>
               </div>
+              {isOwnUserId ? (
+                <></>
+              ) : (
+                <div className={classes.communicationArea}>
+                  <ChatButton />
+                  <VideoCallOpenModalButton
+                    userIdsByVideoCall={[user.id, profilePageUserId]}
+                  />
+                </div>
+              )}
+              {isOwnUserId ? (
+                <ButtonWithIcon
+                  className={classes.editButton}
+                  onClick={handleClickEditButton}
+                  description="編集する"
+                  icon={
+                    <PersonIcon style={{ fontSize: fontSize.medium.medium }} />
+                  }
+                  variant="outlined"
+                />
+              ) : (
+                <FollowButton userId={profilePageUserId} />
+              )}
             </div>
-            <div className={classes.communicationArea}>
-              <ChatButton />
-              <VideoCallOpenModalButton />
-            </div>
-            {isOwnUserId ? (
-              <ButtonWithIcon
-                className={classes.editButton}
-                onClick={handleClickEditButton}
-                description="編集する"
-                icon={
-                  <PersonIcon style={{ fontSize: fontSize.medium.medium }} />
-                }
-                variant="outlined"
-              />
-            ) : (
-              <FollowButton userId={profilePageUserId} />
-            )}
           </div>
         </div>
+        <FileArea className={classes.fileArea} userId={id} />
       </div>
-      <FileArea className={classes.fileArea} userId={id} />
-    </div>
+    </Layout>
   );
 };
 

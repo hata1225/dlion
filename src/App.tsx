@@ -1,4 +1,3 @@
-import React from "react";
 import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { UserProvider } from "contexts/UserContext";
@@ -7,7 +6,6 @@ import "react-notifications-component/dist/theme.css";
 import "animate.css/animate.min.css";
 
 import { ReactNotifications } from "react-notifications-component";
-import { Layout } from "components/Layout";
 import { SignupAndSigninPage } from "pages/SignupAndSigninPage";
 import { PostModalProvider } from "contexts/PostModalContext";
 import { FileDataProvider } from "contexts/FileDataContexts";
@@ -27,9 +25,7 @@ export default function App() {
           <PostModalProvider>
             <VideoCallModalModalProvider>
               <ReactNotifications />
-              <Layout>
-                <ReactRouter />
-              </Layout>
+              <ReactRouter />
             </VideoCallModalModalProvider>
           </PostModalProvider>
         </FileDataProvider>

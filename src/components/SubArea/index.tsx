@@ -9,6 +9,7 @@ import { fontSize, baseStyle, shadow } from "theme";
 import React from "react";
 import { PostModalContext } from "contexts/PostModalContext";
 import { UserContext } from "contexts/UserContext";
+import { useNavigate } from "react-router-dom";
 
 type SubAreaContents = {
   func: any;
@@ -18,11 +19,12 @@ type SubAreaContents = {
 
 export const SubArea = () => {
   const classes = useStyles();
+  const navigate = useNavigate();
   const { handleOpenPostModal } = React.useContext(PostModalContext);
   const { signout, user } = React.useContext(UserContext);
 
   const handleClickHomeIcon = () => {
-    window.location.href = "/";
+    navigate("/");
   };
 
   const handleClickSignout = () => {
@@ -30,15 +32,15 @@ export const SubArea = () => {
   };
 
   const handleClickUserEditButton = () => {
-    window.location.href = "/edituser";
+    navigate("/edituser");
   };
 
   const handleClickUserProfileButton = () => {
-    window.location.href = `/profile/${user?.id}`;
+    navigate(`/profile/${user?.id}`);
   };
 
   const handleClickChatIcon = () => {
-    window.location.href = "/chat";
+    navigate("/chat");
   };
 
   const subAreaContents: SubAreaContents = [

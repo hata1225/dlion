@@ -39,8 +39,8 @@
 > | -------------- | ---------- |
 > | docker         | 20.10.13   |
 > | docker-compose | 1.92.2     |
-> | node           | 19.8.1     |
-> | python         | 3.11.2     |
+> | node           | 19.9.0     |
+> | python         | 3.11.3     |
 > | Django         | 4.2        |
 > | DRF            | 3.14.0     |
 >
@@ -48,7 +48,7 @@
 >
 > ### 使用している Docker イメージについて
 >
-> - **ubuntu**: 22.10
+> - **python**: 3.11.3-slim-bullseye
 > - **node**: 19.8.1-slim
 > - **selenium**: docker hub から最新の image を引っ張ってる
 > - **redis**: redis:latest
@@ -142,7 +142,7 @@
 
 6.  **superuser 情報などを.env ファイルに追記**
 
-    localhost:8000/admin にログインするとき & watchdog でディレクトリを監視、エンコード等で使います
+    localhost:8000/admin にログインするときに使います
 
         SECRET_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx # 前回手順で作成済み
         SUPER_USER_EMAIL=example@example.com

@@ -1,23 +1,26 @@
 import { Link, makeStyles } from "@material-ui/core";
+import { Layout } from "components/Layout";
 import { NotFound404Lottie } from "components/LottieComponents/NotFound404Lottie";
 import { baseStyle } from "theme";
 
 export const NotFoundPage = () => {
   const classes = useStyles();
   return (
-    <div className={classes.notFoundPage}>
-      <div className={classes.notFoundPageContentArea}>
-        <div className={classes.headingArea}>
-          <h2 className={classes.heading}>ページが見つかりませんでした。</h2>
-          <Link className={classes.homePageTransition} href="/">
-            ホーム画面へ
-          </Link>
-        </div>
-        <div>
-          <NotFound404Lottie />
+    <Layout>
+      <div className={classes.notFoundPage}>
+        <div className={classes.notFoundPageContentArea}>
+          <div className={classes.headingArea}>
+            <h2 className={classes.heading}>ページが見つかりませんでした。</h2>
+            <Link className={classes.homePageTransition} href="/">
+              ホーム画面へ
+            </Link>
+          </div>
+          <div>
+            <NotFound404Lottie />
+          </div>
         </div>
       </div>
-    </div>
+    </Layout>
   );
 };
 

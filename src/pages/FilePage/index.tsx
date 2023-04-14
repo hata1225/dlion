@@ -1,13 +1,16 @@
 import { makeStyles } from "@material-ui/core";
 import { FileArea } from "../FileArea/index";
+import { Layout } from "components/Layout";
 
 export const FilePage = () => {
   const classes = useStyles();
 
   return (
-    <div className={classes.filePage}>
-      <FileArea className={classes.fileArea} />
-    </div>
+    <Layout>
+      <div className={classes.filePage}>
+        <FileArea className={classes.fileArea} />
+      </div>
+    </Layout>
   );
 };
 

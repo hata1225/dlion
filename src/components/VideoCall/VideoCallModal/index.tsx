@@ -3,18 +3,17 @@ import { Modal, makeStyles, IconButton } from "@material-ui/core";
 import { baseStyle, borderRadius } from "theme";
 import HighlightOffIcon from "@material-ui/icons/HighlightOff";
 import { VideoCall } from "../index";
-import { UserInterface } from "types/User";
 
 interface Props {
   isOpenVideoCallModal: boolean;
   setIsOpenVideoCallModal: React.Dispatch<React.SetStateAction<boolean>>;
-  usersByVideoCall: UserInterface[];
+  userIdsByVideoCall: string[];
 }
 
 export const VideoCallModal = ({
   isOpenVideoCallModal,
   setIsOpenVideoCallModal,
-  usersByVideoCall,
+  userIdsByVideoCall,
 }: Props) => {
   const classes = useStyles();
 
@@ -37,7 +36,7 @@ export const VideoCallModal = ({
             className={`${classes.HighlightOffIcon} ${classes.iconButtonWhiteColor}`}
           />
         </IconButton>
-        <VideoCall usersByVideoCall={usersByVideoCall} />
+        <VideoCall userIdsByVideoCall={userIdsByVideoCall} />
       </div>
     </Modal>
   );

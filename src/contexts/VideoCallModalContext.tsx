@@ -1,13 +1,12 @@
 import { VideoCallModal } from "components/VideoCall/VideoCallModal";
 import React from "react";
-import { UserInterface } from "types/User";
 
 interface VideoCallModalContextInterface {
   isOpenVideoCallModal: boolean;
-  setIsOpenVideoCallModal: React.Dispatch<React.SetStateAction<boolean>>;
-  handleOpenVideoCallModal: () => void;
-  usersByVideoCall: UserInterface[];
-  setUsersByVideoCall: React.Dispatch<React.SetStateAction<UserInterface[]>>;
+  handleOpenVideoCallModal: (newUserIdsByVideoCall: string[]) => void;
+  handleCloseVideoCallModal: () => void;
+  userIdsByVideoCall: string[];
+  setUserIdsByVideoCall: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
 export const VideoCallModalContext =
@@ -21,28 +20,34 @@ export const VideoCallModalModalProvider = ({
   children: React.ReactNode;
 }) => {
   const [isOpenVideoCallModal, setIsOpenVideoCallModal] = React.useState(false);
-  const [usersByVideoCall, setUsersByVideoCall] = React.useState<
-    UserInterface[]
-  >([]);
+  const [userIdsByVideoCall, setUserIdsByVideoCall] = React.useState<string[]>(
+    []
+  );
 
-  const handleOpenVideoCallModal = () => {
+  const handleOpenVideoCallModal = (newUserIdsByVideoCall: string[]) => {
+    setUserIdsByVideoCall(newUserIdsByVideoCall);
     setIsOpenVideoCallModal(true);
+  };
+
+  const handleCloseVideoCallModal = () => {
+    setUserIdsByVideoCall([]);
+    setIsOpenVideoCallModal(false);
   };
 
   return (
     <VideoCallModalContext.Provider
       value={{
         isOpenVideoCallModal,
-        setIsOpenVideoCallModal,
         handleOpenVideoCallModal,
-        usersByVideoCall,
-        setUsersByVideoCall,
+        handleCloseVideoCallModal,
+        userIdsByVideoCall,
+        setUserIdsByVideoCall,
       }}
     >
       <VideoCallModal
         isOpenVideoCallModal={isOpenVideoCallModal}
         setIsOpenVideoCallModal={setIsOpenVideoCallModal}
-        usersByVideoCall={usersByVideoCall}
+        userIdsByVideoCall={userIdsByVideoCall}
       />
       {children}
     </VideoCallModalContext.Provider>
