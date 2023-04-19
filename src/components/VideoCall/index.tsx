@@ -1,36 +1,44 @@
 import React from "react";
-import Peer from "simple-peer";
-import { Button, makeStyles } from "@material-ui/core";
+import Peer, { SignalData } from "simple-peer";
+import { makeStyles } from "@material-ui/core";
 import { CallEnd, Call } from "@material-ui/icons";
 import { ButtonWithIcon } from "components/ButtonWithIcon";
 import { ENV } from "api/api";
-import { v4 as uuidv4 } from "uuid";
 import { createChatRoom } from "api/apiChat";
 import { UserContext } from "contexts/UserContext";
-import { baseStyle } from "theme";
-import { VideoCallModalContext } from "contexts/VideoCallModalContext";
+import { baseStyle, borderRadius } from "theme";
 
 interface Props {
   userIdsByVideoCall: string[];
 }
 
-interface PeerData {
-  peerID: string;
+interface PeerObj {
   peer: Peer.Instance;
+  peerID: string;
+  stream?: MediaStream;
 }
 
 export const VideoCall = ({ userIdsByVideoCall }: Props) => {
   const classes = useStyles();
   const { user } = React.useContext(UserContext);
-  const { handleCloseVideoCallModal } = React.useContext(VideoCallModalContext);
   const [chatRoomId, setChatRoomId] = React.useState("");
-  const [peers, setPeers] = React.useState<Peer.Instance[]>([]);
-  const [localStream, setLocalStream] = React.useState<MediaStream | null>(
-    null
-  );
   const userVideo = React.useRef<HTMLVideoElement>(null);
-  const peersRef = React.useRef<PeerData[]>([]);
-  // const partnerVideo = React.useRef<HTMLVideoElement>(null);
+  const [peers, setPeers] = React.useState<PeerObj[]>([]);
+  let socket: WebSocket;
+
+  const handleStopVideoCall = async () => {
+    // すべてのpeer接続を切断
+    peers.forEach((peerData) => {
+      peerData.peer.destroy();
+    });
+    // ユーザービデオとオーディオのストリームを停止
+    if (userVideo.current) {
+      const stream = userVideo.current.srcObject as MediaStream;
+      stream.getTracks().forEach(async (track) => {
+        track.stop();
+      });
+    }
+  };
 
   React.useEffect(() => {
     const f = async () => {
@@ -43,82 +51,149 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
   }, [userIdsByVideoCall]);
 
   React.useEffect(() => {
+    if (socket) {
+      handleStopVideoCall();
+      socket.close();
+    }
+    // WebSocket connection
     if (chatRoomId) {
-      navigator.mediaDevices
-        .getUserMedia({ video: true, audio: true })
-        .then((stream) => {
-          if (userVideo.current) {
-            userVideo.current.srcObject = stream;
+      socket = new WebSocket(`ws://${ENV}:8000/ws/webrtc/${chatRoomId}/`);
+      socket.onopen = () => {
+        console.log("Connected to WebSocke by videocall");
+        socket.send(
+          JSON.stringify({
+            type: "join-room",
+          })
+        );
+      };
+
+      socket.onmessage = (message) => {
+        const payload = JSON.parse(message.data);
+
+        if (payload.type === "all-users") {
+          const otherUsers = payload.users;
+          const currentUserID = payload.currentUserID;
+          otherUsers.forEach((userID: string) => {
+            createPeer(userID, currentUserID);
+          });
+        } else if (payload.type === "user-joined") {
+          const peerId = payload.callerID; // 呼び出し元ID
+          const currentUserID = payload.currentUserID;
+          console.log("----- user-joined -----");
+          console.log("userID: ", peerId);
+          console.log("currentUserID: ", currentUserID);
+          createPeer(peerId, currentUserID, true);
+        } else if (payload.type === "offer") {
+          const desc = new RTCSessionDescription(payload.sdp);
+          const currentUserID = payload.currentUserID;
+          const userID = payload.callerID;
+          if (desc) {
+            const peer = createPeer(userID, currentUserID);
+            peer.signal(desc);
           }
-          const ws = new WebSocket(
-            `ws://localhost:8000/ws/webrtc/${chatRoomId}/`
-          );
-          ws.onopen = () => {
-            console.log("Connected to Websocket server");
-          };
-          ws.onmessage = (message) => {
-            const data = JSON.parse(message.data);
-            const signal = data.message;
-            const { signal: receivedSignal, callerID } = signal;
+        } else if (payload.type === "answer") {
+          const peer = peers.find((p) => p.peerID === payload.callerID);
+          if (peer) {
+            peer.peer.signal(payload.sdp);
+          }
+        } else if (payload.type === "candidate") {
+          const peer = peers.find((p) => p.peerID === payload.callerID);
+          if (peer) {
+            peer.peer.signal(payload.sdp);
+          }
+        }
+      };
 
-            if (receivedSignal) {
-              const peer = addPeer(receivedSignal, callerID, stream);
-              peersRef.current.push({
-                peerID: callerID,
-                peer,
-              });
-              setPeers((peers) => [...peers, peer]);
-            } else {
-              const item = peersRef.current.find((p) => p.peerID === callerID);
-              if (item) {
-                item.peer.signal(signal);
-              }
-            }
-          };
+      socket.onclose = () => {
+        console.log("WebSocket disconnected");
+      };
 
-          ws.onclose = () => {
-            console.log("Disconnected from Websocket server");
-          };
-
-          const addPeer = (
-            incomingSignal: Peer.SignalData,
-            callerID: string,
-            stream: MediaStream
-          ) => {
-            const peer = new Peer({
-              initiator: false,
-              trickle: false,
-              stream,
-            });
-
-            peer.on("signal", (signal) => {
-              ws.send(
-                JSON.stringify({
-                  message: { signal, callerID: user.id },
-                  action: "webrtc_signal",
-                })
-              );
-            });
-
-            peer.signal(incomingSignal);
-
-            return peer;
-          };
-        });
+      return () => {
+        // Clean up the WebSocket connection when the component is unmounted
+        if (socket) {
+          handleStopVideoCall();
+          socket.close();
+        }
+      };
     }
   }, [chatRoomId]);
+
+  const createPeer = (
+    peerID: string,
+    id: string,
+    initiator: boolean = false
+  ) => {
+    const peer = new Peer({
+      initiator: initiator,
+      trickle: false,
+    });
+
+    peer.on("signal", (data: SignalData) => {
+      if (data.type === "offer") {
+        socket.send(
+          JSON.stringify({
+            type: "offer",
+            sdp: data,
+            callerID: id,
+            peerID: peerID,
+          })
+        );
+      } else if (data.type === "answer") {
+        socket.send(
+          JSON.stringify({
+            type: "answer",
+            sdp: data,
+            callerID: id,
+            peerID: peerID,
+          })
+        );
+      } else if (data.type === "candidate") {
+        socket.send(
+          JSON.stringify({
+            type: "candidate",
+            sdp: data,
+            callerID: id,
+            peerID: peerID,
+          })
+        );
+      }
+    });
+
+    peer.on("connect", () => {
+      console.log("---connect peer---");
+      const peerObj: PeerObj = {
+        peer,
+        peerID,
+      };
+      setPeers((prev) => [...prev, peerObj]);
+    });
+
+    peer.on("stream", (stream: MediaStream) => {
+      const peerObj: PeerObj = {
+        peer,
+        peerID,
+        stream,
+      };
+      setPeers((prev) => [...prev, peerObj]);
+    });
+
+    peer.on("close", () => {
+      const index = peers.findIndex((p) => p.peerID === peerID);
+      if (index !== -1) {
+        const newPeers = [...peers];
+        newPeers.splice(index, 1);
+        setPeers(newPeers);
+      }
+    });
+
+    return peer;
+  };
 
   return (
     <div className={classes.videoAreaWrap}>
       <div className={classes.videoArea}>
-        <video
-          className={classes.video}
-          playsInline
-          muted
-          ref={userVideo}
-          autoPlay
-        />
-        {peers?.map((peer, key) => {
+        <VideoContnet userVideo={userVideo} />
+        {peers.map((peer, key) => {
           return <VideoContnet key={key} peer={peer} />;
         })}
       </div>
@@ -128,7 +203,8 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
           variant="contained"
           icon={<CallEnd />}
           description="終了する"
-          // onClick={endCall}
+          onClick={async () => await handleStopVideoCall()}
+          disabled={false}
         />
       </div>
     </div>
@@ -136,35 +212,55 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
 };
 
 interface VideoProps {
-  peer: Peer.Instance;
+  peer?: PeerObj;
+  userVideo?: React.RefObject<HTMLVideoElement> | null;
 }
-const VideoContnet = ({ peer }: VideoProps) => {
-  const ref = React.useRef<HTMLVideoElement>(null);
+const VideoContnet = ({ peer, userVideo = null }: VideoProps) => {
+  const classes = useStyles();
+  let ref = React.useRef<HTMLVideoElement>(null);
 
   React.useEffect(() => {
-    peer.on("stream", (stream) => {
-      if (ref.current) {
-        ref.current.srcObject = stream;
-      }
-    });
-  }, []);
+    if (peer?.stream && ref.current) {
+      ref.current.srcObject = peer.stream;
+    } else if (peer && ref.current) {
+    }
+  }, [peer, ref]);
 
-  return <video ref={ref} autoPlay />;
+  return (
+    <div className={classes.videoContentArea}>
+      <video
+        className={classes.video}
+        ref={userVideo ?? ref}
+        playsInline
+        muted={Boolean(userVideo)}
+        autoPlay
+      />
+    </div>
+  );
 };
 
 const useStyles = makeStyles({
   videoAreaWrap: {
     width: "100%",
     height: "100%",
+    padding: "10px",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
     flexDirection: "column",
     gap: "30px",
   },
-  video: {
+  videoContentArea: {
     width: "50%",
+    backgroundColor: baseStyle.color.gray.dark,
+    borderRadius: borderRadius.large.main,
+  },
+  video: {
+    width: "100%",
     aspectRatio: "16 / 9",
+    objectFit: "cover",
+    verticalAlign: "top",
+    borderRadius: borderRadius.large.main,
   },
   videoArea: {
     display: "flex",

@@ -1,9 +1,10 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
+from asgiref.sync import sync_to_async
 
 class WebRTCConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
+        self.room_name = self.scope["url_route"]["kwargs"]["chat_room_id"]
         self.room_group_name = f"webrtc_{self.room_name}"
 
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
@@ -14,12 +15,54 @@ class WebRTCConsumer(AsyncWebsocketConsumer):
 
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
-        message = text_data_json['message']
-        action = text_data_json['action']
+        message = text_data_json.get('message')
+        type = text_data_json.get('type')
 
-        if action == "webrtc_signal":
+        if type == "join-room":
+            # Handle join-room event here
+            # callerID: connect時に生成された呼び出し元識別子(self.channel_name)
+            print("\n--- join room ---\n")
+            print(self.channel_name)
+            print("---------\n\n")
+            await self.channel_layer.group_send(self.room_group_name, {"type": "user_joined", "callerID": self.channel_name})
+        elif type in ["offer", "answer", "candidate"]:
+            # Handle offer, answer, and candidate events here
+            await self.channel_layer.group_send(self.room_group_name, {"type": type, **text_data_json})
+        elif type == "webrtc_signal":
             await self.channel_layer.group_send(self.room_group_name, {"type": "webrtc_message", "message": message})
 
     async def webrtc_message(self, event):
         message = event["message"]
         await self.send(text_data=json.dumps({"message": message}))
+
+    async def user_joined(self, event):
+        print("--user_joined method--")
+        callerID = event["callerID"]
+        await self.send(text_data=json.dumps({"type": "user-joined", "callerID": callerID, "currentUserID": self.channel_name}))
+
+    async def offer(self, event):
+        # Send offer event to the target user
+        await self.send(text_data=json.dumps({
+            "type": "offer",
+            "sdp": event["sdp"],
+            "callerID": event["callerID"],
+            "currentUserID": self.channel_name,  # あなたの実装に応じてcurrentUserIDを設定してください
+        }))
+
+    async def answer(self, event):
+        # Send answer event to the target user
+        await self.send(text_data=json.dumps({
+            "type": "answer",
+            "sdp": event["sdp"],
+            "callerID": event["callerID"],
+            "currentUserID": self.channel_name,  # あなたの実装に応じてcurrentUserIDを設定してください
+        }))
+
+    async def candidate(self, event):
+        # Send candidate event to the target user
+        await self.send(text_data=json.dumps({
+            "type": "candidate",
+            "sdp": event["sdp"],
+            "callerID": event["callerID"],
+            "currentUserID": self.channel_name,  # あなたの実装に応じてcurrentUserIDを設定してください
+        }))

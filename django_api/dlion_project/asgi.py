@@ -27,7 +27,7 @@ application = ProtocolTypeRouter({
             path('ws/chat_room/<str:chat_room_id>/', ChatRoomConsumer.as_asgi()),
             path('ws/follow/<str:user_id>/', FollowInfoConsumer.as_asgi()),
             path('ws/filedata/<str:file_data_id>/', FileDataConsumer.as_asgi()),
-            path('ws/webrtc/<str:room_name>/', WebRTCConsumer.as_asgi()),
+            path('ws/webrtc/<str:chat_room_id>/', WebRTCConsumer.as_asgi()),
         ])
     ),
 })

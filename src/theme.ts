@@ -104,6 +104,9 @@ export const baseStyle = {
 };
 
 export const borderRadius = {
+  large: {
+    main: "10px",
+  },
   main: "3px",
 };
 

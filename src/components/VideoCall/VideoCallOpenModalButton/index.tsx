@@ -12,10 +12,6 @@ export const VideoCallOpenModalButton = ({ userIdsByVideoCall }: Props) => {
   const classes = useStyles();
   const { handleOpenVideoCallModal } = React.useContext(VideoCallModalContext);
 
-  React.useEffect(() => {
-    console.log("users: ", userIdsByVideoCall);
-  }, [userIdsByVideoCall]);
-
   return (
     <Button
       className={classes.buttonWithIcon}
