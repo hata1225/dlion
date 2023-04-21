@@ -99,7 +99,7 @@ const useStyles = makeStyles({
   subArea: {
     height: "100%",
     width: baseStyle.subArea.width,
-    display: "flex",
+    display: "none",
     flexDirection: "column",
     alignItems: "center",
     paddingTop: "30px",

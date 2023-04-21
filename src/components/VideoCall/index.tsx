@@ -25,6 +25,7 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
   const userVideo = React.useRef<HTMLVideoElement>(null);
   const [peers, setPeers] = React.useState<PeerObj[]>([]);
   let socket: WebSocket;
+  let answerdPeers: PeerObj[] = [];
 
   const handleStopVideoCall = async () => {
     // すべてのpeer接続を切断
@@ -70,41 +71,60 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
       socket.onmessage = (message) => {
         const payload = JSON.parse(message.data);
 
-        if (payload.type === "all-users") {
-          const otherUsers = payload.users;
-          const currentUserID = payload.currentUserID;
-          otherUsers.forEach((userID: string) => {
-            createPeer(userID, currentUserID);
-          });
-        } else if (payload.type === "user-joined") {
+        if (payload.type === "user-joined") {
           const peerId = payload.callerID; // 呼び出し元ID
           const currentUserID = payload.currentUserID;
-          console.log("----- user-joined -----");
-          console.log("userID: ", peerId);
+          console.log("\n\n----- onmessage [user-joined] -----");
+          console.log("peerId: ", peerId);
           console.log("currentUserID: ", currentUserID);
-          createPeer(peerId, currentUserID, true);
+          if (peerId !== currentUserID) {
+            // 自分自身が入出した場合以外にofferを作成
+            const peer = createPeer(peerId, currentUserID, true);
+            answerdPeers.push(peer);
+          } else {
+            console.log("cant create offer");
+          }
         } else if (payload.type === "offer") {
+          console.log("\n\n----- onmessage [offer] -----");
           const desc = new RTCSessionDescription(payload.sdp);
           const currentUserID = payload.currentUserID;
-          const userID = payload.callerID;
-          if (desc) {
-            const peer = createPeer(userID, currentUserID);
-            peer.signal(desc);
+          const peerId = payload.callerID;
+          console.log("peerId: ", peerId);
+          console.log("currentUserID: ", currentUserID);
+          if (desc && peerId !== currentUserID) {
+            // 自分自身からofferを受けて、自分自身にanswerを送ることはない
+            const peerObj = createPeer(peerId, currentUserID);
+            peerObj.peer.signal(desc);
           }
         } else if (payload.type === "answer") {
-          const peer = peers.find((p) => p.peerID === payload.callerID);
-          if (peer) {
-            peer.peer.signal(payload.sdp);
+          console.log("\n\n----- onmessage [answer] -----");
+          const desc = new RTCSessionDescription(payload.sdp);
+          const currentUserID = payload.currentUserID;
+          const peerId = payload.callerID;
+          console.log("peerId: ", peerId);
+          console.log("currentUserID: ", currentUserID);
+          if (peerId !== currentUserID) {
+            const peerObj = answerdPeers.find((peer) => peer.peerID === peerId);
+            if (peerObj) {
+              peerObj.peer.signal(desc);
+            }
           }
+          // const peer = peers.find((p) => p.peerID === payload.callerID);
+          // if (peer) {
+          //   peer.peer.signal(payload.sdp);
+          // }
+          // const peer = peers.find((peer)=>peer.peerID === payload.)
         } else if (payload.type === "candidate") {
-          const peer = peers.find((p) => p.peerID === payload.callerID);
-          if (peer) {
-            peer.peer.signal(payload.sdp);
-          }
+          // const peer = peers.find((p) => p.peerID === payload.callerID);
+          // if (peer) {
+          //   peer.peer.signal(payload.sdp);
+          // }
         }
       };
 
       socket.onclose = () => {
+        console.log("close socket");
+        handleStopVideoCall();
         console.log("WebSocket disconnected");
       };
 
@@ -130,6 +150,9 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
 
     peer.on("signal", (data: SignalData) => {
       if (data.type === "offer") {
+        console.log("\n\ncreate peer [ --- offer --- ]");
+        console.log("peerId: ", peerID);
+        console.log("callerId: ", id);
         socket.send(
           JSON.stringify({
             type: "offer",
@@ -139,6 +162,9 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
           })
         );
       } else if (data.type === "answer") {
+        console.log("\n\ncreate peer [ --- answer --- ]");
+        console.log("peerId: ", peerID);
+        console.log("callerId: ", id);
         socket.send(
           JSON.stringify({
             type: "answer",
@@ -148,14 +174,17 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
           })
         );
       } else if (data.type === "candidate") {
-        socket.send(
-          JSON.stringify({
-            type: "candidate",
-            sdp: data,
-            callerID: id,
-            peerID: peerID,
-          })
-        );
+        console.log("\n\ncreate peer [ --- candidate --- ]");
+        // console.log("peerId: ", peerID);
+        // console.log("callerId: ", id);
+        // socket.send(
+        //   JSON.stringify({
+        //     type: "candidate",
+        //     sdp: data,
+        //     callerID: id,
+        //     peerID: peerID,
+        //   })
+        // );
       }
     });
 
@@ -168,25 +197,26 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
       setPeers((prev) => [...prev, peerObj]);
     });
 
-    peer.on("stream", (stream: MediaStream) => {
-      const peerObj: PeerObj = {
-        peer,
-        peerID,
-        stream,
-      };
-      setPeers((prev) => [...prev, peerObj]);
-    });
+    // peer.on("stream", (stream: MediaStream) => {
+    //   const peerObj: PeerObj = {
+    //     peer,
+    //     peerID,
+    //     stream,
+    //   };
+    //   setPeers((prev) => [...prev, peerObj]);
+    // });
 
     peer.on("close", () => {
-      const index = peers.findIndex((p) => p.peerID === peerID);
-      if (index !== -1) {
-        const newPeers = [...peers];
-        newPeers.splice(index, 1);
-        setPeers(newPeers);
-      }
+      console.log("---close peer---");
+      // const index = peers.findIndex((p) => p.peerID === peerID);
+      // if (index !== -1) {
+      //   const newPeers = [...peers];
+      //   newPeers.splice(index, 1);
+      //   setPeers(newPeers);
+      // }
     });
 
-    return peer;
+    return { peerID, peer };
   };
 
   return (
@@ -219,12 +249,12 @@ const VideoContnet = ({ peer, userVideo = null }: VideoProps) => {
   const classes = useStyles();
   let ref = React.useRef<HTMLVideoElement>(null);
 
-  React.useEffect(() => {
-    if (peer?.stream && ref.current) {
-      ref.current.srcObject = peer.stream;
-    } else if (peer && ref.current) {
-    }
-  }, [peer, ref]);
+  // React.useEffect(() => {
+  //   if (peer?.stream && ref.current) {
+  //     ref.current.srcObject = peer.stream;
+  //   } else if (peer && ref.current) {
+  //   }
+  // }, [peer, ref]);
 
   return (
     <div className={classes.videoContentArea}>
