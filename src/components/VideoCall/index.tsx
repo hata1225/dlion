@@ -29,16 +29,20 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
 
   const handleStopVideoCall = async () => {
     // すべてのpeer接続を切断
-    peers.forEach((peerData) => {
-      peerData.peer.destroy();
+
+    answerdPeers.forEach((peerObj) => {
+      peerObj.peer.destroy();
     });
-    // ユーザービデオとオーディオのストリームを停止
-    if (userVideo.current) {
-      const stream = userVideo.current.srcObject as MediaStream;
-      stream.getTracks().forEach(async (track) => {
-        track.stop();
-      });
-    }
+    answerdPeers = [];
+    setPeers([]);
+    // setPeers([]);
+    // // ユーザービデオとオーディオのストリームを停止
+    // if (userVideo.current) {
+    //   const stream = userVideo.current.srcObject as MediaStream;
+    //   stream.getTracks().forEach(async (track) => {
+    //     track.stop();
+    //   });
+    // }
   };
 
   React.useEffect(() => {
@@ -109,11 +113,6 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
               peerObj.peer.signal(desc);
             }
           }
-          // const peer = peers.find((p) => p.peerID === payload.callerID);
-          // if (peer) {
-          //   peer.peer.signal(payload.sdp);
-          // }
-          // const peer = peers.find((peer)=>peer.peerID === payload.)
         } else if (payload.type === "candidate") {
           // const peer = peers.find((p) => p.peerID === payload.callerID);
           // if (peer) {
@@ -123,15 +122,15 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
       };
 
       socket.onclose = () => {
-        console.log("close socket");
         handleStopVideoCall();
+        console.log("close socket");
         console.log("WebSocket disconnected");
       };
 
       return () => {
         // Clean up the WebSocket connection when the component is unmounted
+        handleStopVideoCall();
         if (socket) {
-          handleStopVideoCall();
           socket.close();
         }
       };
@@ -214,6 +213,10 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
       //   newPeers.splice(index, 1);
       //   setPeers(newPeers);
       // }
+    });
+
+    peer.on("error", () => {
+      console.log("---error peer---");
     });
 
     return { peerID, peer };
