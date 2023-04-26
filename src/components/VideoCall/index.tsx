@@ -27,10 +27,10 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
   const { user } = React.useContext(UserContext);
   const [chatRoomId, setChatRoomId] = React.useState("");
   const userVideo = React.useRef<HTMLVideoElement>(null);
-  // const [peers, setPeers] = React.useState<PeerObj[]>([]);
   const peersRef = React.useRef<PeerObj[]>([]);
   const [isCameraOn, setIsCameraOn] = React.useState(false); // カメラオンならtrue
   const [isUnMute, setIsUnMute] = React.useState(false); // マイクオンならtrue
+  const [peers, setPeers] = React.useState<PeerObj[]>([]);
   let socket: WebSocket;
 
   const handleStopVideoCall = async () => {
@@ -62,13 +62,18 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
       console.log("---camera add stream---");
       console.log("peers ref: ", peersRef.current);
       console.log("data: ", peersRef);
-      peersRef.current.forEach((peerObj) => {
-        console.log("--peerobj start camera--");
-        cameraStream.getTracks().forEach((track) => {
-          console.log("peerObj: ", peerObj);
-          peerObj.peer.addTrack(track, cameraStream);
+
+      const addStreamToPeers = () => {
+        peers.forEach((peerObj) => {
+          console.log("--peerobj start camera--");
+          cameraStream.getTracks().forEach((track) => {
+            console.log("peerObj: ", peerObj);
+            peerObj.peer.addTrack(track, cameraStream);
+          });
         });
-      });
+      };
+      await addStreamToPeers();
+      peersRef.current = [...peers];
       // setPeers([...peersRef.current]);
     }
     setIsCameraOn(true);
@@ -99,6 +104,10 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
   //     userVideo.current.srcObject = stream;
   //   }
   // };
+
+  React.useEffect(() => {
+    console.log("peersrefcurrent: ", peersRef.current);
+  }, [peersRef.current]);
 
   React.useEffect(() => {
     const f = async () => {
@@ -297,6 +306,7 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
         peersRef.current = [...peersRef.current, peerObj];
       }
       // });
+      setPeers([...peersRef.current]);
     });
 
     peer.on("stream", (stream: MediaStream) => {
@@ -316,6 +326,7 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
         peersRef.current = [...peersRef.current, peerObj];
       }
       // });
+      setPeers([...peersRef.current]);
     });
 
     peer.on("track", () => {
@@ -343,7 +354,7 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
     <div className={classes.videoAreaWrap}>
       <div className={classes.videoArea}>
         <VideoContnet userVideo={userVideo} />
-        {peersRef.current.map((peer, key) => {
+        {peers.map((peer, key) => {
           return <VideoContnet key={key} peer={peer} />;
         })}
       </div>
