@@ -68,14 +68,13 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
   }
 
   const addStreamToPeers = (stream: MediaStream) => {
-    peersRef.current.forEach((peerObj) => {
+    peers.forEach((peerObj) => {
       console.log("--peerobj start camera--");
       stream.getTracks().forEach((track) => {
         console.log("peerObj: ", peerObj);
         peerObj.peer.addTrack(track, stream);
       });
     });
-    setPeers([...peersRef.current]);
   };
 
   const handleClickCameraButton = async () => {
@@ -170,115 +169,56 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
           const currentUserID = payload.currentUserID;
           console.log("peerId: ", peerId);
           console.log("currentUserID: ", currentUserID);
-          if (peerId !== currentUserID) {
-            // 自分自身が入室した場合以外
-            const peer = createPeer(peerId, currentUserID, true); // offerを作成
-            // const isExistPeerByAnswerPeers = answerdPeers.some(
-            //   (peer) => peer.peerID === peerId
-            // );
-            // if (!isExistPeerByAnswerPeers) {
-            //   answerdPeers.push(peer);
-            // }
-            const newPeers = [...peersRef.current];
-            const index = newPeers.findIndex(
-              (peerObj) => peerObj.peerID === peerId
-            );
-            if (index !== -1) {
-              newPeers[index] = peer;
-              peersRef.current = newPeers;
-            } else {
-              // setPeers((prev) => [...prev, peer]);
-              peersRef.current = [...peersRef.current, peer];
-            }
+          const index = peersRef.current.findIndex(
+            (peerObj) => peerObj.peerID === peerId
+          );
+          console.log("peersref: ", peersRef.current);
+          console.log("index: ", index);
+          if (index === -1 && peerId !== currentUserID) {
+            const peerObj = createPeer(peerId, currentUserID, true); // offerを作成
+            peersRef.current = [...peersRef.current, peerObj];
+          } else if (index !== -1 && peerId !== currentUserID) {
+            const peerObj = createPeer(peerId, currentUserID, true); // offerを作成
+            peersRef.current[index] = peerObj;
           }
-        }
-        // else if (payload.type === "update_sdp") {
-        //   const peerId = payload.callerID; // 呼び出し元ID
-        //   const currentUserID = payload.currentUserID;
-        //   console.log("peerId: ", peerId);
-        //   console.log("currentUserID: ", currentUserID);
-        //   console.log("isCameraOn: ", isCameraOn);
-        //   console.log("isUmMute: ", isUnMute);
-        //   const newStream = await getStream({
-        //     video: true,
-        //     audio: isUnMute,
-        //   });
-        //   console.log("newStream: ", newStream);
-        //   if (peerId !== currentUserID && newStream) {
-        //     addStreamToPeers(newStream);
-        //   }
-        // }
-        else if (payload.type === "offer") {
-          const desc = new RTCSessionDescription(payload.sdp);
-          console.log("sdp: ", desc);
+        } else if (payload.type === "offer") {
+          const sdp = new RTCSessionDescription(payload.sdp);
+          console.log("sdp: ", sdp);
           const currentUserID = payload.currentUserID;
           const peerId = payload.callerID;
           console.log("peerId: ", peerId);
           console.log("currentUserID: ", currentUserID);
-          const newPeers = [...peersRef.current];
-          const index = newPeers.findIndex(
-            (peerObj) =>
-              peerObj.peerID === peerId &&
-              peerObj.currentUserId === currentUserID
+          const index = peersRef.current.findIndex(
+            (peerObj) => peerObj.peerID === peerId
           );
-          console.log("isExistPeer: ", index);
-          if (index !== -1 && peerId !== currentUserID) {
-            // 存在してたらsdpを更新する
-            // const newPeers = [...peers];
-            // newPeers[index] = createPeer(peerId, currentUserID);
-            newPeers[index].peer.signal(desc);
-            peersRef.current = newPeers;
-            setPeers([...peersRef.current]);
-            // setPeers(newPeers);
-          } else if (desc && peerId !== currentUserID) {
-            console.log("onmessage offer process");
-            // 自分自身からofferを受けて、自分自身にanswerを送ることはない
+          console.log("peersref: ", peersRef.current);
+          console.log("index: ", index);
+          if (sdp && index === -1 && peerId !== currentUserID) {
             const peerObj = createPeer(peerId, currentUserID); // answer作成
-            peerObj.peer.signal(desc);
-            const newPeers = [...peersRef.current, peerObj];
-            peersRef.current = newPeers;
-            setPeers([...peersRef.current]);
-            const isExistPeer = peersRef.current.some((peerObj) => {
-              return peerObj.peerID === currentUserID;
-            });
-            if (!isExistPeer) {
-              const newPeerObj = createPeer(currentUserID, peerId, true); // offerを作成
-              const newPeers = [...peersRef.current, newPeerObj];
-              peersRef.current = newPeers;
-              setPeers([...peersRef.current]);
-            }
-            // setPeers(newPeers);
+            peerObj.peer.signal(sdp);
+            peersRef.current = [...peersRef.current, peerObj];
+          } else if (sdp && index !== -1 && peerId !== currentUserID) {
+            const peerObj = peersRef.current[index];
+            peerObj.peer.signal(sdp);
           }
         } else if (payload.type === "answer") {
-          const desc = new RTCSessionDescription(payload.sdp);
-          console.log("sdp: ", desc);
+          const sdp = new RTCSessionDescription(payload.sdp);
           const currentUserID = payload.currentUserID;
           const peerId = payload.callerID;
           console.log("peerId: ", peerId);
           console.log("currentUserID: ", currentUserID);
-          // console.log("answerdPeers", answerdPeers);
-          const newPeers = [...peersRef.current];
-          const index = newPeers.findIndex(
-            (peerObj) =>
-              peerObj.peerID === peerId &&
-              peerObj.currentUserId === currentUserID
+          const index = peersRef.current.findIndex(
+            (peerObj) => peerObj.peerID === peerId
           );
+          console.log("peersref: ", peersRef.current);
           console.log("index: ", index);
-          if (index !== -1 && peerId !== currentUserID) {
-            console.log("--- update answer ---");
-            // 存在してたらsdpを更新する
-            newPeers[index].peer.signal(desc);
-            peersRef.current = newPeers;
-            setPeers([...peersRef.current]);
-            // setPeers(newPeers);
-          } else if (desc && peerId !== currentUserID) {
-            console.log("onmessage answer process");
+          if (sdp && index === -1 && peerId !== currentUserID) {
             const peerObj = createPeer(peerId, currentUserID);
-            peerObj.peer.signal(desc);
-            const newPeers = [...peersRef.current, peerObj];
-            peersRef.current = newPeers;
-            setPeers([...peersRef.current]);
-            // setPeers(newPeers);
+            peerObj.peer.signal(sdp);
+            peersRef.current[index] = peerObj;
+          } else if (sdp && index !== -1 && peerId !== currentUserID) {
+            const peerObj = peersRef.current[index];
+            peerObj.peer.signal(sdp);
           }
         }
       };
@@ -310,6 +250,8 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
     });
 
     peer.on("signal", (data: SignalData) => {
+      console.log("signal はっかしてるよ！！！");
+      console.log("data: ", data);
       if (data.type === "offer") {
         console.log("\n\ncreate peer [ --- offer --- ]");
         console.log("peerId: ", peerID);
@@ -349,13 +291,10 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
       };
       const index = peersRef.current.findIndex((p) => p.peerID === peerID);
       if (index !== -1) {
-        const newPeers = [...peersRef.current];
-        newPeers[index] = peerObj;
-        peersRef.current = newPeers;
+        peersRef.current[index] = peerObj;
       } else {
         peersRef.current = [...peersRef.current, peerObj];
       }
-      // });
       setPeers([...peersRef.current]);
     });
 
@@ -368,16 +307,12 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
         currentUserId,
         stream,
       };
-      // setPeers((prevPeers) => {
       const index = peersRef.current.findIndex((p) => p.peerID === peerID);
       if (index !== -1) {
-        const newPeers = [...peersRef.current];
-        newPeers[index] = peerObj;
-        peersRef.current = newPeers;
+        peersRef.current[index] = peerObj;
       } else {
         peersRef.current = [...peersRef.current, peerObj];
       }
-      // });
       setPeers([...peersRef.current]);
     });
 
@@ -448,10 +383,6 @@ interface VideoProps {
 const VideoContnet = ({ peer, userVideo = null }: VideoProps) => {
   const classes = useStyles();
   let ref = React.useRef<HTMLVideoElement>(null);
-
-  React.useEffect(() => {
-    console.log("videocontent peer: ", peer);
-  }, [peer]);
 
   React.useEffect(() => {
     if (peer?.stream && ref.current) {
