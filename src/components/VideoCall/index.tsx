@@ -21,7 +21,8 @@ interface PeerObj {
   initiator: boolean;
   peerID: string;
   currentUserId: string;
-  stream?: MediaStream;
+  stream: MediaStream | null;
+  tracks: MediaStreamTrack[];
 }
 
 export const VideoCall = ({ userIdsByVideoCall }: Props) => {
@@ -31,21 +32,16 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
   const userVideo = React.useRef<HTMLVideoElement>(null);
   const peersRef = React.useRef<PeerObj[]>([]);
   const [isCameraOn, setIsCameraOn] = React.useState(false); // カメラオンならtrue
-  const [isUnMute, setIsUnMute] = React.useState(false); // マイクオンならtrue
-  const [streamByMyPeer, setStreamByMyPeer] =
-    React.useState<MediaStream | null>(null);
+  const [isMicOn, setIsMicOn] = React.useState(false); // マイクオンならtrue
+  const [streamButton, setStreamButton] = React.useState(false);
   const [peers, setPeers] = React.useState<PeerObj[]>([]);
-  // let socket: WebSocket;
-  const [isUpdatingSDP, setIsUpdatingSDP] = React.useState(false);
   const [socket, setSocket] = React.useState<WebSocket | null>(null);
 
   const handleStopVideoCall = async () => {
     // すべてのpeer接続を切断
-    // answerdPeers.forEach((peerObj) => {
-    //   peerObj.peer.destroy();
-    // });
-    // answerdPeers = [];
-    // setPeers([]);
+    peers.forEach((peerObj) => {
+      peerObj.peer.destroy();
+    });
   };
 
   async function getStream({
@@ -67,59 +63,56 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
     }
   }
 
-  const addStreamToPeers = (stream: MediaStream) => {
-    peers.forEach((peerObj) => {
-      console.log("--peerobj start camera--");
-      stream.getTracks().forEach((track) => {
-        console.log("peerObj: ", peerObj);
-        peerObj.peer.addTrack(track, stream);
-      });
-    });
-  };
-
   const handleClickCameraButton = async () => {
-    const stream = await getStream({ video: true, audio: isUnMute });
-    setStreamByMyPeer(stream);
-    if (stream && userVideo.current) {
-      userVideo.current.srcObject = stream;
-      console.log("---camera add stream---");
-      console.log("peers ref: ", peersRef.current);
-      console.log("data: ", peersRef);
-
-      await addStreamToPeers(stream);
-
-      // let allInitiatorsFalse = true;
-      // allInitiatorsFalse = !peersRef.current.some((peerObj) => {
-      //   return peerObj.initiator === true;
-      // });
-      // console.log("allInitiatorsFalse: ", allInitiatorsFalse);
-      // if (allInitiatorsFalse) {
-      //   socket?.send(
-      //     JSON.stringify({
-      //       type: "update_sdp",
-      //     })
-      //   );
-      // }
-    }
-    setIsCameraOn(true);
+    setIsCameraOn((prev) => !prev);
   };
 
   const handleClickMicButton = () => {
-    // if (isUnMute) {
-    //   navigator.mediaDevices
-    //     .getUserMedia({
-    //       audio: true,
-    //     })
-    //     .then(removeMedia);
-    // } else {
-    //   navigator.mediaDevices
-    //     .getUserMedia({
-    //       audio: true,
-    //     })
-    //     .then(addMedia);
-    // }
-    // setIsUnMute((prev) => !prev);
+    setIsMicOn((prev) => !prev);
   };
+
+  const addStreamToPeers = async (stream: MediaStream) => {
+    const newPeers = [...peers];
+    await newPeers.forEach(async (peerObj) => {
+      await stream.getTracks().forEach(async (track) => {
+        await peerObj.peer.addTrack(track, stream);
+      });
+    });
+    setPeers(newPeers);
+  };
+
+  const removeStreamFromPeers = async () => {
+    const newPeers = [...peers];
+    console.log(newPeers);
+    // await newPeers.forEach(async (peerObj) => {
+    //   if (peerObj.stream && userVideo.current) {
+    //     const stream = peerObj.stream;
+    //     await peerObj.tracks.forEach((track) => {
+    //       track.stop();
+    //       peerObj.peer.removeTrack(track, stream);
+    //     });
+    //     userVideo.current.srcObject = null;
+    //   }
+    // });
+    setPeers(newPeers);
+  };
+
+  React.useEffect(() => {
+    const f = async () => {
+      setStreamButton(true);
+      if (isCameraOn || isMicOn) {
+        const stream = await getStream({ video: isCameraOn, audio: isMicOn });
+        if (stream && userVideo.current) {
+          userVideo.current.srcObject = stream;
+          await addStreamToPeers(stream);
+        }
+      } else {
+        await removeStreamFromPeers();
+      }
+      setStreamButton(false);
+    };
+    f();
+  }, [isCameraOn, isMicOn]);
 
   React.useEffect(() => {
     if (chatRoomId) {
@@ -129,10 +122,6 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
       setSocket(newSocket);
     }
   }, [chatRoomId]);
-
-  React.useEffect(() => {
-    console.log("peersrefcurrent: ", peersRef.current);
-  }, [peersRef.current]);
 
   React.useEffect(() => {
     const f = async () => {
@@ -145,11 +134,6 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
   }, [userIdsByVideoCall]);
 
   React.useEffect(() => {
-    // if (socket) {
-    //   handleStopVideoCall();
-    //   socket.close();
-    // }
-    // WebSocket connection
     if (socket) {
       socket.onopen = () => {
         console.log("Connected to WebSocke by videocall");
@@ -163,36 +147,25 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
       socket.onmessage = async (message) => {
         const payload = JSON.parse(message.data);
         console.log(`\n\n----- onmessage [${payload.type}] -----`);
-
+        const currentUserID = payload.currentUserID;
+        const peerId = payload.callerID;
         if (payload.type === "user-joined") {
-          const peerId = payload.callerID; // 呼び出し元ID
-          const currentUserID = payload.currentUserID;
-          console.log("peerId: ", peerId);
-          console.log("currentUserID: ", currentUserID);
           const index = peersRef.current.findIndex(
             (peerObj) => peerObj.peerID === peerId
           );
-          console.log("peersref: ", peersRef.current);
-          console.log("index: ", index);
           if (index === -1 && peerId !== currentUserID) {
             const peerObj = createPeer(peerId, currentUserID, true); // offerを作成
             peersRef.current = [...peersRef.current, peerObj];
           } else if (index !== -1 && peerId !== currentUserID) {
-            const peerObj = createPeer(peerId, currentUserID, true); // offerを作成
-            peersRef.current[index] = peerObj;
+            // const peerObj = createPeer(peerId, currentUserID, true); // offerを作成
+            // peersRef.current[index] = peerObj;
           }
         } else if (payload.type === "offer") {
           const sdp = new RTCSessionDescription(payload.sdp);
           console.log("sdp: ", sdp);
-          const currentUserID = payload.currentUserID;
-          const peerId = payload.callerID;
-          console.log("peerId: ", peerId);
-          console.log("currentUserID: ", currentUserID);
           const index = peersRef.current.findIndex(
             (peerObj) => peerObj.peerID === peerId
           );
-          console.log("peersref: ", peersRef.current);
-          console.log("index: ", index);
           if (sdp && index === -1 && peerId !== currentUserID) {
             const peerObj = createPeer(peerId, currentUserID); // answer作成
             peerObj.peer.signal(sdp);
@@ -203,15 +176,9 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
           }
         } else if (payload.type === "answer") {
           const sdp = new RTCSessionDescription(payload.sdp);
-          const currentUserID = payload.currentUserID;
-          const peerId = payload.callerID;
-          console.log("peerId: ", peerId);
-          console.log("currentUserID: ", currentUserID);
           const index = peersRef.current.findIndex(
             (peerObj) => peerObj.peerID === peerId
           );
-          console.log("peersref: ", peersRef.current);
-          console.log("index: ", index);
           if (sdp && index === -1 && peerId !== currentUserID) {
             const peerObj = createPeer(peerId, currentUserID);
             peerObj.peer.signal(sdp);
@@ -220,24 +187,30 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
             const peerObj = peersRef.current[index];
             peerObj.peer.signal(sdp);
           }
+        } else if (payload.type === "renegotiate") {
+          const index = peersRef.current.findIndex(
+            (peerObj) => peerObj.peerID === peerId
+          );
+          if (payload.data && index !== -1 && peerId !== currentUserID) {
+            const peerObj = peersRef.current[index];
+            peerObj.peer.signal(payload.data);
+          }
         }
       };
 
       socket.onclose = () => {
         handleStopVideoCall();
-        console.log("close socket");
         console.log("WebSocket disconnected");
       };
 
       return () => {
-        // Clean up the WebSocket connection when the component is unmounted
         handleStopVideoCall();
         if (socket) {
           socket.close();
         }
       };
     }
-  }, [socket, isUpdatingSDP]);
+  }, [socket]);
 
   const createPeer = (
     peerID: string,
@@ -250,13 +223,11 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
     });
 
     peer.on("signal", (data: SignalData) => {
-      console.log("signal はっかしてるよ！！！");
+      console.log(`\n\nsignal peer [ --- ${data.type} --- ]`);
+      console.log("peerId: ", peerID);
+      console.log("callerId: ", currentUserId);
       console.log("data: ", data);
       if (data.type === "offer") {
-        console.log("\n\ncreate peer [ --- offer --- ]");
-        console.log("peerId: ", peerID);
-        console.log("callerId: ", currentUserId);
-        console.log("data: ", data);
         socket?.send(
           JSON.stringify({
             type: "offer",
@@ -266,14 +237,19 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
           })
         );
       } else if (data.type === "answer") {
-        console.log("\n\ncreate peer [ --- answer --- ]");
-        console.log("peerId: ", peerID);
-        console.log("callerId: ", currentUserId);
-        console.log("data: ", data);
         socket?.send(
           JSON.stringify({
             type: "answer",
             sdp: data,
+            callerID: currentUserId,
+            peerID: peerID,
+          })
+        );
+      } else if (data.type === "renegotiate") {
+        socket?.send(
+          JSON.stringify({
+            type: "renegotiate",
+            data: data,
             callerID: currentUserId,
             peerID: peerID,
           })
@@ -288,6 +264,8 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
         initiator,
         peerID,
         currentUserId,
+        stream: null,
+        tracks: [],
       };
       const index = peersRef.current.findIndex((p) => p.peerID === peerID);
       if (index !== -1) {
@@ -299,13 +277,14 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
     });
 
     peer.on("stream", (stream: MediaStream) => {
-      console.log("\n\n\n---stream peer---");
+      console.log("---stream peer---");
       const peerObj: PeerObj = {
         peer,
         initiator,
         peerID,
         currentUserId,
         stream,
+        tracks: [],
       };
       const index = peersRef.current.findIndex((p) => p.peerID === peerID);
       if (index !== -1) {
@@ -317,24 +296,18 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
     });
 
     peer.on("track", () => {
-      console.log("\n\n\n---track---");
+      console.log("---track peer---");
     });
 
     peer.on("close", () => {
       console.log("---close peer---");
-      // const index = peers.findIndex((p) => p.peerID === peerID);
-      // if (index !== -1) {
-      //   const newPeers = [...peers];
-      //   newPeers.splice(index, 1);
-      //   setPeers(newPeers);
-      // }
     });
 
     peer.on("error", () => {
       console.log("---error peer---");
     });
 
-    return { peerID, currentUserId, peer, initiator };
+    return { peerID, currentUserId, peer, initiator, stream: null, tracks: [] };
   };
 
   return (
@@ -353,7 +326,7 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
           icon={<CallEnd />}
           description="終了する"
           onClick={async () => await handleStopVideoCall()}
-          disabled={false}
+          disabled={streamButton}
         />
         <ButtonWithIcon
           className={classes.cameraButton}
@@ -361,15 +334,15 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
           icon={isCameraOn ? <VideocamOffIcon /> : <VideocamIcon />}
           description={`カメラ - ${isCameraOn ? "off" : "on"}`}
           onClick={handleClickCameraButton}
-          disabled={false}
+          disabled={streamButton}
         />
         <ButtonWithIcon
           className={classes.micButton}
-          variant={isUnMute ? "outlined" : "contained"}
-          icon={isUnMute ? <MicOffIcon /> : <MicIcon />}
-          description={`マイク - ${isUnMute ? "off" : "on"}`}
+          variant={isMicOn ? "outlined" : "contained"}
+          icon={isMicOn ? <MicOffIcon /> : <MicIcon />}
+          description={`マイク - ${isMicOn ? "off" : "on"}`}
           onClick={handleClickMicButton}
-          disabled={false}
+          disabled={streamButton}
         />
       </div>
     </div>
