@@ -24,7 +24,7 @@ class WebRTCConsumer(AsyncWebsocketConsumer):
             if type == "join-room":
                 type = "user_joined"
             await self.channel_layer.group_send(self.room_group_name, {"type": type, "callerID": self.channel_name})
-        elif type in ["offer", "answer", "renegotiate"]:
+        elif type in ["offer", "answer", "renegotiate", "transceiverRequest"]:
             # Handle offer, answer, and candidate events here
             await self.channel_layer.group_send(self.room_group_name, {"type": type, **text_data_json})
         elif type == "webrtc_signal":
@@ -65,6 +65,15 @@ class WebRTCConsumer(AsyncWebsocketConsumer):
         # Send renegotiate event to the target user
         await self.send(text_data=json.dumps({
             "type": "renegotiate",
+            "data": event["data"],
+            "callerID": event["callerID"],
+            "currentUserID": self.channel_name,  # あなたの実装に応じてcurrentUserIDを設定してください
+        }))
+
+    async def transceiverRequest(self, event):
+        # Send transceiverRequest event to the target user
+        await self.send(text_data=json.dumps({
+            "type": "transceiverRequest",
             "data": event["data"],
             "callerID": event["callerID"],
             "currentUserID": self.channel_name,  # あなたの実装に応じてcurrentUserIDを設定してください

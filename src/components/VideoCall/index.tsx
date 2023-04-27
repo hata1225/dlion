@@ -76,6 +76,7 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
     await newPeers.forEach(async (peerObj) => {
       await stream.getTracks().forEach(async (track) => {
         await peerObj.peer.addTrack(track, stream);
+        peerObj.tracks.push(track);
       });
     });
     setPeers(newPeers);
@@ -83,19 +84,22 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
 
   const removeStreamFromPeers = async () => {
     const newPeers = [...peers];
-    console.log(newPeers);
-    // await newPeers.forEach(async (peerObj) => {
-    //   if (peerObj.stream && userVideo.current) {
-    //     const stream = peerObj.stream;
-    //     await peerObj.tracks.forEach((track) => {
-    //       track.stop();
-    //       peerObj.peer.removeTrack(track, stream);
-    //     });
-    //     userVideo.current.srcObject = null;
-    //   }
-    // });
-    setPeers(newPeers);
+    await newPeers.forEach(async (peerObj) => {
+      const stream = userVideo.current?.srcObject as MediaStream;
+      await peerObj.tracks.forEach(async (track) => {
+        await track.stop();
+        await peerObj.peer.removeTrack(track, stream);
+      });
+      peerObj.tracks = [];
+      if (userVideo.current) {
+        userVideo.current.srcObject = null;
+      }
+    });
   };
+
+  React.useEffect(() => {
+    console.log("peers: ", peers);
+  }, [peers, peersRef.current]);
 
   React.useEffect(() => {
     const f = async () => {
@@ -149,6 +153,8 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
         console.log(`\n\n----- onmessage [${payload.type}] -----`);
         const currentUserID = payload.currentUserID;
         const peerId = payload.callerID;
+        console.log("currentUserId: ", currentUserID);
+        console.log("peerId: ", peerId);
         if (payload.type === "user-joined") {
           const index = peersRef.current.findIndex(
             (peerObj) => peerObj.peerID === peerId
@@ -156,13 +162,9 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
           if (index === -1 && peerId !== currentUserID) {
             const peerObj = createPeer(peerId, currentUserID, true); // offerを作成
             peersRef.current = [...peersRef.current, peerObj];
-          } else if (index !== -1 && peerId !== currentUserID) {
-            // const peerObj = createPeer(peerId, currentUserID, true); // offerを作成
-            // peersRef.current[index] = peerObj;
           }
         } else if (payload.type === "offer") {
           const sdp = new RTCSessionDescription(payload.sdp);
-          console.log("sdp: ", sdp);
           const index = peersRef.current.findIndex(
             (peerObj) => peerObj.peerID === peerId
           );
@@ -173,6 +175,7 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
           } else if (sdp && index !== -1 && peerId !== currentUserID) {
             const peerObj = peersRef.current[index];
             peerObj.peer.signal(sdp);
+            setPeers(peersRef.current);
           }
         } else if (payload.type === "answer") {
           const sdp = new RTCSessionDescription(payload.sdp);
@@ -186,14 +189,19 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
           } else if (sdp && index !== -1 && peerId !== currentUserID) {
             const peerObj = peersRef.current[index];
             peerObj.peer.signal(sdp);
+            setPeers(peersRef.current);
           }
-        } else if (payload.type === "renegotiate") {
+        } else if (
+          payload.type === "renegotiate" ||
+          payload.type === "transceiverRequest"
+        ) {
           const index = peersRef.current.findIndex(
             (peerObj) => peerObj.peerID === peerId
           );
           if (payload.data && index !== -1 && peerId !== currentUserID) {
             const peerObj = peersRef.current[index];
             peerObj.peer.signal(payload.data);
+            setPeers(peersRef.current);
           }
         }
       };
@@ -246,6 +254,15 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
           })
         );
       } else if (data.type === "renegotiate") {
+        socket?.send(
+          JSON.stringify({
+            type: "renegotiate",
+            data: data,
+            callerID: currentUserId,
+            peerID: peerID,
+          })
+        );
+      } else if (data.type === "transceiverRequest") {
         socket?.send(
           JSON.stringify({
             type: "renegotiate",
