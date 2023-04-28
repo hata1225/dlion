@@ -86,7 +86,7 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
     const newPeers = [...peers];
     await newPeers.forEach(async (peerObj) => {
       const stream = userVideo.current?.srcObject as MediaStream;
-      await peerObj.tracks.forEach(async (track) => {
+      await stream.getTracks().forEach(async (track) => {
         await track.stop();
         await peerObj.peer.removeTrack(track, stream);
       });
@@ -94,12 +94,20 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
       if (userVideo.current) {
         userVideo.current.srcObject = null;
       }
+      socket?.send(
+        JSON.stringify({
+          type: "stopStream",
+          callerID: peerObj.currentUserId,
+        })
+      );
     });
+
+    setPeers(newPeers);
   };
 
   React.useEffect(() => {
     console.log("peers: ", peers);
-  }, [peers, peersRef.current]);
+  }, [peers]);
 
   React.useEffect(() => {
     const f = async () => {
@@ -155,19 +163,17 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
         const peerId = payload.callerID;
         console.log("currentUserId: ", currentUserID);
         console.log("peerId: ", peerId);
+        const index = peersRef.current.findIndex(
+          (peerObj) => peerObj.peerID === peerId
+        );
+
         if (payload.type === "user-joined") {
-          const index = peersRef.current.findIndex(
-            (peerObj) => peerObj.peerID === peerId
-          );
           if (index === -1 && peerId !== currentUserID) {
             const peerObj = createPeer(peerId, currentUserID, true); // offerを作成
             peersRef.current = [...peersRef.current, peerObj];
           }
         } else if (payload.type === "offer") {
           const sdp = new RTCSessionDescription(payload.sdp);
-          const index = peersRef.current.findIndex(
-            (peerObj) => peerObj.peerID === peerId
-          );
           if (sdp && index === -1 && peerId !== currentUserID) {
             const peerObj = createPeer(peerId, currentUserID); // answer作成
             peerObj.peer.signal(sdp);
@@ -179,9 +185,6 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
           }
         } else if (payload.type === "answer") {
           const sdp = new RTCSessionDescription(payload.sdp);
-          const index = peersRef.current.findIndex(
-            (peerObj) => peerObj.peerID === peerId
-          );
           if (sdp && index === -1 && peerId !== currentUserID) {
             const peerObj = createPeer(peerId, currentUserID);
             peerObj.peer.signal(sdp);
@@ -195,12 +198,16 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
           payload.type === "renegotiate" ||
           payload.type === "transceiverRequest"
         ) {
-          const index = peersRef.current.findIndex(
-            (peerObj) => peerObj.peerID === peerId
-          );
           if (payload.data && index !== -1 && peerId !== currentUserID) {
             const peerObj = peersRef.current[index];
             peerObj.peer.signal(payload.data);
+            setPeers(peersRef.current);
+          }
+        } else if (payload.type === "stopStream") {
+          console.log("index: ", index);
+          if (index !== -1) {
+            const peerObj = peersRef.current[index];
+            peerObj.stream = null;
             setPeers(peersRef.current);
           }
         }
@@ -375,7 +382,7 @@ const VideoContnet = ({ peer, userVideo = null }: VideoProps) => {
   let ref = React.useRef<HTMLVideoElement>(null);
 
   React.useEffect(() => {
-    if (peer?.stream && ref.current) {
+    if (peer && ref.current) {
       ref.current.srcObject = peer.stream;
     }
   }, [peer?.stream, ref]);

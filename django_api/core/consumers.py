@@ -24,7 +24,7 @@ class WebRTCConsumer(AsyncWebsocketConsumer):
             if type == "join-room":
                 type = "user_joined"
             await self.channel_layer.group_send(self.room_group_name, {"type": type, "callerID": self.channel_name})
-        elif type in ["offer", "answer", "renegotiate", "transceiverRequest"]:
+        elif type in ["offer", "answer", "renegotiate", "transceiverRequest", "stopStream"]:
             # Handle offer, answer, and candidate events here
             await self.channel_layer.group_send(self.room_group_name, {"type": type, **text_data_json})
         elif type == "webrtc_signal":
@@ -44,37 +44,40 @@ class WebRTCConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({"type": "update_sdp", "callerID": callerID, "currentUserID": self.channel_name}))
 
     async def offer(self, event):
-        # Send offer event to the target user
         await self.send(text_data=json.dumps({
             "type": "offer",
             "sdp": event["sdp"],
             "callerID": event["callerID"],
-            "currentUserID": self.channel_name,  # あなたの実装に応じてcurrentUserIDを設定してください
+            "currentUserID": self.channel_name,
         }))
 
     async def answer(self, event):
-        # Send answer event to the target user
         await self.send(text_data=json.dumps({
             "type": "answer",
             "sdp": event["sdp"],
             "callerID": event["callerID"],
-            "currentUserID": self.channel_name,  # あなたの実装に応じてcurrentUserIDを設定してください
+            "currentUserID": self.channel_name,
         }))
 
     async def renegotiate(self, event):
-        # Send renegotiate event to the target user
         await self.send(text_data=json.dumps({
             "type": "renegotiate",
             "data": event["data"],
             "callerID": event["callerID"],
-            "currentUserID": self.channel_name,  # あなたの実装に応じてcurrentUserIDを設定してください
+            "currentUserID": self.channel_name,
         }))
 
     async def transceiverRequest(self, event):
-        # Send transceiverRequest event to the target user
         await self.send(text_data=json.dumps({
             "type": "transceiverRequest",
             "data": event["data"],
             "callerID": event["callerID"],
-            "currentUserID": self.channel_name,  # あなたの実装に応じてcurrentUserIDを設定してください
+            "currentUserID": self.channel_name,
+        }))
+
+    async def stopStream(self, event):
+        await self.send(text_data=json.dumps({
+            "type": "stopStream",
+            "callerID": event["callerID"],
+            "currentUserID": self.channel_name,
         }))
