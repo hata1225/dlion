@@ -64,6 +64,7 @@ export const baseStyle = {
     small: "32px",
   },
   gap: {
+    large: "15px",
     main: "10px",
     small: "5px",
   },

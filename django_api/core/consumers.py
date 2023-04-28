@@ -49,6 +49,7 @@ class WebRTCConsumer(AsyncWebsocketConsumer):
             "sdp": event["sdp"],
             "callerID": event["callerID"],
             "currentUserID": self.channel_name,
+            "userInfo": event["userInfo"]
         }))
 
     async def answer(self, event):
@@ -57,6 +58,7 @@ class WebRTCConsumer(AsyncWebsocketConsumer):
             "sdp": event["sdp"],
             "callerID": event["callerID"],
             "currentUserID": self.channel_name,
+            "userInfo": event["userInfo"]
         }))
 
     async def renegotiate(self, event):
@@ -65,6 +67,7 @@ class WebRTCConsumer(AsyncWebsocketConsumer):
             "data": event["data"],
             "callerID": event["callerID"],
             "currentUserID": self.channel_name,
+            "userInfo": event["userInfo"]
         }))
 
     async def transceiverRequest(self, event):
@@ -73,6 +76,7 @@ class WebRTCConsumer(AsyncWebsocketConsumer):
             "data": event["data"],
             "callerID": event["callerID"],
             "currentUserID": self.channel_name,
+            "userInfo": event["userInfo"]
         }))
 
     async def stopStream(self, event):
@@ -80,4 +84,5 @@ class WebRTCConsumer(AsyncWebsocketConsumer):
             "type": "stopStream",
             "callerID": event["callerID"],
             "currentUserID": self.channel_name,
+            "userInfo": event["userInfo"]
         }))

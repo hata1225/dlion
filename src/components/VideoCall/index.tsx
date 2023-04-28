@@ -7,6 +7,7 @@ import { ENV } from "api/api";
 import { createChatRoom } from "api/apiChat";
 import { UserContext } from "contexts/UserContext";
 import { baseStyle, borderRadius } from "theme";
+import { UserInterfaceAndUserFollowInterface } from "types/User";
 import VideocamIcon from "@material-ui/icons/Videocam";
 import VideocamOffIcon from "@material-ui/icons/VideocamOff";
 import MicIcon from "@material-ui/icons/Mic";
@@ -23,6 +24,7 @@ interface PeerObj {
   currentUserId: string;
   stream: MediaStream | null;
   tracks: MediaStreamTrack[];
+  userInfo: UserInterfaceAndUserFollowInterface;
 }
 
 export const VideoCall = ({ userIdsByVideoCall }: Props) => {
@@ -37,25 +39,20 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
   const [peers, setPeers] = React.useState<PeerObj[]>([]);
   const [socket, setSocket] = React.useState<WebSocket | null>(null);
 
-  const handleStopVideoCall = async () => {
+  const peerDestroy = async () => {
     // すべてのpeer接続を切断
-    peers.forEach((peerObj) => {
+    await peers.forEach(async (peerObj) => {
+      await peerObj.tracks.forEach((track) => {
+        track.stop();
+      });
       peerObj.peer.destroy();
     });
+    console.log(peers);
   };
 
-  async function getStream({
-    video = false,
-    audio = false,
-  }: {
-    video: boolean;
-    audio: boolean;
-  }) {
+  async function getStream({ video = false, audio = false }: { video: boolean; audio: boolean }) {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video,
-        audio,
-      });
+      const stream = await navigator.mediaDevices.getUserMedia({ video, audio });
       return stream;
     } catch (error) {
       console.error("Error accessing camera:", error);
@@ -98,6 +95,7 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
         JSON.stringify({
           type: "stopStream",
           callerID: peerObj.currentUserId,
+          userInfo: user,
         })
       );
     });
@@ -107,6 +105,10 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
 
   React.useEffect(() => {
     console.log("peers: ", peers);
+    const tracks = peers.map((peerObj) => {
+      return { peerId: peerObj.peerID, tracks: peerObj.stream?.getTracks() ?? [] };
+    });
+    console.log("tracks: ", tracks);
   }, [peers]);
 
   React.useEffect(() => {
@@ -128,9 +130,7 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
 
   React.useEffect(() => {
     if (chatRoomId) {
-      const newSocket = new WebSocket(
-        `ws://${ENV}:8000/ws/webrtc/${chatRoomId}/`
-      );
+      const newSocket = new WebSocket(`ws://${ENV}:8000/ws/webrtc/${chatRoomId}/`);
       setSocket(newSocket);
     }
   }, [chatRoomId]);
@@ -163,41 +163,25 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
         const peerId = payload.callerID;
         console.log("currentUserId: ", currentUserID);
         console.log("peerId: ", peerId);
-        const index = peersRef.current.findIndex(
-          (peerObj) => peerObj.peerID === peerId
-        );
+        const index = peersRef.current.findIndex((peerObj) => peerObj.peerID === peerId);
 
         if (payload.type === "user-joined") {
           if (index === -1 && peerId !== currentUserID) {
-            const peerObj = createPeer(peerId, currentUserID, true); // offerを作成
+            const peerObj = createPeer(peerId, currentUserID, true);
             peersRef.current = [...peersRef.current, peerObj];
           }
-        } else if (payload.type === "offer") {
-          const sdp = new RTCSessionDescription(payload.sdp);
-          if (sdp && index === -1 && peerId !== currentUserID) {
-            const peerObj = createPeer(peerId, currentUserID); // answer作成
-            peerObj.peer.signal(sdp);
-            peersRef.current = [...peersRef.current, peerObj];
-          } else if (sdp && index !== -1 && peerId !== currentUserID) {
-            const peerObj = peersRef.current[index];
-            peerObj.peer.signal(sdp);
-            setPeers(peersRef.current);
-          }
-        } else if (payload.type === "answer") {
+        } else if (payload.type === "offer" || payload.type === "answer") {
           const sdp = new RTCSessionDescription(payload.sdp);
           if (sdp && index === -1 && peerId !== currentUserID) {
             const peerObj = createPeer(peerId, currentUserID);
             peerObj.peer.signal(sdp);
-            peersRef.current[index] = peerObj;
+            peersRef.current = [...peersRef.current, peerObj];
           } else if (sdp && index !== -1 && peerId !== currentUserID) {
             const peerObj = peersRef.current[index];
             peerObj.peer.signal(sdp);
             setPeers(peersRef.current);
           }
-        } else if (
-          payload.type === "renegotiate" ||
-          payload.type === "transceiverRequest"
-        ) {
+        } else if (payload.type === "renegotiate" || payload.type === "transceiverRequest") {
           if (payload.data && index !== -1 && peerId !== currentUserID) {
             const peerObj = peersRef.current[index];
             peerObj.peer.signal(payload.data);
@@ -214,12 +198,12 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
       };
 
       socket.onclose = () => {
-        handleStopVideoCall();
+        peerDestroy();
         console.log("WebSocket disconnected");
       };
 
       return () => {
-        handleStopVideoCall();
+        peerDestroy();
         if (socket) {
           socket.close();
         }
@@ -242,40 +226,24 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
       console.log("peerId: ", peerID);
       console.log("callerId: ", currentUserId);
       console.log("data: ", data);
-      if (data.type === "offer") {
+      if (data.type === "offer" || data.type === "answer") {
         socket?.send(
           JSON.stringify({
-            type: "offer",
+            type: data.type,
             sdp: data,
             callerID: currentUserId,
             peerID: peerID,
+            userInfo: user,
           })
         );
-      } else if (data.type === "answer") {
+      } else if (data.type === "renegotiate" || data.type === "transceiverRequest") {
         socket?.send(
           JSON.stringify({
-            type: "answer",
-            sdp: data,
-            callerID: currentUserId,
-            peerID: peerID,
-          })
-        );
-      } else if (data.type === "renegotiate") {
-        socket?.send(
-          JSON.stringify({
-            type: "renegotiate",
+            type: data.type,
             data: data,
             callerID: currentUserId,
             peerID: peerID,
-          })
-        );
-      } else if (data.type === "transceiverRequest") {
-        socket?.send(
-          JSON.stringify({
-            type: "renegotiate",
-            data: data,
-            callerID: currentUserId,
-            peerID: peerID,
+            userInfo: user,
           })
         );
       }
@@ -290,6 +258,7 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
         currentUserId,
         stream: null,
         tracks: [],
+        userInfo: user,
       };
       const index = peersRef.current.findIndex((p) => p.peerID === peerID);
       if (index !== -1) {
@@ -309,6 +278,7 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
         currentUserId,
         stream,
         tracks: [],
+        userInfo: user,
       };
       const index = peersRef.current.findIndex((p) => p.peerID === peerID);
       if (index !== -1) {
@@ -331,7 +301,7 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
       console.log("---error peer---");
     });
 
-    return { peerID, currentUserId, peer, initiator, stream: null, tracks: [] };
+    return { peerID, currentUserId, peer, initiator, stream: null, tracks: [], userInfo: user };
   };
 
   return (
@@ -343,31 +313,35 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
         })}
       </div>
       <div className={classes.buttonArea}>
-        <ButtonWithIcon
-          className={classes.callEndButton}
-          variant="outlined"
-          color="secondary"
-          icon={<CallEnd />}
-          description="終了する"
-          onClick={async () => await handleStopVideoCall()}
-          disabled={streamButton}
-        />
-        <ButtonWithIcon
-          className={classes.cameraButton}
-          variant={isCameraOn ? "outlined" : "contained"}
-          icon={isCameraOn ? <VideocamOffIcon /> : <VideocamIcon />}
-          description={`カメラ - ${isCameraOn ? "off" : "on"}`}
-          onClick={handleClickCameraButton}
-          disabled={streamButton}
-        />
-        <ButtonWithIcon
-          className={classes.micButton}
-          variant={isMicOn ? "outlined" : "contained"}
-          icon={isMicOn ? <MicOffIcon /> : <MicIcon />}
-          description={`マイク - ${isMicOn ? "off" : "on"}`}
-          onClick={handleClickMicButton}
-          disabled={streamButton}
-        />
+        <div className={classes.buttonAreaTop}>
+          <ButtonWithIcon
+            className={classes.callEndButton}
+            variant="outlined"
+            color="secondary"
+            icon={<CallEnd />}
+            description="終了する"
+            onClick={async () => await peerDestroy()}
+            disabled={streamButton}
+          />
+        </div>
+        <div className={classes.buttonAreaBottom}>
+          <ButtonWithIcon
+            className={classes.cameraButton}
+            variant={isCameraOn ? "outlined" : "contained"}
+            icon={isCameraOn ? <VideocamOffIcon /> : <VideocamIcon />}
+            description={`カメラ - ${isCameraOn ? "off" : "on"}`}
+            onClick={handleClickCameraButton}
+            disabled={streamButton}
+          />
+          <ButtonWithIcon
+            className={classes.micButton}
+            variant={isMicOn ? "outlined" : "contained"}
+            icon={isMicOn ? <MicOffIcon /> : <MicIcon />}
+            description={`マイク - ${isMicOn ? "off" : "on"}`}
+            onClick={handleClickMicButton}
+            disabled={streamButton}
+          />
+        </div>
       </div>
     </div>
   );
@@ -400,7 +374,7 @@ const VideoContnet = ({ peer, userVideo = null }: VideoProps) => {
   );
 };
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
   videoAreaWrap: {
     width: "100%",
     height: "100%",
@@ -410,11 +384,17 @@ const useStyles = makeStyles({
     alignItems: "center",
     flexDirection: "column",
     gap: "30px",
+    position: "relative",
   },
   videoContentArea: {
-    width: "50%",
+    width: "100%",
+    aspectRatio: "16 / 9",
     backgroundColor: baseStyle.color.gray.dark,
     borderRadius: borderRadius.large.main,
+    [theme.breakpoints.down("xs")]: {
+      maxHeight: "calc(50% - 5vh)",
+      width: "auto",
+    },
   },
   video: {
     width: "100%",
@@ -426,11 +406,26 @@ const useStyles = makeStyles({
   videoArea: {
     display: "flex",
     width: "100%",
+    height: "calc(100% - 120px)",
+    alignItems: "center",
+    justifyContent: "center",
+    [theme.breakpoints.down("xs")]: {
+      height: "calc(100% - 10vh)",
+      flexDirection: "column",
+    },
+    gap: baseStyle.gap.small,
   },
   buttonArea: {
+    height: "120px",
     display: "flex",
     flexDirection: "column",
-    gap: baseStyle.gap.main,
+    gap: baseStyle.gap.large,
+  },
+  buttonAreaTop: {},
+  buttonAreaBottom: {
+    display: "flex",
+    flexDirection: "column",
+    gap: baseStyle.gap.small,
   },
   callEndButton: {
     width: baseStyle.button.width.large,
@@ -441,4 +436,4 @@ const useStyles = makeStyles({
   micButton: {
     width: baseStyle.button.width.large,
   },
-});
+}));
