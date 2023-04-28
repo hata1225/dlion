@@ -1,4 +1,4 @@
-import { makeStyles } from "@material-ui/core";
+import { Box, makeStyles } from "@material-ui/core";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 import PersonIcon from "@material-ui/icons/Person";
@@ -77,7 +77,7 @@ export const SubArea = () => {
   ];
 
   return (
-    <div className={classes.subArea}>
+    <Box className={classes.subArea}>
       <div className={classes.subAreaInner}>
         {subAreaContents.map((item, i) => {
           const { func, description, icon } = item;
@@ -91,18 +91,20 @@ export const SubArea = () => {
           );
         })}
       </div>
-    </div>
+    </Box>
   );
 };
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
   subArea: {
     height: "100%",
     width: baseStyle.subArea.width,
-    display: "none",
     flexDirection: "column",
     alignItems: "center",
     paddingTop: "30px",
+    [theme.breakpoints.down("xs")]: {
+      display: "none",
+    },
   },
   subAreaInner: {
     width: "100%",
@@ -116,4 +118,4 @@ const useStyles = makeStyles({
   button: {
     fontSize: "1.4rem",
   },
-});
+}));

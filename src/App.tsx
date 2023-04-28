@@ -16,9 +16,22 @@ import { ChatPage } from "pages/ChatPage";
 import { ProfilePage } from "pages/ProfilePage";
 import { FilePage } from "pages/FilePage";
 import { VideoCallModalModalProvider } from "contexts/VideoCallModalContext";
+// import { createTheme, ThemeProvider } from "@material-ui/core";
 
 export default function App() {
+  // const theme = createTheme({
+  //   breakpoints: {
+  //     values: {
+  //       xs: 0,
+  //       sm: 600,
+  //       md: 960,
+  //       lg: 1280,
+  //       xl: 1920,
+  //     },
+  //   },
+  // });
   return (
+    // <ThemeProvider theme={theme}>
     <GoogleOAuthProvider clientId={`${process.env.REACT_APP_GOOGLE_CLIENT_ID}`}>
       <UserProvider>
         <FileDataProvider>
@@ -31,6 +44,7 @@ export default function App() {
         </FileDataProvider>
       </UserProvider>
     </GoogleOAuthProvider>
+    // </ThemeProvider>
   );
 }
 
