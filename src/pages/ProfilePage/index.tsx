@@ -1,6 +1,6 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { UserInterfaceAndUserFollowInterface } from "types/User";
 import { getUserInfo } from "api/api";
 import { UserContext } from "contexts/UserContext";
@@ -15,13 +15,14 @@ import { useWSFollowInfo } from "dataService/userData";
 import { VideoCallOpenModalButton } from "components/VideoCall/VideoCallOpenModalButton";
 import { ChatButton } from "components/Chat/ChatButton";
 import { Layout } from "components/Layout";
+import { createChatRoom } from "api/apiChat";
 
 export const ProfilePage = () => {
   const classes = useStyles();
   const { id } = useParams();
+  const navigate = useNavigate();
   const { user } = React.useContext(UserContext);
-  const [userInfo, setUserInfo] =
-    React.useState<UserInterfaceAndUserFollowInterface>();
+  const [userInfo, setUserInfo] = React.useState<UserInterfaceAndUserFollowInterface>();
   const [isOwnUserId, setIsOwnUserId] = React.useState<boolean>(false);
   const [profilePageUserId, setProfilePageUserId] = React.useState("");
   const { followingList, followerList } = useWSFollowInfo(profilePageUserId);
@@ -32,7 +33,7 @@ export const ProfilePage = () => {
 
   React.useEffect(() => {
     const f = async () => {
-      if (user.token) {
+      if (user.token && profilePageUserId) {
         let userId = profilePageUserId ?? user.id;
         const newUserInfo = await getUserInfo(user.token, userId);
         setUserInfo((prev) => ({ ...prev, ...newUserInfo }));
@@ -47,8 +48,15 @@ export const ProfilePage = () => {
     }
   }, [id]);
 
+  const handleClickChatButton = async () => {
+    if (!isOwnUserId) {
+      const chatRoom = await createChatRoom(user.token, [user.id, profilePageUserId]);
+      navigate(`/chat/${chatRoom.id}`);
+    }
+  };
+
   const handleClickEditButton = () => {
-    window.location.href = "/edituser";
+    navigate("/edituser");
   };
 
   return (
@@ -56,11 +64,7 @@ export const ProfilePage = () => {
       <div className={classes.profilePage}>
         <div className={classes.profileArea}>
           <div className={classes.backgroundImageWrap}>
-            <img
-              className={classes.backgroundImage}
-              src={userInfo?.background_image}
-              alt=""
-            />
+            <img className={classes.backgroundImage} src={userInfo?.background_image} alt="" />
           </div>
           <div className={classes.userInfoArea}>
             <div className={classes.userInfoLeftArea}>
@@ -88,10 +92,8 @@ export const ProfilePage = () => {
                 <></>
               ) : (
                 <div className={classes.communicationArea}>
-                  <ChatButton />
-                  <VideoCallOpenModalButton
-                    userIdsByVideoCall={[user.id, profilePageUserId]}
-                  />
+                  <ChatButton onClick={async () => await handleClickChatButton()} />
+                  <VideoCallOpenModalButton userIdsByVideoCall={[user.id, profilePageUserId]} />
                 </div>
               )}
               {isOwnUserId ? (
@@ -99,9 +101,7 @@ export const ProfilePage = () => {
                   className={classes.editButton}
                   onClick={handleClickEditButton}
                   description="編集する"
-                  icon={
-                    <PersonIcon style={{ fontSize: fontSize.medium.medium }} />
-                  }
+                  icon={<PersonIcon style={{ fontSize: fontSize.medium.medium }} />}
                   variant="outlined"
                 />
               ) : (

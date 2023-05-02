@@ -12,6 +12,7 @@ import { createNotification } from "functions/notification";
 import { ChatContent } from "components/Chat/ChatContent";
 import userIconImageDefault from "userIconImageDefault.webp";
 import { changeCreatedAt } from "functions/changeDate";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
   chatRoomId: string;
@@ -23,10 +24,10 @@ interface Props {
  */
 export const ChatArea = ({ chatRoomId, chatRoomProp }: Props) => {
   const classes = useStyles();
+  const navigate = useNavigate();
   const [message, setMessage] = React.useState("");
   const [chatsState, setChatsState] = React.useState<Chat[]>([]);
-  const [userByChatPartner, setUserByChatPartner] =
-    React.useState<UserInterface>();
+  const [userByChatPartner, setUserByChatPartner] = React.useState<UserInterface>();
   const { user } = React.useContext(UserContext);
   const { chatRoom, chats } = useWSChatRoomData(chatRoomId);
   const users = useExceptUsersByCurrentUser(chatRoom?.users ?? []);
@@ -86,6 +87,10 @@ export const ChatArea = ({ chatRoomId, chatRoomProp }: Props) => {
     setMessage(e.target.value);
   };
 
+  const handleClickIcon = () => {
+    navigate(`/profile/${userByChatPartner?.id}`);
+  };
+
   return (
     <div className={classes.chatAreaWrap}>
       <div className={classes.chatArea}>
@@ -94,6 +99,7 @@ export const ChatArea = ({ chatRoomId, chatRoomProp }: Props) => {
             className={`${classes.icon} ${classes.iconMainSize}`}
             src={userByChatPartner?.icon_image ?? userIconImageDefault}
             alt={`${userByChatPartner?.name} icon`}
+            onClick={handleClickIcon}
           />
           <h2>{userByChatPartner?.name}</h2>
         </Paper>
@@ -104,18 +110,13 @@ export const ChatArea = ({ chatRoomId, chatRoomProp }: Props) => {
               const isLatestChat = key === 0;
               const nextChat = isLastChat ? chatsState[key + 1] : null;
               const prevChat = isLatestChat ? null : chatsState[key - 1];
-              const currentDate = changeCreatedAt(
-                chat.created_at
-              ).createdAtDate;
-              const prevDate = prevChat
-                ? changeCreatedAt(prevChat.created_at).createdAtDate
-                : null;
+              const currentDate = changeCreatedAt(chat.created_at).createdAtDate;
+              const prevDate = prevChat ? changeCreatedAt(prevChat.created_at).createdAtDate : null;
 
               const isHiddenUserIcon = Boolean(
                 nextChat && nextChat.created_user.id === chat.created_user.id
               );
-              const isVisibleCreatedAtDate =
-                isLatestChat || currentDate !== prevDate;
+              const isVisibleCreatedAtDate = isLatestChat || currentDate !== prevDate;
 
               const createdAtDate = isVisibleCreatedAtDate ? currentDate : "";
 
@@ -190,6 +191,7 @@ const useStyles = makeStyles({
   },
   iconMainSize: {
     height: baseStyle.userIconSize.main,
+    cursor: "pointer",
   },
   chatContainer: {
     overflow: "scroll",

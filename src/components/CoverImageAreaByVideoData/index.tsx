@@ -1,6 +1,7 @@
 import { makeStyles, CircularProgress } from "@material-ui/core";
 import { useWSFileData } from "dataService/fileData";
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { baseStyle, fontSize } from "theme";
 import { FileData, VideoEncodeStatus } from "types/fileData";
 
@@ -18,11 +19,11 @@ export const CoverImageAreaByVideoData = ({
   isNotTransitionPage,
 }: Props) => {
   const classes = useStyles();
+  const navigate = useNavigate();
   const [isShortVideo, setIsShortVideo] = React.useState(false);
   const [coverImage, setCoverImage] = React.useState("");
   const [shortVideo, setShortVideo] = React.useState("");
-  const [videoEncodeStatus, setVideoEncodeStatus] =
-    React.useState<VideoEncodeStatus>();
+  const [videoEncodeStatus, setVideoEncodeStatus] = React.useState<VideoEncodeStatus>();
   const [isVideoType, setIsVideoType] = React.useState(false); // 動画タイプならtrue
   const [isVideoEncoded, setIsVideoEncoded] = React.useState(true);
   const [videoEncodeProgress, setVideoEncodeProgress] = React.useState(0);
@@ -31,12 +32,7 @@ export const CoverImageAreaByVideoData = ({
   // エンコード状況,カバー画像,ショートビデオの取得
   React.useEffect(() => {
     if (propFileData) {
-      const {
-        video_encode_status,
-        cover_image,
-        short_video_path,
-        main_data_type,
-      } = propFileData;
+      const { video_encode_status, cover_image, short_video_path, main_data_type } = propFileData;
       setVideoEncodeStatus(video_encode_status);
       setCoverImage(cover_image ?? "");
       setShortVideo(short_video_path);
@@ -71,9 +67,9 @@ export const CoverImageAreaByVideoData = ({
 
   const handleClickImage = () => {
     if (!isVideoType && propFileData) {
-      window.location.href = `/filedata/${propFileData.id}`;
+      navigate(`/filedata/${propFileData.id}`);
     } else if (isVideoEncoded && propFileData && !isNotTransitionPage) {
-      window.location.href = `/filedata/${propFileData.id}`;
+      navigate(`/filedata/${propFileData.id}`);
     }
   };
 

@@ -5,6 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from chat.models import ChatRoom, Chat
 from core.models import User
+from django.db.models import Count
 from chat.serializers import ChatSerializer, ChatRoomSerializer
 import re
 
@@ -104,7 +105,7 @@ class CreateChatRoomAPIView(APIView):
                 return Response(status=status.HTTP_400_BAD_REQUEST)
 
             # 重複チェック(chatroom作成時に重複したパターンのuser_idsがないかチェック)
-            chatroom = ChatRoom.objects.filter(users__id__in=user_ids).first()
+            chatroom = ChatRoom.objects.filter(users__id__in=user_ids).annotate(num_users=Count("users")).filter(num_users=len(user_ids)).first()
 
             # 重複チェックしてなかったら新しく作成
             if not chatroom:
