@@ -1,4 +1,4 @@
-import { makeStyles } from "@material-ui/core";
+import { Box, makeStyles } from "@material-ui/core";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 import PersonIcon from "@material-ui/icons/Person";
@@ -9,6 +9,7 @@ import { fontSize, baseStyle, shadow } from "theme";
 import React from "react";
 import { PostModalContext } from "contexts/PostModalContext";
 import { UserContext } from "contexts/UserContext";
+import { useNavigate } from "react-router-dom";
 
 type SubAreaContents = {
   func: any;
@@ -18,11 +19,12 @@ type SubAreaContents = {
 
 export const SubArea = () => {
   const classes = useStyles();
+  const navigate = useNavigate();
   const { handleOpenPostModal } = React.useContext(PostModalContext);
   const { signout, user } = React.useContext(UserContext);
 
   const handleClickHomeIcon = () => {
-    window.location.href = "/";
+    navigate("/");
   };
 
   const handleClickSignout = () => {
@@ -30,15 +32,15 @@ export const SubArea = () => {
   };
 
   const handleClickUserEditButton = () => {
-    window.location.href = "/edituser";
+    navigate("/edituser");
   };
 
   const handleClickUserProfileButton = () => {
-    window.location.href = `/profile/${user?.id}`;
+    navigate(`/profile/${user?.id}`);
   };
 
   const handleClickChatIcon = () => {
-    window.location.href = "/chat";
+    navigate("/chat");
   };
 
   const subAreaContents: SubAreaContents = [
@@ -75,7 +77,7 @@ export const SubArea = () => {
   ];
 
   return (
-    <div className={classes.subArea}>
+    <Box className={classes.subArea}>
       <div className={classes.subAreaInner}>
         {subAreaContents.map((item, i) => {
           const { func, description, icon } = item;
@@ -89,18 +91,20 @@ export const SubArea = () => {
           );
         })}
       </div>
-    </div>
+    </Box>
   );
 };
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
   subArea: {
     height: "100%",
     width: baseStyle.subArea.width,
-    display: "flex",
     flexDirection: "column",
     alignItems: "center",
     paddingTop: "30px",
+    [theme.breakpoints.down("xs")]: {
+      display: "none",
+    },
   },
   subAreaInner: {
     width: "100%",
@@ -114,4 +118,4 @@ const useStyles = makeStyles({
   button: {
     fontSize: "1.4rem",
   },
-});
+}));

@@ -1,4 +1,3 @@
-import React from "react";
 import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { UserProvider } from "contexts/UserContext";
@@ -7,7 +6,6 @@ import "react-notifications-component/dist/theme.css";
 import "animate.css/animate.min.css";
 
 import { ReactNotifications } from "react-notifications-component";
-import { Layout } from "components/Layout";
 import { SignupAndSigninPage } from "pages/SignupAndSigninPage";
 import { PostModalProvider } from "contexts/PostModalContext";
 import { FileDataProvider } from "contexts/FileDataContexts";
@@ -17,24 +15,36 @@ import { EditUserPage } from "pages/EditUserPage";
 import { ChatPage } from "pages/ChatPage";
 import { ProfilePage } from "pages/ProfilePage";
 import { FilePage } from "pages/FilePage";
+import { VideoCallModalModalProvider } from "contexts/VideoCallModalContext";
+// import { createTheme, ThemeProvider } from "@material-ui/core";
 
 export default function App() {
-  React.useEffect(() => {
-    console.log(process.env.REACT_APP_GOOGLE_CLIENT_ID);
-  }, [process.env.REACT_APP_GOOGLE_CLIENT_ID]);
+  // const theme = createTheme({
+  //   breakpoints: {
+  //     values: {
+  //       xs: 0,
+  //       sm: 600,
+  //       md: 960,
+  //       lg: 1280,
+  //       xl: 1920,
+  //     },
+  //   },
+  // });
   return (
+    // <ThemeProvider theme={theme}>
     <GoogleOAuthProvider clientId={`${process.env.REACT_APP_GOOGLE_CLIENT_ID}`}>
       <UserProvider>
         <FileDataProvider>
           <PostModalProvider>
-            <ReactNotifications />
-            <Layout>
+            <VideoCallModalModalProvider>
+              <ReactNotifications />
               <ReactRouter />
-            </Layout>
+            </VideoCallModalModalProvider>
           </PostModalProvider>
         </FileDataProvider>
       </UserProvider>
     </GoogleOAuthProvider>
+    // </ThemeProvider>
   );
 }
 

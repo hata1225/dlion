@@ -35,19 +35,20 @@
 >
 > ### バージョンについて
 >
-> | サービス名 | バージョン |
-> ----|---- 
-> | docker | 20.10.13 |
-> | docker-compose | 1.92.2 |
-> | node | 19.8.1 |
-> | python | 3.11.2 |
-> | Django | 4.2 |
-> | DRF | 3.14.0 |
+> | サービス名     | バージョン |
+> | -------------- | ---------- |
+> | docker         | 20.10.13   |
+> | docker-compose | 1.92.2     |
+> | node           | 19.9.0     |
+> | python         | 3.11.3     |
+> | Django         | 4.2        |
+> | DRF            | 3.14.0     |
+>
 > ---
 >
 > ### 使用している Docker イメージについて
 >
-> - **ubuntu**: 22.10
+> - **python**: 3.11.3-slim-bullseye
 > - **node**: 19.8.1-slim
 > - **selenium**: docker hub から最新の image を引っ張ってる
 > - **redis**: redis:latest
@@ -67,7 +68,7 @@
 
 <details>
 
-![画面設計](./dlion%E7%94%BB%E9%9D%A2%E9%81%B7%E7%A7%BB.png)
+![画面設計](./readme_image/dlion%E7%94%BB%E9%9D%A2%E9%81%B7%E7%A7%BB.png)
 
 </details>
 
@@ -127,9 +128,9 @@
 
     個人でソース(dlion)を使う場合は、シークレットキーを自分で発行し.env ファイルに貼り付けてください。
 
-    1.  シークレットキー発行(dlion直下で行う)
+    1.  シークレットキー発行(dlion 直下で行う)
         ```
-        cd django_api && 3python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())' && cd ../
+        cd django_api && python3 -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())' && cd ../
         ```
     2.  出力された文字列をコピー
 
@@ -141,7 +142,7 @@
 
 6.  **superuser 情報などを.env ファイルに追記**
 
-    localhost:8000/admin にログインするとき & watchdog でディレクトリを監視、エンコード等で使います
+    localhost:8000/admin にログインするときに使います
 
         SECRET_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx # 前回手順で作成済み
         SUPER_USER_EMAIL=example@example.com
@@ -154,9 +155,9 @@
     dlion ディレクトリ直下でコマンドを叩いてください。
 
         npm install
-  
+
     or
-  
+
         yarn install
 
 8.  **docker-compose build をする**
@@ -171,13 +172,15 @@
 
         docker-compose run --rm django_app sh -c "python3 manage.py makemigrations core"
 
+        docker-compose run --rm django_app sh -c "python3 manage.py makemigrations chat"
+
     --rm: コンテナ停止後、コンテナを削除
 
     sh -c: シェルコマンド （bash -c: バッシュコマンド）
 
 10. **マイグレーションファイルをもとに、データベースへ反映**
 
-        docker-compose run --rm django_app sh -c "python3 manage.py migrate core"
+        docker-compose run --rm django_app sh -c "python3 manage.py migrate"
 
 11. **docker-compose up**
 
@@ -212,13 +215,15 @@
 
         docker-compose run --rm django_app sh -c "python3 manage.py makemigrations core"
 
+        docker-compose run --rm django_app sh -c "python3 manage.py makemigrations chat"
+
     --rm: コンテナ停止後、コンテナを削除
 
     sh -c: シェルコマンド （bash -c: バッシュコマンド）
 
 4.  **マイグレーションファイルをもとに、データベースへ反映**
 
-        docker-compose run --rm django_app sh -c "python3 manage.py migrate core"
+        docker-compose run --rm django_app sh -c "python3 manage.py migrate"
 
 </details>
 
@@ -227,11 +232,11 @@
 
 ## 🍭 その他
 
-- docker-compose で動かしている docker イメージを更新する（現状は selenium の更新のみ）
+- **docker-compose で動かしている docker イメージを更新する（現状は selenium の更新のみ）**
 
       docker-compose pull | grep "Downloaded newer image" && docker-compose down && docker-compose up -d
 
-- django に superuser を新しく作成する
+- **django に superuser を新しく作成する**
 
   以下を実行
 
@@ -252,7 +257,27 @@
   Superuser created successfully.
   ```
 
-- UI 実装時によく使っているライブラリ
+- **package.json の更新**
+
+  npm install -g npm-check-updates のインストール
+
+  ```
+  npm install -g npm-check-updates
+  ```
+
+  package.json を以下コマンドで更新
+
+  ```
+  npm-check-updates -u
+  ```
+
+  yarn.lock, node_modules に反映
+
+  ```
+  yarn install
+  ```
+
+- **UI 実装時の主なライブラリ**
 
   - [material ui v4](https://v4.mui.com/)
 

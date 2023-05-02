@@ -1,14 +1,17 @@
 import React from "react";
 import { IconButton, makeStyles, Paper, InputBase } from "@material-ui/core";
 import { UserContext } from "contexts/UserContext";
-import { baseStyle, fontSize } from "theme";
+import { baseStyle, fontSize, shadow } from "theme";
 import { UserInterface } from "types/User";
 import { useWSChatRoomData } from "dataService/chatData";
 import { useExceptUsersByCurrentUser } from "functions/exceptUsers";
-import { ChatRoom } from "types/chat";
+import { Chat, ChatRoom } from "types/chat";
 import SendIcon from "@material-ui/icons/Send";
 import { createChat } from "api/apiChat";
 import { createNotification } from "functions/notification";
+import { ChatContent } from "components/Chat/ChatContent";
+import userIconImageDefault from "userIconImageDefault.webp";
+import { changeCreatedAt } from "functions/changeDate";
 
 interface Props {
   chatRoomId: string;
@@ -21,6 +24,7 @@ interface Props {
 export const ChatArea = ({ chatRoomId, chatRoomProp }: Props) => {
   const classes = useStyles();
   const [message, setMessage] = React.useState("");
+  const [chatsState, setChatsState] = React.useState<Chat[]>([]);
   const [userByChatPartner, setUserByChatPartner] =
     React.useState<UserInterface>();
   const { user } = React.useContext(UserContext);
@@ -33,10 +37,46 @@ export const ChatArea = ({ chatRoomId, chatRoomProp }: Props) => {
     }
   }, [users]);
 
+  React.useEffect(() => {
+    setChatsState(chats);
+  }, [chats]);
+
+  React.useEffect(() => {
+    const container = document.getElementById("chatContainer");
+    if (container) {
+      container.scrollTop = container.scrollHeight;
+    }
+  }, [chatsState]);
+
   const handleClickSendButton = async () => {
     try {
-      await createChat(user.token, chatRoomId, message);
+      if (chatRoom && message) {
+        const currentDate = new Date()
+          .toLocaleString("ja-JP", {
+            timeZone: "Asia/Tokyo",
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: false,
+          })
+          .replace(/\//g, "-")
+          .replace(/ /g, "T");
+        setChatsState((prev) => [
+          ...prev,
+          {
+            id: "",
+            chat_room: chatRoom,
+            message,
+            created_user: user,
+            created_at: `${currentDate}`,
+          },
+        ]);
+      }
       setMessage("");
+      await createChat(user.token, chatRoomId, message);
     } catch (error: any) {
       createNotification("danger", error?.message, "投稿に失敗しました");
     }
@@ -47,33 +87,49 @@ export const ChatArea = ({ chatRoomId, chatRoomProp }: Props) => {
   };
 
   return (
-    <div className={classes.chatArea}>
-      <div className={classes.headingArea}>
-        <img
-          className={`${classes.icon} ${classes.iconMainSize}`}
-          src={userByChatPartner?.icon_image}
-          alt={`${userByChatPartner?.name} icon`}
-        />
-        <h2>{userByChatPartner?.name}</h2>
-      </div>
-      <div className={classes.chatContainer}>
-        {chats.map((chat, key) => {
-          const { message, created_user } = chat;
-          return (
-            <div className={classes.chatContent} key={key}>
-              <div className={classes.chatContentIconArea}>
-                <img
-                  className={`${classes.icon} ${classes.iconMainSize}`}
-                  src={`${created_user.icon_image}`}
-                  alt=""
+    <div className={classes.chatAreaWrap}>
+      <div className={classes.chatArea}>
+        <Paper className={classes.headingArea}>
+          <img
+            className={`${classes.icon} ${classes.iconMainSize}`}
+            src={userByChatPartner?.icon_image ?? userIconImageDefault}
+            alt={`${userByChatPartner?.name} icon`}
+          />
+          <h2>{userByChatPartner?.name}</h2>
+        </Paper>
+        <div id="chatContainer" className={classes.chatContainer}>
+          <div>
+            {chatsState?.map((chat, key) => {
+              const isLastChat = chatsState.length - 1 > key;
+              const isLatestChat = key === 0;
+              const nextChat = isLastChat ? chatsState[key + 1] : null;
+              const prevChat = isLatestChat ? null : chatsState[key - 1];
+              const currentDate = changeCreatedAt(
+                chat.created_at
+              ).createdAtDate;
+              const prevDate = prevChat
+                ? changeCreatedAt(prevChat.created_at).createdAtDate
+                : null;
+
+              const isHiddenUserIcon = Boolean(
+                nextChat && nextChat.created_user.id === chat.created_user.id
+              );
+              const isVisibleCreatedAtDate =
+                isLatestChat || currentDate !== prevDate;
+
+              const createdAtDate = isVisibleCreatedAtDate ? currentDate : "";
+
+              return (
+                <ChatContent
+                  key={key}
+                  chat={chat}
+                  isHiddenUserIcon={isHiddenUserIcon}
+                  createdAtDate={createdAtDate}
                 />
-              </div>
-              <div>
-                <p>{message}</p>
-              </div>
-            </div>
-          );
-        })}
+              );
+            })}
+          </div>
+        </div>
       </div>
       <div className={classes.inputArea}>
         <Paper className={classes.inputContainer}>
@@ -83,11 +139,17 @@ export const ChatArea = ({ chatRoomId, chatRoomProp }: Props) => {
             onChange={handleChangeMessage}
             multiline
             maxRows={5}
+            placeholder="Type your message..."
           />
           <div className={classes.sendButtonArea}>
             <IconButton
               className={classes.sendIconButton}
               onClick={handleClickSendButton}
+              onKeyPress={(e) => {
+                if (e.key === "Enter") {
+                  handleClickSendButton();
+                }
+              }}
             >
               <SendIcon className={classes.sendIcon} />
             </IconButton>
@@ -99,19 +161,27 @@ export const ChatArea = ({ chatRoomId, chatRoomProp }: Props) => {
 };
 
 const useStyles = makeStyles({
-  chatArea: {
+  chatAreaWrap: {
+    height: "100%",
     width: "100%",
     minWidth: baseStyle.card.minWidth,
     maxWidth: baseStyle.card.maxWidth,
+  },
+  chatArea: {
+    height: "calc(100% - 75px)",
+    paddingTop: "30px",
+    position: "relative",
+    width: "100%",
     display: "flex",
     flexDirection: "column",
-    gap: "5px",
+    gap: baseStyle.gap.small,
   },
   headingArea: {
     display: "flex",
-    gap: "10px",
+    gap: baseStyle.gap.main,
     width: "100%",
     alignItems: "center",
+    padding: "10px",
   },
   icon: {
     aspectRatio: "1 / 1",
@@ -119,25 +189,28 @@ const useStyles = makeStyles({
     objectFit: "cover",
   },
   iconMainSize: {
-    height: baseStyle.userIconSize.small,
+    height: baseStyle.userIconSize.main,
   },
-  chatContainer: {},
-  chatContent: {
-    display: "flex",
-    gap: "10px",
+  chatContainer: {
+    overflow: "scroll",
   },
-  chatContentIconArea: {},
-  inputArea: {},
+  inputArea: {
+    width: "100%",
+    paddingBottom: "30px",
+  },
   inputContainer: {
     height: "100%",
     position: "relative",
     display: "flex",
     justifyContent: "space-between",
     padding: "5px",
-    gap: "5px",
+    gap: baseStyle.gap.small,
+    backgroundColor: baseStyle.color.white.main,
+    borderRadius: "25px",
   },
   inputBase: {
     width: "100%",
+    paddingLeft: "10px",
     fontSize: fontSize.medium.medium,
   },
   sendButtonArea: {
@@ -147,6 +220,7 @@ const useStyles = makeStyles({
   sendIconButton: {
     height: baseStyle.iconButtonSize.main,
     width: baseStyle.iconButtonSize.main,
+    boxShadow: shadow.main,
     backgroundColor: baseStyle.color.purple.main,
     "&:hover": {
       backgroundColor: baseStyle.color.purple.mainButtonHover,

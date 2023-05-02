@@ -115,9 +115,9 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const signout = () => {
+    window.location.href = "/auth";
     localStorage.clear();
     setUser({ id: "", token: "", following: [], followers: [] });
-    window.location.href = "/auth";
   };
 
   // [修正]

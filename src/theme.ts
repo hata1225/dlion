@@ -23,7 +23,9 @@ export const baseStyle = {
   },
   button: {
     width: {
+      large: "150px",
       main: "120px",
+      small: "55px",
     },
   },
   maxWidthLayout: {
@@ -62,6 +64,8 @@ export const baseStyle = {
     small: "32px",
   },
   gap: {
+    large: "15px",
+    main: "10px",
     small: "5px",
   },
   color: {
@@ -73,7 +77,7 @@ export const baseStyle = {
     },
     white: {
       light: "#ffffff",
-      main: "#dcdcdc",
+      main: "#e2e2e2",
       dark: "#b9b9b9",
     },
     gray: {
@@ -101,6 +105,9 @@ export const baseStyle = {
 };
 
 export const borderRadius = {
+  large: {
+    main: "10px",
+  },
   main: "3px",
 };
 

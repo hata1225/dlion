@@ -3,19 +3,12 @@ import { makeStyles } from "@material-ui/core";
 import { baseStyle } from "theme";
 import { useWSChatRoomsData } from "dataService/chatData";
 import { ChatRoomContent } from "components/Chat/ChatRoomContent";
+import { UserContext } from "contexts/UserContext";
 
 export const ChatRoomListArea = () => {
   const classes = useStyles();
   const { chatRooms } = useWSChatRoomsData();
-
-  React.useEffect(() => {
-    console.log("chatrooms: ", chatRooms);
-  }, [chatRooms]);
-
-  // チャットルーム作成の関数例
-  // const handleClickFollowListContnet = async (followUser: UserInterface) => {
-  //   await createChatRoom(user.token, [user.id, followUser.id]);
-  // };
+  const { user } = React.useContext(UserContext);
 
   return (
     <div className={classes.chatRoomListArea}>
@@ -26,6 +19,13 @@ export const ChatRoomListArea = () => {
         {chatRooms?.map((chatRoom, key) => {
           return <ChatRoomContent key={key} chatRoom={chatRoom} />;
         })}
+        {chatRooms.length ? (
+          <></>
+        ) : (
+          user.following?.map((followUser, key) => {
+            return <ChatRoomContent key={key} followUser={followUser} />;
+          })
+        )}
       </div>
     </div>
   );
@@ -33,6 +33,7 @@ export const ChatRoomListArea = () => {
 
 const useStyles = makeStyles({
   chatRoomListArea: {
+    paddingTop: baseStyle.pageLayoutInnerTop.main,
     width: "100%",
     minWidth: baseStyle.card.minWidth,
     maxWidth: baseStyle.card.maxWidth,

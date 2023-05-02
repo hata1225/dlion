@@ -66,7 +66,7 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
 
 def chat_room_by_id(chat_room_id):
     chat_room = ChatRoom.objects.get(id=chat_room_id)
-    chats = Chat.objects.filter(chat_room=chat_room).order_by('-created_at')
+    chats = Chat.objects.filter(chat_room=chat_room).order_by('created_at')
     chat_room_data = ChatRoomSerializer(chat_room).data
     chats_data = ChatSerializer(chats, many=True).data
     return {"chat_room": chat_room_data, "chats": chats_data}

@@ -1,4 +1,5 @@
 import { postAxios, getAxios } from "api/api";
+import { ChatRoom } from "types/chat";
 
 /**
  * 現在のuserが含まれるChatRoomと、それに紐づく最新のChat1件を取得
@@ -42,7 +43,8 @@ export const createChatRoom = async (token: string, userIds: string[]) => {
     user_ids: userIds,
   };
   try {
-    await postAxios(path, data, token);
+    const result = await postAxios(path, data, token);
+    return result.data as ChatRoom;
   } catch (error) {
     console.log("@createChatRoom: ", error);
     throw error;
