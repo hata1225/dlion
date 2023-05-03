@@ -16,6 +16,7 @@ class WebRTCConsumer(AsyncWebsocketConsumer):
         text_data_json = json.loads(text_data)
         message = text_data_json.get('message')
         type = text_data_json.get('type')
+        userInfo = text_data_json.get('userInfo')
 
         if type in ["join-room"]:
             # Handle join-room event here
@@ -23,7 +24,7 @@ class WebRTCConsumer(AsyncWebsocketConsumer):
             print(self.channel_name)
             if type == "join-room":
                 type = "user_joined"
-            await self.channel_layer.group_send(self.room_group_name, {"type": type, "callerID": self.channel_name})
+            await self.channel_layer.group_send(self.room_group_name, {"type": type, "callerID": self.channel_name, "userInfo": userInfo})
         elif type in ["offer", "answer", "renegotiate", "transceiverRequest", "stopStream"]:
             # Handle offer, answer, and candidate events here
             await self.channel_layer.group_send(self.room_group_name, {"type": type, **text_data_json})
@@ -37,7 +38,7 @@ class WebRTCConsumer(AsyncWebsocketConsumer):
     async def user_joined(self, event):
         print("--user_joined method--")
         callerID = event["callerID"]
-        await self.send(text_data=json.dumps({"type": "user-joined", "callerID": callerID, "currentUserID": self.channel_name}))
+        await self.send(text_data=json.dumps({"type": "user-joined", "callerID": callerID, "currentUserID": self.channel_name, "userInfo": event["userInfo"]}))
 
     async def update_sdp(self, event):
         callerID = event["callerID"]

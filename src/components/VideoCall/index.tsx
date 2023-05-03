@@ -52,7 +52,10 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
 
   async function getStream({ video = false, audio = false }: { video: boolean; audio: boolean }) {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video, audio });
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video,
+        audio,
+      });
       return stream;
     } catch (error) {
       console.error("Error accessing camera:", error);
@@ -106,7 +109,10 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
   React.useEffect(() => {
     console.log("peers: ", peers);
     const tracks = peers.map((peerObj) => {
-      return { peerId: peerObj.peerID, tracks: peerObj.stream?.getTracks() ?? [] };
+      return {
+        peerId: peerObj.peerID,
+        tracks: peerObj.stream?.getTracks() ?? [],
+      };
     });
     console.log("tracks: ", tracks);
   }, [peers]);
@@ -152,6 +158,7 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
         socket.send(
           JSON.stringify({
             type: "join-room",
+            userInfo: user,
           })
         );
       };
@@ -161,37 +168,36 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
         console.log(`\n\n----- onmessage [${payload.type}] -----`);
         const currentUserID = payload.currentUserID;
         const peerId = payload.callerID;
+        const userInfo = payload.userInfo as UserInterfaceAndUserFollowInterface;
         console.log("currentUserId: ", currentUserID);
         console.log("peerId: ", peerId);
         const index = peersRef.current.findIndex((peerObj) => peerObj.peerID === peerId);
 
         if (payload.type === "user-joined") {
           if (index === -1 && peerId !== currentUserID) {
-            const peerObj = createPeer(peerId, currentUserID, true);
+            console.log("userInfo0: ", userInfo);
+            const peerObj = createPeer(peerId, currentUserID, true, userInfo);
             peersRef.current = [...peersRef.current, peerObj];
           }
         } else if (payload.type === "offer" || payload.type === "answer") {
           const sdp = new RTCSessionDescription(payload.sdp);
           if (sdp && index === -1 && peerId !== currentUserID) {
-            const peerObj = createPeer(peerId, currentUserID);
+            console.log("userInfo1: ", userInfo);
+            const peerObj = createPeer(peerId, currentUserID, false, userInfo);
             peerObj.peer.signal(sdp);
             peersRef.current = [...peersRef.current, peerObj];
           } else if (sdp && index !== -1 && peerId !== currentUserID) {
-            const peerObj = peersRef.current[index];
-            peerObj.peer.signal(sdp);
-            setPeers(peersRef.current);
+            peersRef.current[index].peer.signal(sdp);
           }
         } else if (payload.type === "renegotiate" || payload.type === "transceiverRequest") {
           if (payload.data && index !== -1 && peerId !== currentUserID) {
-            const peerObj = peersRef.current[index];
-            peerObj.peer.signal(payload.data);
+            peersRef.current[index].peer.signal(payload.data);
             setPeers(peersRef.current);
           }
         } else if (payload.type === "stopStream") {
           console.log("index: ", index);
           if (index !== -1) {
-            const peerObj = peersRef.current[index];
-            peerObj.stream = null;
+            peersRef.current[index].stream = null;
             setPeers(peersRef.current);
           }
         }
@@ -214,7 +220,8 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
   const createPeer = (
     peerID: string,
     currentUserId: string,
-    initiator: boolean = false
+    initiator: boolean,
+    userInfo: UserInterfaceAndUserFollowInterface
   ): PeerObj => {
     const peer = new Peer({
       initiator: initiator,
@@ -258,7 +265,7 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
         currentUserId,
         stream: null,
         tracks: [],
-        userInfo: user,
+        userInfo,
       };
       const index = peersRef.current.findIndex((p) => p.peerID === peerID);
       if (index !== -1) {
@@ -278,7 +285,7 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
         currentUserId,
         stream,
         tracks: [],
-        userInfo: user,
+        userInfo,
       };
       const index = peersRef.current.findIndex((p) => p.peerID === peerID);
       if (index !== -1) {
@@ -301,7 +308,15 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
       console.log("---error peer---");
     });
 
-    return { peerID, currentUserId, peer, initiator, stream: null, tracks: [], userInfo: user };
+    return {
+      peerID,
+      currentUserId,
+      peer,
+      initiator,
+      stream: null,
+      tracks: [],
+      userInfo,
+    };
   };
 
   return (
@@ -353,16 +368,29 @@ interface VideoProps {
 }
 const VideoContnet = ({ peer, userVideo = null }: VideoProps) => {
   const classes = useStyles();
+  const { user } = React.useContext(UserContext);
+  const [userInfo, setUserInfo] = React.useState<UserInterfaceAndUserFollowInterface | null>(null);
   let ref = React.useRef<HTMLVideoElement>(null);
 
   React.useEffect(() => {
     if (peer && ref.current) {
       ref.current.srcObject = peer.stream;
+      setUserInfo(peer.userInfo);
+    } else if (userVideo) {
+      setUserInfo(user);
     }
-  }, [peer?.stream, ref]);
+  }, [peer, ref, user, userVideo]);
 
   return (
     <div className={classes.videoContentArea}>
+      <div className={classes.userInfoArea}>
+        <img
+          className={classes.userIcon}
+          src={userInfo?.icon_image}
+          alt={`${userInfo?.name}'s icon`}
+        />
+        <p className={classes.userName}>{userInfo?.name}</p>
+      </div>
       <video
         className={classes.video}
         ref={userVideo ?? ref}
@@ -387,14 +415,34 @@ const useStyles = makeStyles((theme) => ({
     position: "relative",
   },
   videoContentArea: {
+    position: "relative",
     width: "100%",
     aspectRatio: "16 / 9",
     backgroundColor: baseStyle.color.gray.dark,
     borderRadius: borderRadius.large.main,
     [theme.breakpoints.down("xs")]: {
       maxHeight: "calc(50% - 5vh)",
-      width: "auto",
     },
+  },
+  userInfoArea: {
+    position: "absolute",
+    bottom: 0,
+    padding: "5px 8px",
+    display: "flex",
+    alignItems: "center",
+    gap: baseStyle.gap.small,
+    backgroundColor: "rgba(0,0,0,.6)",
+    borderTopRightRadius: borderRadius.large.main,
+    borderBottomLeftRadius: borderRadius.large.main,
+  },
+  userIcon: {
+    width: `calc(${baseStyle.userIconSize.small}/5*4)`,
+    aspectRatio: "1 / 1",
+    objectFit: "cover",
+    borderRadius: "100%",
+  },
+  userName: {
+    color: baseStyle.color.white.main,
   },
   video: {
     width: "100%",
