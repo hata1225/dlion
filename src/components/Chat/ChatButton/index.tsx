@@ -1,11 +1,15 @@
 import { Button, makeStyles } from "@material-ui/core";
 import MailOutlineIcon from "@material-ui/icons/MailOutline";
+import React from "react";
 import { baseStyle, fontSize } from "theme";
 
-export const ChatButton = () => {
+type ButtonProps = React.ComponentProps<typeof Button>;
+type Props = ButtonProps;
+
+export const ChatButton = ({ ...props }: Props) => {
   const classes = useStyles();
   return (
-    <Button className={classes.buttonWithIcon} variant="outlined">
+    <Button className={classes.buttonWithIcon} variant="outlined" {...props}>
       <MailOutlineIcon style={{ fontSize: fontSize.medium.medium }} />
     </Button>
   );
