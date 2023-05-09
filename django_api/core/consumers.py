@@ -18,44 +18,60 @@ class WebRTCConsumer(AsyncWebsocketConsumer):
         text_data_json = json.loads(text_data)
         type = text_data_json.get('type')
         userInfo = text_data_json.get('userInfo')
-        event = {"callerID": self.channel_name, "userInfo": userInfo}
 
         # 認証部分(tokenをもとにuserを取得 -> 取得したuserが該当のchatroomに所属されているかチェック)
         token = userInfo["token"]
         await sync_to_async(checked_exist_user_from_chatroom)(token, self.room_name)
 
-        if type == "join-room":
-            event["type"] = "user_joined"
+        if type in ["join-room"]:
+            await self.channel_layer.group_send(self.room_group_name, {"type": "user_joined", "callerID": self.channel_name, "userInfo": userInfo})
         elif type in ["offer", "answer", "renegotiate", "transceiverRequest", "stopStream"]:
-            event["type"] = type
-            event.update(text_data_json)
-        await self.channel_layer.group_send(self.room_group_name, event)
+            await self.channel_layer.group_send(self.room_group_name, {"type": type, **text_data_json})
 
     async def user_joined(self, event):
-        await self.send_event(event)
+        callerID = event["callerID"]
+        await self.send(text_data=json.dumps({"type": "user-joined", "callerID": callerID, "currentUserID": self.channel_name, "userInfo": event["userInfo"]}))
 
     async def offer(self, event):
-        await self.send_event(event, "sdp")
-
-    async def answer(self, event):
-        await self.send_event(event, "sdp")
-
-    async def renegotiate(self, event):
-        await self.send_event(event, "data")
-
-    async def transceiverRequest(self, event):
-        await self.send_event(event, "data")
-
-    async def stopStream(self, event):
-        await self.send_event(event)
-
-    async def send_event(self, event, *args):
-        data = {
-            "type": event["type"],
+        await self.send(text_data=json.dumps({
+            "type": "offer",
+            "sdp": event["sdp"],
             "callerID": event["callerID"],
             "currentUserID": self.channel_name,
             "userInfo": event["userInfo"]
-        }
-        if args:
-            data[args[0]] = event[args[0]]
-        await self.send(text_data=json.dumps(data))
+        }))
+
+    async def answer(self, event):
+        await self.send(text_data=json.dumps({
+            "type": "answer",
+            "sdp": event["sdp"],
+            "callerID": event["callerID"],
+            "currentUserID": self.channel_name,
+            "userInfo": event["userInfo"]
+        }))
+
+    async def renegotiate(self, event):
+        await self.send(text_data=json.dumps({
+            "type": "renegotiate",
+            "data": event["data"],
+            "callerID": event["callerID"],
+            "currentUserID": self.channel_name,
+            "userInfo": event["userInfo"]
+        }))
+
+    async def transceiverRequest(self, event):
+        await self.send(text_data=json.dumps({
+            "type": "transceiverRequest",
+            "data": event["data"],
+            "callerID": event["callerID"],
+            "currentUserID": self.channel_name,
+            "userInfo": event["userInfo"]
+        }))
+
+    async def stopStream(self, event):
+        await self.send(text_data=json.dumps({
+            "type": "stopStream",
+            "callerID": event["callerID"],
+            "currentUserID": self.channel_name,
+            "userInfo": event["userInfo"]
+        }))
