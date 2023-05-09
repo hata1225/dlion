@@ -165,24 +165,19 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
 
       socket.onmessage = async (message) => {
         const payload = JSON.parse(message.data);
-        console.log(`\n\n----- onmessage [${payload.type}] -----`);
         const currentUserID = payload.currentUserID;
         const peerId = payload.callerID;
         const userInfo = payload.userInfo as UserInterfaceAndUserFollowInterface;
-        console.log("currentUserId: ", currentUserID);
-        console.log("peerId: ", peerId);
         const index = peersRef.current.findIndex((peerObj) => peerObj.peerID === peerId);
 
         if (payload.type === "user-joined") {
           if (index === -1 && peerId !== currentUserID) {
-            console.log("userInfo0: ", userInfo);
             const peerObj = createPeer(peerId, currentUserID, true, userInfo);
             peersRef.current = [...peersRef.current, peerObj];
           }
         } else if (payload.type === "offer" || payload.type === "answer") {
           const sdp = new RTCSessionDescription(payload.sdp);
           if (sdp && index === -1 && peerId !== currentUserID) {
-            console.log("userInfo1: ", userInfo);
             const peerObj = createPeer(peerId, currentUserID, false, userInfo);
             peerObj.peer.signal(sdp);
             peersRef.current = [...peersRef.current, peerObj];
@@ -195,7 +190,6 @@ export const VideoCall = ({ userIdsByVideoCall }: Props) => {
             setPeers(peersRef.current);
           }
         } else if (payload.type === "stopStream") {
-          console.log("index: ", index);
           if (index !== -1) {
             peersRef.current[index].stream = null;
             setPeers(peersRef.current);
