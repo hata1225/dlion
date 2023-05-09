@@ -1,5 +1,7 @@
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
+from user.services import checked_exist_user_from_chatroom
+from asgiref.sync import sync_to_async
 
 
 class WebRTCConsumer(AsyncWebsocketConsumer):
@@ -17,6 +19,11 @@ class WebRTCConsumer(AsyncWebsocketConsumer):
         type = text_data_json.get('type')
         userInfo = text_data_json.get('userInfo')
         event = {"callerID": self.channel_name, "userInfo": userInfo}
+
+        # 認証部分(tokenをもとにuserを取得 -> 取得したuserが該当のchatroomに所属されているかチェック)
+        token = userInfo["token"]
+        await sync_to_async(checked_exist_user_from_chatroom)(token, self.room_name)
+
         if type == "join-room":
             event["type"] = "user_joined"
         elif type in ["offer", "answer", "renegotiate", "transceiverRequest", "stopStream"]:
