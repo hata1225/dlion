@@ -4,6 +4,8 @@ from chat.models import Chat, ChatRoom
 from core.models import User
 from asgiref.sync import sync_to_async
 from chat.serializers import ChatRoomSerializer, ChatSerializer
+from user.serializers import UserSerializer
+from user.services import get_user_from_token
 
 
 class ChatRoomsConsumer(AsyncWebsocketConsumer):
@@ -19,8 +21,22 @@ class ChatRoomsConsumer(AsyncWebsocketConsumer):
         text_data_json = json.loads(text_data)
         action = text_data_json.get("action")
 
+        # コネクション確立後、初回の接続
         if action == "fetch_chat_rooms":
+            token = text_data_json.get("token")
             chat_rooms = await chat_rooms_by_user_id(self.user_id)
+
+            # 認証部分
+            user_from_token = await sync_to_async(get_user_from_token)(token)
+            user_serializer = UserSerializer(user_from_token).data
+            users_from_chat_rooms = []
+            for chat_room in chat_rooms:
+                for user in chat_room["users"]:
+                    users_from_chat_rooms.append(user)
+            is_exist_user = user_serializer in users_from_chat_rooms
+            if not is_exist_user:
+                raise
+
             await self.send(text_data=json.dumps({"type": "chat_rooms", "data": chat_rooms}))
 
     async def chat_rooms_update(self, event):
@@ -59,8 +75,19 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
         text_data_json = json.loads(text_data)
         action = text_data_json.get("action")
 
+        # コネクション確立後、初回の接続
         if action == "fetch_chat_room":
+            token = text_data_json.get("token")
             chat_room = await sync_to_async(chat_room_by_id)(self.chat_room_id)
+
+            # 認証部分
+            users_from_chat_room = chat_room["chat_room"]["users"]
+            user_from_token = await sync_to_async(get_user_from_token)(token)
+            user_serializer = UserSerializer(user_from_token).data
+            is_exist_user = user_serializer in users_from_chat_room
+            if not is_exist_user:
+                raise
+
             await self.send(text_data=json.dumps({"type": "chat_room", "data": chat_room}))
 
     async def chat_room_update(self, event):

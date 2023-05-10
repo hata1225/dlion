@@ -6,32 +6,35 @@ import { Chat, ChatRoom } from "types/chat";
 export const useWSChatRoomData = (chatRoomId: string) => {
   const [chatRoom, setChatRoom] = React.useState<ChatRoom>();
   const [chats, setChats] = React.useState<Chat[]>([]);
+  const { user } = React.useContext(UserContext);
   React.useEffect(() => {
-    const ws = new WebSocket(`ws://${ENV}:8000/ws/chat_room/${chatRoomId}/`);
+    if (user) {
+      const ws = new WebSocket(`ws://${ENV}:8000/ws/chat_room/${chatRoomId}/`);
 
-    ws.onopen = () => {
-      console.log("WebSocket connected");
-      ws.send(JSON.stringify({ action: "fetch_chat_room" }));
-    };
+      ws.onopen = () => {
+        console.log("WebSocket connected");
+        ws.send(JSON.stringify({ action: "fetch_chat_room", token: user.token }));
+      };
 
-    ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      console.log("Message from server:", data);
+      ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        console.log("Message from server:", data);
 
-      if (data.type === "chat_room" || data.type === "chat_room_update") {
-        setChatRoom(data.data.chat_room);
-        setChats(data.data.chats);
-      }
-    };
+        if (data.type === "chat_room" || data.type === "chat_room_update") {
+          setChatRoom(data.data.chat_room);
+          setChats(data.data.chats);
+        }
+      };
 
-    ws.onclose = () => {
-      console.log("WebSocket disconnected");
-    };
+      ws.onclose = () => {
+        console.log("WebSocket disconnected");
+      };
 
-    return () => {
-      ws.close();
-    };
-  }, [chatRoomId]);
+      return () => {
+        ws.close();
+      };
+    }
+  }, [chatRoomId, user]);
   return { chatRoom, chats };
 };
 
@@ -44,7 +47,7 @@ export const useWSChatRoomsData = () => {
 
       ws.onopen = () => {
         console.log("WebSocket connected");
-        ws.send(JSON.stringify({ action: "fetch_chat_rooms" }));
+        ws.send(JSON.stringify({ action: "fetch_chat_rooms", token: user.token }));
       };
 
       ws.onmessage = (event) => {
