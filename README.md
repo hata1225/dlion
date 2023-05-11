@@ -35,21 +35,23 @@
 >
 > ### バージョンについて
 >
-> - docker: 20.10.13
-> - docker-compose: 1.92.2
-> - node: 19.8.1
-> - python: 3.11.2
-> - Django: 4.1.7
-> - DRF: 3.14.0
+> | サービス名     | バージョン |
+> | -------------- | ---------- |
+> | docker         | 20.10.13   |
+> | docker-compose | 1.92.2     |
+> | node           | 20.0.0     |
+> | python         | 3.11.3     |
+> | Django         | 4.2.1      |
+> | DRF            | 3.14.0     |
 >
 > ---
 >
 > ### 使用している Docker イメージについて
 >
-> - ubuntu: 22.10
-> - node: 19.8.1-slim
-> - selenium (docker hub から最新の image を引っ張ってる)
-> - redis: redis:latest
+> - **python**: 3.11.3-slim-bullseye
+> - **node**: 20.0.0-slim
+> - **selenium**: docker hub から最新の image を引っ張ってる
+> - **redis**: redis:latest
 >
 > ---
 >
@@ -66,7 +68,7 @@
 
 <details>
 
-![画面設計](https://lh3.googleusercontent.com/nRzfPmMVbbyvrw7XO_T2Hqz-Uk9Kj2yGbcYo4pGIRLjMKewo2auP54qUlDVImhk4hfYDJsgM6Reo0Ksk63pq=w2156-h1414-rw)
+![画面設計](./readme_image/dlion%E7%94%BB%E9%9D%A2%E9%81%B7%E7%A7%BB.png)
 
 </details>
 
@@ -98,7 +100,7 @@
 
 2.  **停止**
 
-    ショートカット: cmd + c
+    ショートカット: ctrl + c
 
 </details>
 
@@ -116,7 +118,7 @@
 
 3.  **任意のブランチに切り替える**
 
-        例: git checkout develop/v1.0.0
+        git checkout develop/v1.0.0
 
 4.  **.env ファイルを作成する**
 
@@ -126,9 +128,9 @@
 
     個人でソース(dlion)を使う場合は、シークレットキーを自分で発行し.env ファイルに貼り付けてください。
 
-    1.  シークレットキー発行
+    1.  シークレットキー発行(dlion 直下で行う)
         ```
-        cd django_api && python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())' && cd ../
+        cd django_api && python3 -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())' && cd ../
         ```
     2.  出力された文字列をコピー
 
@@ -140,16 +142,21 @@
 
 6.  **superuser 情報などを.env ファイルに追記**
 
-    localhost:8000/admin にログインするとき & watchdog でディレクトリを監視、エンコード等で使います
+    localhost:8000/admin にログインするときに使います
 
+        SECRET_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx # 前回手順で作成済み
         SUPER_USER_EMAIL=example@example.com
         SUPER_USER_PASS=password
         SUPER_USER_NAME=example
-        REACT_APP_IP_ADDRESS=localhost
+        REACT_APP_IP_ADDRESS=localhost # REACT~と書かれているが、Djangoでも呼び出している
 
 7.  **yarn install をする**
 
     dlion ディレクトリ直下でコマンドを叩いてください。
+
+        npm install
+
+    or
 
         yarn install
 
@@ -165,21 +172,19 @@
 
         docker-compose run --rm django_app sh -c "python3 manage.py makemigrations core"
 
+        docker-compose run --rm django_app sh -c "python3 manage.py makemigrations chat"
+
     --rm: コンテナ停止後、コンテナを削除
 
     sh -c: シェルコマンド （bash -c: バッシュコマンド）
 
 10. **マイグレーションファイルをもとに、データベースへ反映**
 
-        docker-compose run --rm django_app sh -c "python3 manage.py migrate core"
+        docker-compose run --rm django_app sh -c "python3 manage.py migrate"
 
 11. **docker-compose up**
 
     docker-compose up
-
-    しばらくした後、ターミナルの一番下の行にこんなのが出力されたら**多分成功**です。
-
-    react-app_1 | No issues found.
 
 12. **localhost:3000 へ移動する**
 
@@ -210,13 +215,15 @@
 
         docker-compose run --rm django_app sh -c "python3 manage.py makemigrations core"
 
+        docker-compose run --rm django_app sh -c "python3 manage.py makemigrations chat"
+
     --rm: コンテナ停止後、コンテナを削除
 
     sh -c: シェルコマンド （bash -c: バッシュコマンド）
 
 4.  **マイグレーションファイルをもとに、データベースへ反映**
 
-        docker-compose run --rm django_app sh -c "python3 manage.py migrate core"
+        docker-compose run --rm django_app sh -c "python3 manage.py migrate"
 
 </details>
 
@@ -225,11 +232,11 @@
 
 ## 🍭 その他
 
-- docker-compose で動かしている docker イメージを更新する（現状は selenium の更新のみ）
+- **docker-compose で動かしている docker イメージを更新する（現状は selenium の更新のみ）**
 
       docker-compose pull | grep "Downloaded newer image" && docker-compose down && docker-compose up -d
 
-- django に superuser を新しく作成する
+- **django に superuser を新しく作成する**
 
   以下を実行
 
@@ -250,7 +257,27 @@
   Superuser created successfully.
   ```
 
-- UI 実装時によく使っているライブラリ
+- **package.json の更新**
+
+  npm install -g npm-check-updates のインストール
+
+  ```
+  npm install -g npm-check-updates
+  ```
+
+  package.json を以下コマンドで更新
+
+  ```
+  npm-check-updates -u
+  ```
+
+  yarn.lock, node_modules に反映
+
+  ```
+  yarn install
+  ```
+
+- **UI 実装時の主なライブラリ**
 
   - [material ui v4](https://v4.mui.com/)
 

@@ -1,9 +1,10 @@
 import json
-import aiohttp
 from channels.generic.websocket import AsyncWebsocketConsumer
 from core import models
 from asgiref.sync import sync_to_async
 from file_data import serializers
+from user.services import get_user_from_token
+
 
 class FileDataConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -18,7 +19,13 @@ class FileDataConsumer(AsyncWebsocketConsumer):
         text_data_json = json.loads(text_data)
         action = text_data_json.get("action")
 
+        # コネクション確立後、初回の接続
         if action == "fetch_file_data":
+
+            # 認証部分
+            token = text_data_json.get("token")
+            await sync_to_async(get_user_from_token)(token)
+
             file_data = await file_data_by_id(self.file_data_id)
             await self.send(text_data=json.dumps({"type": "file_data", "data": file_data}))
 
@@ -26,11 +33,6 @@ class FileDataConsumer(AsyncWebsocketConsumer):
         file_data = await file_data_by_id(self.file_data_id)
         await self.send(text_data=json.dumps({"type": "file_data_update", "data": file_data}))
 
-    async def fetch_api_data(self, api_url):
-        async with aiohttp.ClientSession() as session:
-            async with session.get(api_url) as resp:
-                data = await resp.json()
-                return data
 
 async def file_data_by_id(file_data_id):
     file_data = await sync_to_async(models.FileData.objects.get)(id=file_data_id)

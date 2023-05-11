@@ -1,24 +1,32 @@
 import axios, { AxiosRequestConfig } from "axios";
 import { FileData, FileDataByEdit } from "types/fileData";
 
-const ENVS = {
+export const ENVS = {
   develop: `${process.env.REACT_APP_IP_ADDRESS}`,
 };
 
-export const ENV = `http://${ENVS.develop}`; // 環境ごとに変更
+export const ENV = `${ENVS.develop}`; // 環境ごとに変更
 
-axios.defaults.baseURL = `${ENV}:8000`;
+axios.defaults.baseURL = `http://${ENV}:8000`;
 axios.defaults.headers.common["Accept"] = "application/json";
 axios.defaults.headers.post["Content-Type"] = "multipart/form-data";
-axios.defaults.headers.common["Access-Control-Allow-Origin"] = `${ENV}:3000`;
+axios.defaults.headers.common[
+  "Access-Control-Allow-Origin"
+] = `http://${ENV}:3000`;
 axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
 
-const createFormData = (data: any) => {
+export const createFormData = (data: any) => {
   let formData = new FormData();
   const objectKeys = Object.keys(data);
   objectKeys.forEach((objectKey) => {
-    if (data[objectKey] === false || data[objectKey]) {
-      formData.append(`${objectKey}`, data[objectKey]);
+    const value = data[objectKey];
+    if (Array.isArray(value)) {
+      value.forEach((v, i) => {
+        formData.append(`${objectKey}[${i}]`, v); // arrayデータを分割して入れ直す
+      });
+    } else if (value === false || value) {
+      // valueがfalse or valueがtruthy
+      formData.append(`${objectKey}`, value);
     }
   });
   return formData;
@@ -469,6 +477,30 @@ export const getFollowerListByUserId = async (
     return result.data;
   } catch (error) {
     console.log("@getFollowerListByUserId: ", error);
+    throw error;
+  }
+};
+
+/**
+ * google認証のための関数
+ * @param access_token
+ * @returns
+ */
+export const googleOauth = async (access_token: string) => {
+  const path = "/auth/google-auth/";
+  const data = {
+    access_token,
+    backend: "google-oauth2",
+    grant_type: "convert_token",
+    client_id: process.env.REACT_APP_DRF_GOOGLE_OAUTH_CLIENT_ID,
+    client_secret: process.env.REACT_APP_DRF_GOOGLE_OAUTH_CLIENT_SECRET,
+  };
+  console.log("@googleOauth sendData: ", data);
+  try {
+    const result = await postAxios(path, data);
+    return result.data;
+  } catch (error) {
+    console.log("@googleOauth: ", error);
     throw error;
   }
 };

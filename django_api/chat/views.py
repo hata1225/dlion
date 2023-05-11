@@ -4,12 +4,15 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from chat.models import ChatRoom, Chat
+from core.models import User
+from django.db.models import Count
 from chat.serializers import ChatSerializer, ChatRoomSerializer
+import re
 
 
-class GetChatRoomsByUserAPIView(APIView):
+class GetChatRoomsByCurrentUserAPIView(APIView):
     """
-    対象のuserが含まれるChatRoomと、それに紐づく最新のChatを取得
+    現在のuserが含まれるChatRoomと、それに紐づく最新のChat1件を取得
 
     ---
     """
@@ -51,10 +54,15 @@ class GetChatRoomAPIView(APIView):
     def get(self, request):
         try:
             chat_room_id = request.GET.get('chat_room_id')
-            if chat_room_id:
+
+            # formdataにchat_room_idが含まれているか
+            if not chat_room_id:
                 return Response(status=status.HTTP_400_BAD_REQUEST)
+
+            # 指定されたchat_room_idが存在するか
             if ChatRoom.objects.filter(id=chat_room_id).exists():
-                return Response(status=status.HTTP_400_BAD_REQUEST)
+                return Response(status=status.HTTP_404_NOT_FOUND)
+
             chat_room = ChatRoom.objects.get(id=chat_room_id)
             chats = Chat.objects.filter(chat_room__id=chat_room_id)
             chat_room_serializer = ChatRoomSerializer(chat_room)
@@ -79,21 +87,33 @@ class CreateChatRoomAPIView(APIView):
 
     def post(self, request):
         try:
-            serializer = ChatRoomSerializer(data=request.data)
             user = request.user
-            user_ids = serializer.validated_data["user_ids"]
-            if not user.id in user_ids:
-                user_ids.append(user.id)
+
+            user_ids = []
+            for key, value in request.data.items():
+                match = re.match(r'user_ids\[(\d+)\]', key)
+                if match:
+                    index = int(match.group(1))
+                    user_ids.insert(index, value)
+
+            if not str(user.id) in user_ids:
+                if user.id == "":
+                    return Response(status=status.HTTP_400_BAD_REQUEST)
+                user_ids.append(str(user.id))
+
+            if len(user_ids) < 2:
+                return Response(status=status.HTTP_400_BAD_REQUEST)
 
             # 重複チェック(chatroom作成時に重複したパターンのuser_idsがないかチェック)
-            is_exist_user_ids = ChatRoom.objects.filter(users__id__in=user_ids).count() > 0
+            chatroom = ChatRoom.objects.filter(users__id__in=user_ids).annotate(num_users=Count("users")).filter(num_users=len(user_ids)).first()
 
-            # シリアライザ成功(userのidが存在しているetc...) and 重複チェック
-            if serializer.is_valid() and not is_exist_user_ids:
-                chat_room = serializer.save()
-                return Response(ChatRoomSerializer(chat_room).data, status=status.HTTP_201_CREATED)
-            else:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            # 重複チェックしてなかったら新しく作成
+            if not chatroom:
+                users = User.objects.filter(id__in=user_ids)
+                chatroom = ChatRoom.objects.create()
+                chatroom.users.set(users)
+                chatroom.save()
+            return Response(ChatRoomSerializer(chatroom).data,status=status.HTTP_201_CREATED)
         except:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
@@ -103,7 +123,7 @@ class CreateChatAPIView(APIView):
     Chatの作成(メッセージ送信時)
 
     ---
-    ### formdata
+    ### formdatap
     - chat_room_id: (string)ChatRoomのID
     - message: (string)メッセージ本文
     """
@@ -111,18 +131,19 @@ class CreateChatAPIView(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request):
+        # return Response(status=status.HTTP_200_OK)
         try:
             user = request.user
-            serializer = ChatSerializer(data=request.data)
-            chat_room_id = serializer.validated_data["chat_room_id"]
-            message = serializer.validated_data["message"]
-            chat_room_by_id = ChatRoom.objects.filter(id=chat_room_id).first()
-            if not chat_room_by_id: # チャットルームが存在しているかチェック
+
+            chat_room_id = request.data['chat_room_id']
+            message = request.data.get('message')
+            chat_room = ChatRoom.objects.filter(id=chat_room_id).first()
+            if not chat_room: # チャットルームが存在しているか
                 return Response(status=status.HTTP_404_NOT_FOUND)
-            is_exist_chat_room_by_user = user in chat_room_by_id.users.all()
-            if not is_exist_chat_room_by_user:
+            if not user in chat_room.users.all(): # チャットルームにuserが含まれているか
                 return Response(status=status.HTTP_400_BAD_REQUEST)
-            serializer.save(chat_room=chat_room_by_id, message=message, created_user=request.user)
+            if message:
+                Chat.objects.create(chat_room=chat_room, message=message, created_user=request.user)
             return Response(status=status.HTTP_201_CREATED)
         except:
             return Response(status=status.HTTP_400_BAD_REQUEST)

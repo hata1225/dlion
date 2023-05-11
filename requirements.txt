@@ -1,4 +1,4 @@
-Django==4.1.7
+Django==4.2.1
 djangorestframework==3.14.0
 django-cleanup
 django-cors-headers
@@ -17,5 +17,6 @@ redis==3.5.3
 aiohttp==3.8.4
 daphne==3.0.2
 asgiref==3.6.0
-celery
-django-celery-results
+celery==5.2.7
+django-celery-results==2.5.0
+social-auth-app-django==5.2.0

@@ -6,10 +6,15 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-
+from rest_framework.response import Response
+from rest_framework import status
+from social_core.exceptions import MissingBackend
+from social_core.backends.oauth import BaseOAuth2
+from social_django.utils import load_strategy
+from rest_framework.authtoken.models import Token
 from user import serializers
-
 from core import models
+
 
 class CreateUserView(generics.CreateAPIView):
     serializer_class = serializers.UserSerializer
@@ -29,6 +34,50 @@ class ManageUserView(generics.RetrieveUpdateAPIView):
         return self.request.user
 
 
+class GoogleAuthView(APIView):
+    def post(self, request):
+        access_token = request.data.get('access_token')
+        if not access_token:
+            return Response({'error': 'Access token is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            backend = load_strategy().get_backend('google-oauth2')
+        except MissingBackend:
+            return Response({'error': 'Google backend not found.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not isinstance(backend, BaseOAuth2):
+            return Response({'error': 'Google authentication failed.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Google OAuth2からユーザー情報を取得
+        authenticated_user = backend.do_auth(access_token)
+        if not authenticated_user:
+            return Response({'error': 'Google authentication failed.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        user_data = {
+            'id': authenticated_user.social_auth.get(provider='google-oauth2').uid,
+            'email': authenticated_user.email,
+            'name': authenticated_user.name,
+        }
+
+        # Google OAuth2から取得した情報を使ってユーザーを作成または取得
+        user = models.User.objects.get_or_create(
+            email=user_data.get('email'),
+            defaults={
+                'social_id': user_data.get('id'),
+                'name': user_data.get('name'),
+                'is_active': True,
+                'is_staff': False,
+                'is_private': False,
+            }
+        )[0]
+
+        if not user.is_active:
+            return Response({'error': 'User is not active.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        token, _ = Token.objects.get_or_create(user=user)
+        return Response({'token': token.key}, status=status.HTTP_200_OK)
+
+
 class FollowUserView(generics.CreateAPIView):
     queryset = models.FriendShip.objects.all()
     serializer_class = serializers.FriendShipSerializer
@@ -43,7 +92,8 @@ class FollowUserView(generics.CreateAPIView):
         # すでにフォローをしている場合
         if models.FriendShip.objects.filter(created_user=request.user, following_user=following_user).exists():
             return Response({'detail': 'You already follow this user.'}, status=400)
-        serializer = self.get_serializer(data={'following_user': following_user.id})
+        serializer = self.get_serializer(
+            data={'following_user': following_user.id})
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
@@ -61,7 +111,8 @@ class UnfollowAPIView(APIView):
         user = request.user
         following_user = models.User.objects.get(id=request.GET.get('user_id'))
         try:
-            friendship = models.FriendShip.objects.get(created_user=user, following_user=following_user)
+            friendship = models.FriendShip.objects.get(
+                created_user=user, following_user=following_user)
             friendship.delete()
         except models.FriendShip.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
@@ -81,7 +132,8 @@ class FollowingListAPIView(APIView):
             user = models.User.objects.get(id=request.GET.get('user_id'))
 
         friendships = models.FriendShip.objects.filter(created_user=user)
-        following_users = [friendship.following_user for friendship in friendships]
+        following_users = [
+            friendship.following_user for friendship in friendships]
         serializer = serializers.UserSerializer(following_users, many=True)
         return Response(serializer.data)
 
@@ -109,4 +161,4 @@ class GetUserView(generics.RetrieveAPIView):
     serializer_class = serializers.UserSerializer
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
-    lookup_field='pk'
+    lookup_field = 'pk'

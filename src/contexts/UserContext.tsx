@@ -5,6 +5,7 @@ import {
   updateUser,
   followUser as followUserByAPI,
   unfollowUser as unfollowUserByAPI,
+  googleOauth,
 } from "api/api";
 import { useWSFollowInfo } from "dataService/userData";
 import { createNotification } from "functions/notification";
@@ -18,6 +19,7 @@ interface UserContextInterface {
   >;
   signup: (email: string, name: string, password: string) => Promise<any>;
   signin: (email: string, password: string) => Promise<any>;
+  signinByGoogleOauth: (access_token: string) => Promise<any>;
   signout: () => void;
   editUser: (
     email: string,
@@ -80,6 +82,14 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     }));
   }, [followingList, followerList]);
 
+  const signinByGoogleOauth = async (access_token: string) => {
+    const data = await googleOauth(access_token);
+    const token = data.token;
+    const userInfo = await getUserInfo(token);
+    localStorage.setItem("token", token);
+    return { ...userInfo, token };
+  };
+
   const signin = async (email: string, password: string) => {
     try {
       const token = await getToken(email, password);
@@ -105,9 +115,9 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const signout = () => {
+    window.location.href = "/auth";
     localStorage.clear();
     setUser({ id: "", token: "", following: [], followers: [] });
-    window.location.href = "/auth";
   };
 
   // [修正]
@@ -154,6 +164,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
         setUser,
         signup,
         signin,
+        signinByGoogleOauth,
         signout,
         editUser,
         followUser,

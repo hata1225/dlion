@@ -15,7 +15,7 @@ export const baseStyle = {
   card: {
     width: "370px",
     padding: "20px",
-    minWidth: "370px",
+    minWidth: "330px",
     maxWidth: "500px",
   },
   subArea: {
@@ -23,7 +23,9 @@ export const baseStyle = {
   },
   button: {
     width: {
+      large: "150px",
       main: "120px",
+      small: "55px",
     },
   },
   maxWidthLayout: {
@@ -53,22 +55,29 @@ export const baseStyle = {
     height: "25px",
     width: "50px",
   },
+  iconButtonSize: {
+    main: "35px",
+  },
   userIconSize: {
-    main: "72px",
+    large: "72px",
+    main: "45px",
     small: "32px",
   },
   gap: {
+    large: "15px",
+    main: "10px",
     small: "5px",
   },
   color: {
     purple: {
       dark: "#2c387e",
       main: "#3f51b5",
+      mainButtonHover: "rgb(63 81 181 / .85)",
       light: "#6573c3",
     },
     white: {
       light: "#ffffff",
-      main: "#dcdcdc",
+      main: "#e2e2e2",
       dark: "#b9b9b9",
     },
     gray: {
@@ -96,6 +105,9 @@ export const baseStyle = {
 };
 
 export const borderRadius = {
+  large: {
+    main: "10px",
+  },
   main: "3px",
 };
 

@@ -11,6 +11,7 @@ import { BasePdf } from "components/BasePdf";
 import { fontSize } from "theme";
 import { getFileData, getMainDataByBlob } from "api/api";
 import { NotFoundPage } from "pages/NotFoundPage";
+import { Layout } from "components/Layout";
 
 export const FileDataDetailPage = () => {
   const [fileData, setFileData] = React.useState<FileData>();
@@ -57,60 +58,66 @@ export const FileDataDetailPage = () => {
   };
 
   if (isNotFoundPage) {
-    return <NotFoundPage />;
+    return (
+      <Layout>
+        <NotFoundPage />
+      </Layout>
+    );
   } else {
     return (
-      <div className={classes.fileDataDetailPage}>
-        <div className={classes.headingArea}>
-          <h2 className={classes.heading}>{fileData?.title}</h2>
-        </div>
-        {mainDataType === "video" && (
-          <ReactHlsPlayer
-            src={fileData?.main_data ? fileData.main_data : ""}
-            playerRef={playerRef}
-            autoPlay={false}
-            controls={true}
-            width="100%"
-            height="auto"
-            hlsConfig={{
-              maxBufferSize: 30 * 1000 * 1000,
-            }}
-          />
-        )}
-        {mainDataType === "audio" && (
-          <audio
-            className={classes.audio}
-            src={fileData ? fileData.main_data : ""}
-            preload="metadata"
-            controls
-          ></audio>
-        )}
-        {mainDataType === "pdf" && (
-          <>
-            <div className={classes.zoomButtonArea}>
-              <IconButton
-                className={classes.zoomButton}
-                onClick={handleClickZoomButton}
-              >
-                <ZoomOutMapIcon />
-              </IconButton>
-            </div>
-            <BasePdf
-              mainDataBlobUrl={mainDataBlobUrl}
-              isBlackByIconButtonColor
+      <Layout>
+        <div className={classes.fileDataDetailPage}>
+          <div className={classes.headingArea}>
+            <h2 className={classes.heading}>{fileData?.title}</h2>
+          </div>
+          {mainDataType === "video" && (
+            <ReactHlsPlayer
+              src={fileData?.main_data ? fileData.main_data : ""}
+              playerRef={playerRef}
+              autoPlay={false}
+              controls={true}
+              width="100%"
+              height="auto"
+              hlsConfig={{
+                maxBufferSize: 30 * 1000 * 1000,
+              }}
             />
-            <PdfModal
-              isOpen={isOpenByPdfModal}
-              setIsOpen={setIsOpenByPdfModal}
-              mainDataBlobUrl={mainDataBlobUrl}
-            />
-          </>
-        )}
-        <div className={classes.descriptionArea}>
-          <p>{fileData?.description}</p>
+          )}
+          {mainDataType === "audio" && (
+            <audio
+              className={classes.audio}
+              src={fileData ? fileData.main_data : ""}
+              preload="metadata"
+              controls
+            ></audio>
+          )}
+          {mainDataType === "pdf" && (
+            <>
+              <div className={classes.zoomButtonArea}>
+                <IconButton
+                  className={classes.zoomButton}
+                  onClick={handleClickZoomButton}
+                >
+                  <ZoomOutMapIcon />
+                </IconButton>
+              </div>
+              <BasePdf
+                mainDataBlobUrl={mainDataBlobUrl}
+                isBlackByIconButtonColor
+              />
+              <PdfModal
+                isOpen={isOpenByPdfModal}
+                setIsOpen={setIsOpenByPdfModal}
+                mainDataBlobUrl={mainDataBlobUrl}
+              />
+            </>
+          )}
+          <div className={classes.descriptionArea}>
+            <p>{fileData?.description}</p>
+          </div>
+          {fileData && <DetailPageCard fileData={fileData} />}
         </div>
-        {fileData && <DetailPageCard fileData={fileData} />}
-      </div>
+      </Layout>
     );
   }
 };

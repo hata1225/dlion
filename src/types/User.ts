@@ -15,5 +15,4 @@ export interface UserFollowInterface {
   followers: UserInterface[];
 }
 
-export type UserInterfaceAndUserFollowInterface = UserInterface &
-  UserFollowInterface;
+export type UserInterfaceAndUserFollowInterface = UserInterface & UserFollowInterface;

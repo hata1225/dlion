@@ -1,21 +1,16 @@
 import { makeStyles } from "@material-ui/core";
-import React from "react";
-import { baseStyle, shadow } from "theme";
+import { baseStyle, fontSize, shadow, fontWeight } from "theme";
 
 export const Header = () => {
   const classes = useStyles();
-
-  const handleClickHeading = () => {
-    window.location.href = `/`;
-  };
 
   return (
     <header className={classes.header}>
       <div className={classes.headerInner}>
         <div>
-          <h1 className={classes.heading} onClick={handleClickHeading}>
+          <a className={classes.heading} href={"/"}>
             DLion
-          </h1>
+          </a>
         </div>
         <div></div>
       </div>
@@ -40,6 +35,8 @@ const useStyles = makeStyles({
     padding: `0 ${baseStyle.pagePaddingHorizontal.main}`,
   },
   heading: {
+    fontSize: fontSize.large.large,
+    fontWeight: fontWeight.bold,
     color: baseStyle.color.white.light,
     cursor: "pointer",
   },

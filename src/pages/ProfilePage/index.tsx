@@ -1,6 +1,6 @@
 import React from "react";
 import { makeStyles } from "@material-ui/core";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { UserInterfaceAndUserFollowInterface } from "types/User";
 import { getUserInfo } from "api/api";
 import { UserContext } from "contexts/UserContext";
@@ -12,13 +12,17 @@ import PersonIcon from "@material-ui/icons/Person";
 import { fontSize } from "theme";
 import { FollowButton } from "components/FollowButton";
 import { useWSFollowInfo } from "dataService/userData";
+import { VideoCallOpenModalButton } from "components/VideoCall/VideoCallOpenModalButton";
+import { ChatButton } from "components/Chat/ChatButton";
+import { Layout } from "components/Layout";
+import { createChatRoom } from "api/apiChat";
 
 export const ProfilePage = () => {
   const classes = useStyles();
   const { id } = useParams();
+  const navigate = useNavigate();
   const { user } = React.useContext(UserContext);
-  const [userInfo, setUserInfo] =
-    React.useState<UserInterfaceAndUserFollowInterface>();
+  const [userInfo, setUserInfo] = React.useState<UserInterfaceAndUserFollowInterface>();
   const [isOwnUserId, setIsOwnUserId] = React.useState<boolean>(false);
   const [profilePageUserId, setProfilePageUserId] = React.useState("");
   const { followingList, followerList } = useWSFollowInfo(profilePageUserId);
@@ -29,7 +33,7 @@ export const ProfilePage = () => {
 
   React.useEffect(() => {
     const f = async () => {
-      if (user.token) {
+      if (user.token && profilePageUserId) {
         let userId = profilePageUserId ?? user.id;
         const newUserInfo = await getUserInfo(user.token, userId);
         setUserInfo((prev) => ({ ...prev, ...newUserInfo }));
@@ -44,63 +48,71 @@ export const ProfilePage = () => {
     }
   }, [id]);
 
+  const handleClickChatButton = async () => {
+    if (!isOwnUserId) {
+      const chatRoom = await createChatRoom(user.token, [user.id, profilePageUserId]);
+      navigate(`/chat/${chatRoom.id}`);
+    }
+  };
+
   const handleClickEditButton = () => {
-    window.location.href = "/edituser";
+    navigate("/edituser");
   };
 
   return (
-    <div className={classes.profilePage}>
-      <div className={classes.profileArea}>
-        <div className={classes.backgroundImageWrap}>
-          <img
-            className={classes.backgroundImage}
-            src={userInfo?.background_image}
-            alt=""
-          />
-        </div>
-        <div className={classes.userInfoArea}>
-          <div className={classes.userInfoAreaTop}>
-            <div className={classes.iconImageWrap}>
-              <img
-                className={classes.iconImage}
-                src={userInfo?.icon_image ?? userIconImageDefault}
-                alt=""
-              />
-            </div>
-            <div className={classes.friendshipArea}>
-              <div className={classes.friendshipContent}>
-                <h5>フォロー</h5>
-                <p>{followingList?.length ?? "0"}</p>
-              </div>
-              <div className={classes.friendshipContent}>
-                <h5>フォロワー</h5>
-                <p>{followerList?.length ?? "0"}</p>
-              </div>
-            </div>
+    <Layout>
+      <div className={classes.profilePage}>
+        <div className={classes.profileArea}>
+          <div className={classes.backgroundImageWrap}>
+            <img className={classes.backgroundImage} src={userInfo?.background_image} alt="" />
           </div>
-          <div className={classes.userInfoTextArea}>
-            <div className={classes.UserInfoTextAreaTop}>
+          <div className={classes.userInfoArea}>
+            <div className={classes.userInfoLeftArea}>
+              <div className={classes.iconImageWrap}>
+                <img
+                  className={classes.iconImage}
+                  src={userInfo?.icon_image ?? userIconImageDefault}
+                  alt=""
+                />
+              </div>
               <h3>{userInfo?.name}</h3>
+            </div>
+            <div className={classes.userInfoRightArea}>
+              <div className={classes.friendshipArea}>
+                <div className={classes.friendshipContent}>
+                  <h5>フォロー</h5>
+                  <p>{followingList?.length ?? "0"}</p>
+                </div>
+                <div className={classes.friendshipContent}>
+                  <h5>フォロワー</h5>
+                  <p>{followerList?.length ?? "0"}</p>
+                </div>
+              </div>
+              {isOwnUserId ? (
+                <></>
+              ) : (
+                <div className={classes.communicationArea}>
+                  <ChatButton onClick={async () => await handleClickChatButton()} />
+                  <VideoCallOpenModalButton userIdsByVideoCall={[user.id, profilePageUserId]} />
+                </div>
+              )}
               {isOwnUserId ? (
                 <ButtonWithIcon
                   className={classes.editButton}
                   onClick={handleClickEditButton}
                   description="編集する"
-                  icon={
-                    <PersonIcon style={{ fontSize: fontSize.medium.medium }} />
-                  }
+                  icon={<PersonIcon style={{ fontSize: fontSize.medium.medium }} />}
                   variant="outlined"
                 />
               ) : (
                 <FollowButton userId={profilePageUserId} />
               )}
             </div>
-            <p>{userInfo?.description}</p>
           </div>
         </div>
+        <FileArea className={classes.fileArea} userId={id} />
       </div>
-      <FileArea className={classes.fileArea} userId={id} />
-    </div>
+    </Layout>
   );
 };
 
@@ -160,24 +172,20 @@ const useStyles = makeStyles({
     marginTop: "20px",
     padding: "0 5px",
     display: "flex",
-    flexDirection: "column",
-    alignItems: "start",
-  },
-  userInfoAreaTop: {
-    width: "100%",
-    display: "flex",
     justifyContent: "space-between",
   },
-  userInfoTextArea: {
-    width: "100%",
+  userInfoLeftArea: {
     display: "flex",
-    gap: "5px",
+    flexDirection: "column",
+    gap: baseStyle.gap.small,
+  },
+  userInfoRightArea: {
+    display: "flex",
     flexDirection: "column",
     justifyContent: "space-between",
   },
-  UserInfoTextAreaTop: {
+  communicationArea: {
     display: "flex",
-    alignItems: "center",
     justifyContent: "space-between",
   },
   editButton: {
