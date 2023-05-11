@@ -41,7 +41,7 @@
 > | docker-compose | 1.92.2     |
 > | node           | 20.0.0     |
 > | python         | 3.11.3     |
-> | Django         | 4.2        |
+> | Django         | 4.2.1      |
 > | DRF            | 3.14.0     |
 >
 > ---
