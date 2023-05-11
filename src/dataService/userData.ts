@@ -1,17 +1,19 @@
 import { ENV } from "api/api";
+import { UserContext } from "contexts/UserContext";
 import React from "react";
 import { UserInterface } from "types/User";
 
 export const useWSFollowInfo = (userId: string) => {
   const [followingList, setFollowingList] = React.useState<UserInterface[]>([]);
   const [followerList, setFollowerList] = React.useState<UserInterface[]>([]);
+  const { user } = React.useContext(UserContext);
   React.useEffect(() => {
-    if (userId) {
+    if (userId && user) {
       const ws = new WebSocket(`ws://${ENV}:8000/ws/follow/${userId}/`);
 
       ws.onopen = () => {
         console.log("WebSocket connected");
-        ws.send(JSON.stringify({ action: "fetch_follow_info" }));
+        ws.send(JSON.stringify({ action: "fetch_follow_info", token: user.token }));
       };
 
       ws.onmessage = (event) => {
@@ -33,6 +35,6 @@ export const useWSFollowInfo = (userId: string) => {
         ws.close();
       };
     }
-  }, [userId]);
+  }, [userId, user]);
   return { followingList, followerList };
 };

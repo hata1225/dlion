@@ -5,7 +5,7 @@ from core.models import User
 from asgiref.sync import sync_to_async
 from chat.serializers import ChatRoomSerializer, ChatSerializer
 from user.serializers import UserSerializer
-from user.services import get_user_from_token
+from user.services import get_user_from_token, checked_exist_user_from_chatroom
 
 
 class ChatRoomsConsumer(AsyncWebsocketConsumer):
@@ -23,10 +23,10 @@ class ChatRoomsConsumer(AsyncWebsocketConsumer):
 
         # コネクション確立後、初回の接続
         if action == "fetch_chat_rooms":
-            token = text_data_json.get("token")
             chat_rooms = await chat_rooms_by_user_id(self.user_id)
 
             # 認証部分
+            token = text_data_json.get("token")
             user_from_token = await sync_to_async(get_user_from_token)(token)
             user_serializer = UserSerializer(user_from_token).data
             users_from_chat_rooms = []
@@ -77,16 +77,11 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
 
         # コネクション確立後、初回の接続
         if action == "fetch_chat_room":
-            token = text_data_json.get("token")
             chat_room = await sync_to_async(chat_room_by_id)(self.chat_room_id)
 
             # 認証部分
-            users_from_chat_room = chat_room["chat_room"]["users"]
-            user_from_token = await sync_to_async(get_user_from_token)(token)
-            user_serializer = UserSerializer(user_from_token).data
-            is_exist_user = user_serializer in users_from_chat_room
-            if not is_exist_user:
-                raise
+            token = text_data_json.get("token")
+            await sync_to_async(checked_exist_user_from_chatroom)(token, self.chat_room_id)
 
             await self.send(text_data=json.dumps({"type": "chat_room", "data": chat_room}))
 

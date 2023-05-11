@@ -15,7 +15,7 @@ export const baseStyle = {
   card: {
     width: "370px",
     padding: "20px",
-    minWidth: "370px",
+    minWidth: "330px",
     maxWidth: "500px",
   },
   subArea: {

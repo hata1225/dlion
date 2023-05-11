@@ -3,9 +3,10 @@ from rest_framework.authtoken.models import Token
 from chat.models import ChatRoom
 
 
-def get_user_from_token(token_key):
+def get_user_from_token(token_key: str):
     """
     tokenをもとにuserを取得
+    (tokenが有効かチェックもできる)
     """
     try:
         token = Token.objects.get(key=token_key)

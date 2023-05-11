@@ -8,7 +8,7 @@ export const useWSChatRoomData = (chatRoomId: string) => {
   const [chats, setChats] = React.useState<Chat[]>([]);
   const { user } = React.useContext(UserContext);
   React.useEffect(() => {
-    if (user) {
+    if (chatRoomId && user.token) {
       const ws = new WebSocket(`ws://${ENV}:8000/ws/chat_room/${chatRoomId}/`);
 
       ws.onopen = () => {
@@ -42,7 +42,7 @@ export const useWSChatRoomsData = () => {
   const [chatRooms, setChatRooms] = React.useState<ChatRoom[]>([]);
   const { user } = React.useContext(UserContext);
   React.useEffect(() => {
-    if (user.id) {
+    if (user.id && user.token) {
       const ws = new WebSocket(`ws://${ENV}:8000/ws/chat_rooms/${user.id}/`);
 
       ws.onopen = () => {
