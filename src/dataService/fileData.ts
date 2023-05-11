@@ -1,16 +1,19 @@
 import { ENV } from "api/api";
+import { UserContext } from "contexts/UserContext";
 import React from "react";
 import { FileData } from "types/fileData";
 
 export const useWSFileData = (fileDataId?: string) => {
   const [fileData, setFileData] = React.useState<FileData>();
+  const { user } = React.useContext(UserContext);
+
   React.useEffect(() => {
-    if (fileDataId) {
+    if (fileDataId && user?.token) {
       const ws = new WebSocket(`ws://${ENV}:8000/ws/filedata/${fileDataId}/`);
 
       ws.onopen = () => {
         console.log("WebSocket connected");
-        ws.send(JSON.stringify({ action: "fetch_file_data" }));
+        ws.send(JSON.stringify({ action: "fetch_file_data", token: user.token }));
       };
 
       ws.onmessage = (event) => {
@@ -30,6 +33,6 @@ export const useWSFileData = (fileDataId?: string) => {
         ws.close();
       };
     }
-  }, [fileDataId]);
+  }, [fileDataId, user]);
   return { fileData };
 };

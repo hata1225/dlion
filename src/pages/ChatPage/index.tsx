@@ -20,6 +20,7 @@ export const ChatPage = () => {
 const useStyles = makeStyles({
   chatPage: {
     height: "100%",
+    width: "100%",
     display: "flex",
     alignItems: "center",
     flexDirection: "column",

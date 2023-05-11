@@ -12,10 +12,9 @@ from social_core.exceptions import MissingBackend
 from social_core.backends.oauth import BaseOAuth2
 from social_django.utils import load_strategy
 from rest_framework.authtoken.models import Token
-
 from user import serializers
-
 from core import models
+
 
 class CreateUserView(generics.CreateAPIView):
     serializer_class = serializers.UserSerializer
@@ -93,7 +92,8 @@ class FollowUserView(generics.CreateAPIView):
         # すでにフォローをしている場合
         if models.FriendShip.objects.filter(created_user=request.user, following_user=following_user).exists():
             return Response({'detail': 'You already follow this user.'}, status=400)
-        serializer = self.get_serializer(data={'following_user': following_user.id})
+        serializer = self.get_serializer(
+            data={'following_user': following_user.id})
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
@@ -111,7 +111,8 @@ class UnfollowAPIView(APIView):
         user = request.user
         following_user = models.User.objects.get(id=request.GET.get('user_id'))
         try:
-            friendship = models.FriendShip.objects.get(created_user=user, following_user=following_user)
+            friendship = models.FriendShip.objects.get(
+                created_user=user, following_user=following_user)
             friendship.delete()
         except models.FriendShip.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
@@ -131,7 +132,8 @@ class FollowingListAPIView(APIView):
             user = models.User.objects.get(id=request.GET.get('user_id'))
 
         friendships = models.FriendShip.objects.filter(created_user=user)
-        following_users = [friendship.following_user for friendship in friendships]
+        following_users = [
+            friendship.following_user for friendship in friendships]
         serializer = serializers.UserSerializer(following_users, many=True)
         return Response(serializer.data)
 
@@ -159,4 +161,4 @@ class GetUserView(generics.RetrieveAPIView):
     serializer_class = serializers.UserSerializer
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
-    lookup_field='pk'
+    lookup_field = 'pk'
