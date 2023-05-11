@@ -8,7 +8,7 @@ export const useWSFileData = (fileDataId?: string) => {
   const { user } = React.useContext(UserContext);
 
   React.useEffect(() => {
-    if (fileDataId && user) {
+    if (fileDataId && user?.token) {
       const ws = new WebSocket(`ws://${ENV}:8000/ws/filedata/${fileDataId}/`);
 
       ws.onopen = () => {

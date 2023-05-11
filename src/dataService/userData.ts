@@ -8,7 +8,7 @@ export const useWSFollowInfo = (userId: string) => {
   const [followerList, setFollowerList] = React.useState<UserInterface[]>([]);
   const { user } = React.useContext(UserContext);
   React.useEffect(() => {
-    if (userId && user) {
+    if (userId && user?.token) {
       const ws = new WebSocket(`ws://${ENV}:8000/ws/follow/${userId}/`);
 
       ws.onopen = () => {
