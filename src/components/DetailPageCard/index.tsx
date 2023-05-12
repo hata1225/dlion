@@ -3,6 +3,7 @@ import { CoverImageAreaByVideoData } from "components/CoverImageAreaByVideoData"
 import { DeleteCheckModal } from "components/DeleteCheckModal";
 import { DeleteFileDataButton } from "components/DeleteFileDataButton";
 import { PostModalContext } from "contexts/PostModalContext";
+import { changeCreatedAt } from "functions/changeDate";
 import React from "react";
 import { borderRadius, shadow } from "theme";
 import { FileData } from "types/fileData";
@@ -13,8 +14,7 @@ interface Props {
 
 export const DetailPageCard = ({ fileData }: Props) => {
   const classes = useStyles();
-  const [isOpenDeleteCheckModal, setIsOpenDeleteCheckModal] =
-    React.useState(false);
+  const [isOpenDeleteCheckModal, setIsOpenDeleteCheckModal] = React.useState(false);
   const { handleOpenEditModal } = React.useContext(PostModalContext);
 
   const handleClickEditButton = () => {
@@ -37,13 +37,9 @@ export const DetailPageCard = ({ fileData }: Props) => {
             <h3>{fileData?.title}</h3>
           </div>
           <div className={classes.RightBottomArea}>
-            <p>投稿日: {fileData?.created_at}</p>
+            <p>投稿日: {changeCreatedAt(fileData?.created_at).createdAt}</p>
             <div className={classes.buttonArea}>
-              <Button
-                onClick={handleClickEditButton}
-                variant="outlined"
-                color="primary"
-              >
+              <Button onClick={handleClickEditButton} variant="outlined" color="primary">
                 編集
               </Button>
               <DeleteFileDataButton fileData={fileData} />

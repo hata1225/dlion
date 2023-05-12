@@ -78,6 +78,10 @@ export const FileDataModal = (props: Props) => {
     }
   }, [mainData, mainDataTypeAndStatus]);
 
+  const onChangeDescription = React.useCallback((value: string) => {
+    setDescription(value);
+  }, []);
+
   const handleClose = () => {
     setIsOpenFileDataModal(false);
   };
@@ -162,8 +166,7 @@ export const FileDataModal = (props: Props) => {
                   : undefined
               }
             />
-            <p>description</p>
-            <SimpleMde value={description} onChange={setDescription} />
+            <SimpleMde value={description} onChange={onChangeDescription} />
           </div>
           {!fileData && (
             <>
@@ -210,7 +213,7 @@ export const FileDataModal = (props: Props) => {
   );
 };
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
   modal: {
     display: "flex",
     justifyContent: "center",
@@ -222,6 +225,9 @@ const useStyles = makeStyles({
     backgroundColor: baseStyle.color.white.light,
     borderRadius: borderRadius.main,
     padding: "10px",
+    [theme.breakpoints.down("xs")]: {
+      width: `calc(100% - 20px)`,
+    },
   },
   modalContentAreaHeader: {
     height: baseStyle.modalContentAreaHeader.pc,
@@ -259,4 +265,4 @@ const useStyles = makeStyles({
     width: "100%",
     fontSize: fontSize.medium.small,
   },
-});
+}));
