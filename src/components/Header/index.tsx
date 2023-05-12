@@ -1,24 +1,32 @@
-import { makeStyles } from "@material-ui/core";
+import { IconButton, makeStyles } from "@material-ui/core";
 import { baseStyle, fontSize, shadow, fontWeight } from "theme";
+import MenuIcon from "@material-ui/icons/Menu";
+import { SubArea } from "components/SubArea";
 
 export const Header = () => {
   const classes = useStyles();
 
   return (
-    <header className={classes.header}>
-      <div className={classes.headerInner}>
-        <div>
-          <a className={classes.heading} href={"/"}>
-            DLion
-          </a>
+    <>
+      <header className={classes.header}>
+        <div className={classes.headerInner}>
+          <div>
+            <a className={classes.heading} href={"/"}>
+              DLion
+            </a>
+          </div>
+          <div>
+            <IconButton className={classes.menuIconButton}>
+              <MenuIcon className={classes.menuIcon} fontSize="large" />
+            </IconButton>
+          </div>
         </div>
-        <div></div>
-      </div>
-    </header>
+      </header>
+    </>
   );
 };
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
   header: {
     height: baseStyle.header.height,
     backgroundColor: baseStyle.color.purple.main,
@@ -40,4 +48,13 @@ const useStyles = makeStyles({
     color: baseStyle.color.white.light,
     cursor: "pointer",
   },
-});
+  menuIconButton: {
+    [theme.breakpoints.up("sm")]: {
+      display: "none",
+    },
+  },
+  menuIcon: {
+    color: baseStyle.color.white.light,
+  },
+  subArea: {},
+}));
