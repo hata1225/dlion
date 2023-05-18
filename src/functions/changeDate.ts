@@ -6,5 +6,6 @@ export const changeCreatedAt = (inputDateString: string) => {
     .toString()
     .padStart(2, "0")}`;
   const createdAtDate = `${inputDate.getMonth() + 1}/${inputDate.getDate()}`;
-  return { createdAtDate, createdAtTime };
+  const createdAt = `${createdAtDate} ${createdAtTime}`;
+  return { createdAtDate, createdAtTime, createdAt };
 };

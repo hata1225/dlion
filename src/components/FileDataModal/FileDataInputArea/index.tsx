@@ -30,15 +30,13 @@ export const FileDataInputArea = React.memo(
     mainDataStatus,
   }: Props) => {
     const classes = useStyles();
-    const [mainDataInputAreaWidth, setMainDataInputAreaWidth] =
-      React.useState(0);
+    const [mainDataInputAreaWidth, setMainDataInputAreaWidth] = React.useState(0);
     const inputAreaRef = React.useRef<HTMLDivElement>(null);
 
     React.useEffect(() => {
       if (inputAreaRef?.current?.clientWidth) {
         const inputAreaWidth = inputAreaRef.current.clientWidth;
-        const newmainDataInputAreaWidth =
-          (inputAreaWidth - parseInt(baseStyle.gap.small, 10)) / 2;
+        const newmainDataInputAreaWidth = (inputAreaWidth - parseInt(baseStyle.gap.small, 10)) / 2;
         setMainDataInputAreaWidth(newmainDataInputAreaWidth);
       }
     }, [inputAreaRef]);
@@ -69,9 +67,7 @@ export const FileDataInputArea = React.memo(
           <MainDataInputArea
             mainData={mainData}
             mainDataObjectUrl={mainDataObjectUrl}
-            handleChangeMainData={(e) =>
-              handleChangeFileData(e, setMainData, setMainDataObjectUrl)
-            }
+            handleChangeMainData={(e) => handleChangeFileData(e, setMainData, setMainDataObjectUrl)}
             mainDataStatus={mainDataStatus}
             mainDataInputAreaWidth={mainDataInputAreaWidth}
           />

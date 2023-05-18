@@ -81,14 +81,7 @@ export const SubArea = () => {
       <div className={classes.subAreaInner}>
         {subAreaContents.map((item, i) => {
           const { func, description, icon } = item;
-          return (
-            <ButtonWithIcon
-              key={i}
-              onClick={func}
-              description={description}
-              icon={icon}
-            />
-          );
+          return <ButtonWithIcon key={i} onClick={func} description={description} icon={icon} />;
         })}
       </div>
     </Box>
@@ -102,9 +95,6 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: "column",
     alignItems: "center",
     paddingTop: "30px",
-    [theme.breakpoints.down("xs")]: {
-      display: "none",
-    },
   },
   subAreaInner: {
     width: "100%",

@@ -1,4 +1,4 @@
-import { makeStyles } from "@material-ui/core";
+import { makeStyles, useMediaQuery, useTheme } from "@material-ui/core";
 import { Header } from "components/Header";
 import { SubArea } from "components/SubArea";
 import React from "react";
@@ -12,14 +12,18 @@ export const Layout = (props: Props) => {
   const { children } = props;
   const [isHiddenSubArea, setIsHiddenSubArea] = React.useState(false);
   const classes = useStyles();
+  const theme = useTheme();
+  const isXs = useMediaQuery(theme.breakpoints.down("xs"));
 
   React.useEffect(() => {
     const pathname = window.location.pathname;
     // if (pathname === "/auth" || pathname.match(/filedata/)) {
-    if (pathname === "/auth") {
+    if (pathname === "/auth" || isXs) {
       setIsHiddenSubArea(true);
+    } else {
+      setIsHiddenSubArea(false);
     }
-  }, []);
+  }, [isXs]);
 
   return (
     <>

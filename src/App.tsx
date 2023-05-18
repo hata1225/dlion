@@ -1,4 +1,3 @@
-import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { UserProvider } from "contexts/UserContext";
 import { GoogleOAuthProvider } from "@react-oauth/google";

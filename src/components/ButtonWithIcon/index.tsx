@@ -20,7 +20,7 @@ export const ButtonWithIcon = (props: Props) => {
       {...props}
     >
       <div className={classes.iconArea}>{icon}</div>
-      <p style={{ fontWeight: fontWeight }}>{description}</p>
+      {description ? <p style={{ fontWeight: fontWeight }}>{description}</p> : <></>}
     </Button>
   );
 };

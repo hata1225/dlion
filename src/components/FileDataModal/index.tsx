@@ -1,17 +1,6 @@
-import {
-  Button,
-  IconButton,
-  makeStyles,
-  Modal,
-  LinearProgress,
-} from "@material-ui/core";
+import { Button, IconButton, makeStyles, Modal, LinearProgress } from "@material-ui/core";
 import React from "react";
-import {
-  baseStyle,
-  borderRadius,
-  fileDataTitleMaxLength,
-  fontSize,
-} from "theme";
+import { baseStyle, borderRadius, fileDataTitleMaxLength, fontSize } from "theme";
 import CloseIcon from "@material-ui/icons/Close";
 import { BaseTextField } from "components/BaseTextField";
 import { CategoryInputArea } from "./CategoryInputArea";
@@ -23,6 +12,8 @@ import { FileDataInputArea } from "./FileDataInputArea";
 import { FileDataContext } from "contexts/FileDataContexts";
 import { createNotification } from "functions/notification";
 import { countString } from "functions/countString";
+import SimpleMde from "react-simplemde-editor";
+import "easymde/dist/easymde.min.css";
 
 interface Props {
   isOpenFileDataModal: boolean;
@@ -32,36 +23,30 @@ interface Props {
 }
 
 export const FileDataModal = (props: Props) => {
-  const { isOpenFileDataModal, setIsOpenFileDataModal, fileData, setFileData } =
-    props;
+  const { isOpenFileDataModal, setIsOpenFileDataModal, fileData, setFileData } = props;
   const [title, setTitle] = React.useState("");
   const [description, setDescription] = React.useState("");
-  const [selectedCategories, setSelectedCategories] = React.useState<string[]>(
-    []
-  );
+  const [selectedCategories, setSelectedCategories] = React.useState<string[]>([]);
   const [coverImage, setCoverImage] = React.useState<File>();
   const [coverImageObjectUrl, setCoverImageObjectUrl] = React.useState("");
   const [mainData, setMainData] = React.useState<File>();
   const [mainDataObjectUrl, setMainDataObjectUrl] = React.useState("");
-  const [mainDataStatus, setMainDataStatus] =
-    React.useState<FileDataStatus>("none");
-  const [isDisabledPostEditButton, setIsDisabledPostEditButton] =
-    React.useState(true);
+  const [mainDataStatus, setMainDataStatus] = React.useState<FileDataStatus>("none");
+  const [isDisabledPostEditButton, setIsDisabledPostEditButton] = React.useState(true);
   const [uploadProgressValue, setUploadProgressValue] = React.useState(0);
   const { user } = React.useContext(UserContext);
   const { updateFileData } = React.useContext(FileDataContext);
   const classes = useStyles();
 
-  const mainDataTypeAndStatus: { status: FileDataStatus; matchText: RegExp }[] =
-    React.useMemo(
-      () => [
-        { status: "video", matchText: /video/ },
-        { status: "image", matchText: /image/ },
-        { status: "audio", matchText: /audio/ },
-        { status: "pdf", matchText: /pdf/ },
-      ],
-      []
-    );
+  const mainDataTypeAndStatus: { status: FileDataStatus; matchText: RegExp }[] = React.useMemo(
+    () => [
+      { status: "video", matchText: /video/ },
+      { status: "image", matchText: /image/ },
+      { status: "audio", matchText: /audio/ },
+      { status: "pdf", matchText: /pdf/ },
+    ],
+    []
+  );
 
   React.useEffect(() => {
     if (fileData) {
@@ -92,6 +77,10 @@ export const FileDataModal = (props: Props) => {
       });
     }
   }, [mainData, mainDataTypeAndStatus]);
+
+  const onChangeDescription = React.useCallback((value: string) => {
+    setDescription(value);
+  }, []);
 
   const handleClose = () => {
     setIsOpenFileDataModal(false);
@@ -132,14 +121,9 @@ export const FileDataModal = (props: Props) => {
       };
       try {
         console.log("---投稿前---");
-        await postFileData(
-          data,
-          user.token,
-          setUploadProgressValue,
-          async () => {
-            console.log("---post済み---");
-          }
-        );
+        await postFileData(data, user.token, setUploadProgressValue, async () => {
+          console.log("---post済み---");
+        });
         setTitle("");
         setDescription("");
         setSelectedCategories([]);
@@ -159,11 +143,7 @@ export const FileDataModal = (props: Props) => {
   };
 
   return (
-    <Modal
-      className={classes.modal}
-      open={isOpenFileDataModal}
-      onClose={handleClose}
-    >
+    <Modal className={classes.modal} open={isOpenFileDataModal} onClose={handleClose}>
       <div className={classes.modalContentArea}>
         <div className={classes.modalContentAreaHeader}>
           <div className={classes.heading}>
@@ -176,9 +156,7 @@ export const FileDataModal = (props: Props) => {
         <div className={classes.main}>
           <div className={classes.inputTextArea}>
             <BaseTextField
-              label={`タイトル (${countString(
-                title
-              )}/${fileDataTitleMaxLength})`}
+              label={`タイトル (${countString(title)}/${fileDataTitleMaxLength})`}
               value={title}
               setValue={setTitle}
               error={countString(title) > fileDataTitleMaxLength}
@@ -188,13 +166,7 @@ export const FileDataModal = (props: Props) => {
                   : undefined
               }
             />
-            <BaseTextField
-              label="説明文"
-              value={description}
-              setValue={setDescription}
-              multiline
-              minRows={2}
-            />
+            <SimpleMde value={description} onChange={onChangeDescription} />
           </div>
           {!fileData && (
             <>
@@ -221,10 +193,7 @@ export const FileDataModal = (props: Props) => {
           {uploadProgressValue ? (
             <div>
               {`${Math.floor(uploadProgressValue)}%`}
-              <LinearProgress
-                variant="determinate"
-                value={uploadProgressValue}
-              />
+              <LinearProgress variant="determinate" value={uploadProgressValue} />
             </div>
           ) : (
             <></>
@@ -244,7 +213,7 @@ export const FileDataModal = (props: Props) => {
   );
 };
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
   modal: {
     display: "flex",
     justifyContent: "center",
@@ -256,6 +225,9 @@ const useStyles = makeStyles({
     backgroundColor: baseStyle.color.white.light,
     borderRadius: borderRadius.main,
     padding: "10px",
+    [theme.breakpoints.down("xs")]: {
+      width: `calc(100% - 20px)`,
+    },
   },
   modalContentAreaHeader: {
     height: baseStyle.modalContentAreaHeader.pc,
@@ -293,4 +265,4 @@ const useStyles = makeStyles({
     width: "100%",
     fontSize: fontSize.medium.small,
   },
-});
+}));
