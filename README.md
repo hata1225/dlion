@@ -39,8 +39,8 @@
 > | -------------- | ---------- |
 > | docker         | 20.10.13   |
 > | docker-compose | 1.92.2     |
-> | node           | 20.0.0     |
-> | python         | 3.11.3     |
+> | node           | 20.3.0     |
+> | python         | 3.11.4     |
 > | Django         | 4.2.1      |
 > | DRF            | 3.14.0     |
 >
@@ -48,8 +48,8 @@
 >
 > ### 使用している Docker イメージについて
 >
-> - **python**: 3.11.3-slim-bullseye
-> - **node**: 20.0.0-slim
+> - **python**: 3.11.4-slim-bullseye
+> - **node**: 20.3.0-slim
 > - **selenium**: docker hub から最新の image を引っ張ってる
 > - **redis**: redis:latest
 >
@@ -127,6 +127,7 @@
 5.  **Django 用シークレットキーを、.env ファイルに書き込み**
 
     個人でソース(dlion)を使う場合は、シークレットキーを自分で発行し.env ファイルに貼り付けてください。
+    以下は django 経由でシークレットキーを作成する例です。(5 種類以上の文字 or 文字数 50 字以上であればなんでもよい)
 
     1.  シークレットキー発行(dlion 直下で行う)
         ```
@@ -150,7 +151,19 @@
         SUPER_USER_NAME=example
         REACT_APP_IP_ADDRESS=localhost # REACT~と書かれているが、Djangoでも呼び出している
 
-7.  **yarn install をする**
+7.  **google アカウント認証用の情報を.env ファイルに追記**
+
+    参考: [クライアント ID とクライアントシークレットの作成方法](https://qiita.com/baby-degu/items/1f011e97b98f9b0fcf01)
+
+        SECRET_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx # 作成済み
+        SUPER_USER_EMAIL=example@example.com # 作成済み
+        SUPER_USER_PASS=password # 作成済み
+        SUPER_USER_NAME=example # 作成済み
+        REACT_APP_IP_ADDRESS=localhost # 作成済み
+        REACT_APP_GOOGLE_CLIENT_ID=xxxxxxxxxxxxxxxxxxxxxxxxxxx.apps.googleusercontent.com
+        REACT_APP_SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET=GOCSPX-xxxxxxxxxxxxxxxxxxxxxxx
+
+8.  **yarn install をする**
 
     dlion ディレクトリ直下でコマンドを叩いてください。
 
@@ -160,7 +173,7 @@
 
         yarn install
 
-8.  **docker-compose build をする**
+9.  **docker-compose build をする**
 
     最初は時間がかかるかもしれないです。
 
@@ -168,7 +181,7 @@
 
         docker-compose build
 
-9.  **マイグレーションファイルを作製**
+10. **マイグレーションファイルを作製**
 
         docker-compose run --rm django_app sh -c "python3 manage.py makemigrations core"
 
@@ -178,19 +191,19 @@
 
     sh -c: シェルコマンド （bash -c: バッシュコマンド）
 
-10. **マイグレーションファイルをもとに、データベースへ反映**
+11. **マイグレーションファイルをもとに、データベースへ反映**
 
         docker-compose run --rm django_app sh -c "python3 manage.py migrate"
 
-11. **docker-compose up**
+12. **docker-compose up**
 
     docker-compose up
 
-12. **localhost:3000 へ移動する**
+13. **localhost:3000 へ移動する**
 
     **http://localhost:3000**
 
-13. **停止**
+14. **停止**
 
     ショートカット: ctrl + c
 
