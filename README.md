@@ -39,8 +39,8 @@
 > | -------------- | ---------- |
 > | docker         | 20.10.13   |
 > | docker-compose | 1.92.2     |
-> | node           | 20.0.0     |
-> | python         | 3.11.3     |
+> | node           | 20.3.0     |
+> | python         | 3.11.4     |
 > | Django         | 4.2.1      |
 > | DRF            | 3.14.0     |
 >
@@ -48,8 +48,8 @@
 >
 > ### 使用している Docker イメージについて
 >
-> - **python**: 3.11.3-slim-bullseye
-> - **node**: 20.0.0-slim
+> - **python**: 3.11.4-slim-bullseye
+> - **node**: 20.3.0-slim
 > - **selenium**: docker hub から最新の image を引っ張ってる
 > - **redis**: redis:latest
 >
