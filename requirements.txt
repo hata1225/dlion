@@ -1,4 +1,4 @@
-Django==4.2.1
+Django==4.2.4
 djangorestframework==3.14.0
 django-cleanup
 django-cors-headers
@@ -7,7 +7,6 @@ opencv-python
 opencv-contrib-python
 requests
 beautifulsoup4
-selenium
 ffmpeg-python
 django-environ
 python-decouple

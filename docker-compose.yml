@@ -1,20 +1,23 @@
 version: "3"
 services:
-  react-app:
+
+  react_app:
     build:
       context: .
       dockerfile: ./Dockerfiles/react.Dockerfile
+    container_name: react_app
     env_file:
       - ./.env
     volumes:
       - ./:/src
-    command: sh -c "yarn start"
+    command: sh -c "yarn install && yarn start"
     ports:
       - "3000:3000"
     depends_on:
       - "django_app"
     stdin_open: true
     tty: true
+
   django_app:
     build:
       context: .
@@ -40,23 +43,13 @@ services:
     depends_on:
       - "redis"
     tty: true
-  selenium:
-    image: seleniarm/standalone-chromium
-    container_name: selenium
-    environment:
-      - SE_NODE_MAX_SESSIONS=3
-    ports:
-      - 4444:4444
-      - 15900:5900
-    volumes:
-      - /dev/shm:/dev/shm
-    depends_on:
-      - "django_app"
+
   redis:
     image: "redis:latest"
     container_name: redis
     ports:
       - "6379:6379"
+
   celery_worker:
     build:
       context: .

@@ -1,3 +1,3 @@
-FROM node:20.3.0-alpine
+FROM node:20.5.1-alpine
 WORKDIR /src
 COPY ./.env /
